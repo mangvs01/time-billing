@@ -1,0 +1,6 @@
+{% extends "_page.html" %}{% block title %}Historique de la saisie n° {{eid}}{% endblock %}{% block backlink %}/entries{% endblock %}{% block body %}
+<h1>Historique de la saisie n° {{eid}}</h1>
+<section class="panel">{% if e %}<p>Saisie actuelle : {{e.work_date|d}} · {{e.project}} · {{e.hours|nb}} h · {{e.description}} — <a href="/entry/{{eid}}/edit">la modifier</a>.</p>{% elif deleted %}<p class="warnbox" id="deletedNotice"><strong>Saisie supprimée</strong> le {{deleted.changed_at|ts}}{% if deleted.actor %} par {{deleted.actor}}{% endif %}{% if deleted.reason %} — motif : {{deleted.reason}}{% endif %}. Sa dernière valeur et toutes ses corrections restent ci-dessous ; une facture émise qui l'a facturée garde sa copie figée.</p>{% endif %}
+<p class="hint">Historique non modifiable : chaque correction ou suppression conserve la valeur avant et après, la date, l'utilisateur, le motif et les factures concernées.</p></section>
+<section class="panel"><h2>Historique des corrections</h2>{% include "_entry_history_table.html" %}</section>
+{% endblock %}

@@ -1,0 +1,105 @@
+<!doctype html><html lang="fr" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">{% include "_theme_head.html" %}<title>Import historique — prévisualisation</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#1d2a35;background:#f3f5f7}*{box-sizing:border-box}body{margin:0}.wrap{max-width:1400px;margin:auto;padding:24px}h1{font-size:22px;margin:8px 0 6px}h2{font-size:16px;margin:0 0 12px}.panel{background:#fff;border:1px solid #dfe5e9;border-radius:12px;padding:18px;margin:0 0 14px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.card{background:#f5f8fa;border:1px solid #e5ebef;border-radius:8px;padding:10px}.card strong{display:block;font-size:22px}.hint{font-size:12px;color:#6c7b86}.msg{background:#fff3d3;border:1px solid #f0dfaa;padding:10px;border-radius:7px;margin:10px 0}table{width:100%;border-collapse:collapse}td,th{text-align:left;border-bottom:1px solid #edf0f2;padding:6px;font-size:12px;vertical-align:top}th{color:#667783;position:sticky;top:0;background:#fff}select,button{padding:8px;border:1px solid #cbd4da;border-radius:7px;font:inherit}button{background:#183b55;color:#fff;border:0;cursor:pointer;font-weight:600}button.secondary{background:#e8eef2;color:#183b55}button:disabled{opacity:.45;cursor:not-allowed}.mapping{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}.mapping label{display:block;font-size:12px;font-weight:650;margin-bottom:4px}.mapping select{width:100%}.sev-error{color:#a32020}.sev-warning{color:#9a4b00}.sev-info{color:#506270}.st{font-weight:650;white-space:nowrap}.st-error,.st-excluded_project,.st-exclude{color:#a32020}.st-needs_decision{color:#9a4b00}.st-ok,.st-include{color:#1d6b3a}.raw{color:#7b8a95;font-size:11px}.filters{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}.filters button{width:auto}.filters button.active{background:#183b55;color:#fff}.tablewrap{overflow:auto;max-height:75vh}tr[hidden]{display:none}.toolbar{position:sticky;top:0;z-index:5;background:#fff}.toolbar input[type=search],.toolbar select{padding:7px;border:1px solid #cbd4da;border-radius:7px;font:inherit}.toolbar .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0}.prop{color:#0b5d8a;font-size:11px}.sel{width:16px;height:16px}.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+{% include "_ds.html" %}</style></head><body><div class="shell">{% include "_sidebar.html" %}<main class="main wrap imp" id="contenu">
+<div class="pagebar"><a class="back" href="/?tab=migration">← Retour à l'application</a></div>
+<h1>Import historique — prévisualisation</h1>
+<p class="hint">Classeur <b>{{payload.filename}}</b> · empreinte SHA-256 {{payload.file_sha256[:16]}}… · préparé le {{payload.created_at|ts}}. Aucune donnée n'est écrite avant « Valider l'import ». Chaque ligne reste distincte : aucune fusion, aucune déduplication, aucune correction automatique.</p>
+{% include "_flash.html" %}
+{% set st=summary.by_status %}
+<section class="panel"><h2>Synthèse</h2><div class="cards">
+<div class="card"><span class="hint">Lignes détectées</span><strong>{{summary.total}}</strong></div>
+<div class="card"><span class="hint">Lignes qui seront ajoutées</span><strong>{{summary.importable}}</strong><span class="hint">{{summary.hours_importable}} h</span></div>
+<div class="card"><span class="hint">Lignes avec anomalie</span><strong>{{summary.anomalies}}</strong></div>
+<div class="card"><span class="hint">Non importables (erreur)</span><strong>{{st.get('error',0)}}</strong></div>
+<div class="card"><span class="hint">Décision attendue</span><strong>{{st.get('needs_decision',0)}}</strong></div>
+<div class="card"><span class="hint">Exclues par décision</span><strong>{{st.get('exclude',0)+st.get('excluded_project',0)}}</strong></div>
+<div class="card"><span class="hint">Projets à associer</span><strong>{{summary.unmapped_projects|length}}</strong></div>
+</div>
+{% if payload.skipped %}<p class="hint">Onglets non lus : {% for x in payload.skipped %}{{x.sheet}} ({{x.reason}}){% if not loop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+<h2 style="margin-top:14px">Typologie des anomalies</h2>
+<table><tr><th>Code</th><th>Signification</th><th>Gravité</th><th>Lignes</th></tr>{% for code,n in summary.issue_counts.items() %}<tr><td>{{code}}</td><td>{{issues[code][1]}}</td><td class="sev-{{issues[code][0]}}">{{ {'error':'bloquante — non importée','warning':'décision requise','info':'information'}[issues[code][0]] }}</td><td>{{n}}</td></tr>{% else %}<tr><td colspan="4">Aucune anomalie.</td></tr>{% endfor %}</table>
+</section>
+<form method="post" id="reviewForm">
+<section class="panel"><h2>Association explicite des projets</h2><p class="hint">Aucun projet n'est créé automatiquement. Chaque nom de projet du classeur doit être associé à un projet existant ou explicitement exclu.</p>
+<div class="mapping">{% for name in payload.project_names %}{% set cur=payload.mapping.get(name,'') %}<div><label>{{name}} <span class="hint">({{per_project.get(name,0)}} ligne(s))</span></label><select name="map_{{loop.index0}}" data-watch><option value="">— Choisir —</option>{% for p in projects %}<option value="{{p.id}}" {% if cur==p.id|string %}selected{% endif %}>{{p.name}}</option>{% endfor %}<option value="skip" {% if cur=='skip' %}selected{% endif %}>✕ Ne pas importer ce projet</option></select>{% if suggestions.get(name) and not cur %}<div class="hint">Proposition (non appliquée) : {{suggestions[name]|join(' / ')}}</div>{% endif %}</div>{% endfor %}</div>
+{% if not projects %}<p class="msg">Aucun projet n'existe encore : créer les projets dans « Mandats & prévisionnel » avant l'association.</p>{% endif %}
+</section>
+{% macro rowtable(lst, decide) %}<div class="tablewrap"><table><thead><tr><th>Sél.</th><th>#</th><th>Onglet!ligne</th><th>Date</th><th>Projet → cible</th><th>Début–fin</th><th>Durée déclarée</th><th>Durée calculée</th><th>Motif</th><th>Contrôles</th><th>{{'Décision' if decide else 'Statut'}}</th></tr></thead><tbody>
+{% for r in lst %}{% set ow = r.status in ('overwrite','keep') %}{% set decidable = (r.cat=='a_arbitrer' or (r.cat=='valide' and 'repeated_in_file' in r.issues)) and r.status!='excluded_project' and not ow %}<tr data-idx="{{r.idx}}" data-status="{{r.status}}" data-cat="{{r.cat}}" data-anomaly="{{1 if r.anomaly else 0}}" data-issues="{{r.issues|join(' ')}}" data-sheet="{{r.source_sheet}}" data-prop="{{1 if r.proposal else 0}}" data-decision="{{r.decision}}" data-text="{{(r.source_sheet ~ '!' ~ r.source_row ~ ' ' ~ r.project_name ~ ' ' ~ r.description ~ ' ' ~ r.work_date)|lower}}">
+<td>{% if decidable %}<input type="checkbox" class="sel" aria-label="Sélectionner {{r.source_sheet}}!{{r.source_row}}">{% endif %}</td><td>{{r.idx+1}}</td><td>{{r.source_sheet}}!{{r.source_row}}</td>
+<td>{{(r.work_date|d) or '—'}}{% if r.raw.date and r.raw.date[:10]!=r.work_date %}<div class="raw">source : {{r.raw.date}}</div>{% endif %}</td>
+<td>{{r.project_name or '—'}}{% if r.project_label %}<div class="raw">→ {{r.project_label}}</div>{% endif %}</td>
+<td>{{r.start_time or '—'}}–{{r.end_time or '—'}}{% if (r.raw.start and r.raw.start!=r.start_time) or (r.raw.end and r.raw.end!=r.end_time) %}<div class="raw">source : {{r.raw.start}} / {{r.raw.end}}</div>{% endif %}</td>
+<td>{{r.hours or '—'}}{% if r.raw.hours and r.raw.hours!=r.hours %}<div class="raw">source : {{r.raw.hours}}</div>{% endif %}</td><td>{{r.clock_hours or '—'}}</td><td>{{r.description}}</td>
+<td>{% for i in r.issues %}<div class="sev-{{issues[i][0]}}">{{issues[i][1]}}</div>{% endfor %}{% if r.match_entry_id %}<div class="raw">saisie n° {{r.match_entry_id}} actuelle : {{r.match_state[0]|d}} · {{r.match_project}} · {{r.match_state[2] or '—'}}–{{r.match_state[3] or '—'}} · {{r.match_state[4]}} h · « {{r.match_state[5]}} »{% if r.match_state[1]!=r.project_id %} — <b>« écraser » la déplace vers {{r.project_label}}</b>{% endif %}</div>{% endif %}{% if r.duplicate_of %}<div class="raw">copie de {{r.duplicate_of}}</div>{% endif %}{% if r.proposal %}<div class="prop">Proposition (non appliquée) : {{r.proposal}}</div>{% endif %}</td>
+<td>{% if ow %}<label><input type="radio" name="d_{{r.idx}}" value="overwrite" data-watch {% if r.decision=='overwrite' %}checked{% endif %}> écraser la saisie n° {{r.match_entry_id}}</label><br><label><input type="radio" name="d_{{r.idx}}" value="exclude" data-watch {% if r.decision!='overwrite' %}checked{% endif %}> conserver la saisie</label>{% elif decidable %}<label><input type="radio" name="d_{{r.idx}}" value="include" data-watch {% if r.decision=='include' or (r.cat=='valide' and r.decision!='exclude') %}checked{% endif %}> importer</label><br><label><input type="radio" name="d_{{r.idx}}" value="exclude" data-watch {% if r.decision=='exclude' %}checked{% endif %}> ne pas importer</label>{% else %}<span class="st st-{{r.status}}">{{ {'ok':'sera ajoutée','error':'non importable','excluded_project':'projet exclu'}[r.status] }}</span>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% endmacro %}
+<section class="panel toolbar" id="toolbar"><h2>Filtres et sélection</h2>
+<div class="filters" id="filters">{% for key,label in [('all','Toutes'),('bloquante','Bloquantes'),('a_arbitrer','À arbitrer'),('attente','Décision attendue'),('valide','Valides'),('proposition','Avec proposition'),('copie','Copies inter-onglets'),('repete','Répétitions exactes'),('chevauchement','Chevauchements'),('annee','Année ≠ onglet'),('datesuspecte','Date suspecte'),('horsmois','Hors mois de l\'onglet'),('exclues','Exclues')] %}<button type="button" class="secondary{% if key=='all' %} active{% endif %}" data-f="{{key}}">{{label}}</button>{% endfor %}</div>
+<div class="row"><input type="search" id="q" placeholder="Rechercher (onglet, projet, motif, date)" aria-label="Rechercher"><select id="sheetSel" aria-label="Onglet"><option value="">Tous les onglets</option>{% for sh in payload.sheets %}<option>{{sh}}</option>{% endfor %}</select><span class="hint"><b id="shown">0</b> ligne(s) affichée(s) · <b id="selCount">0</b> sélectionnée(s)</span></div>
+<div class="row"><button type="button" class="secondary" id="selVisible">Sélectionner les lignes affichées</button><button type="button" class="secondary" id="selNone">Tout désélectionner</button>
+<button type="button" class="secondary" id="bulkInclude">Sélection : importer</button><button type="button" class="secondary" id="bulkExclude">Sélection : ne pas importer</button><button type="button" class="secondary" id="bulkProposals">Sélection : appliquer les propositions</button>
+<a href="/import/review/{{token}}/export.csv" id="exportCsv" download>Exporter l'aperçu en CSV</a></div>
+<p class="hint" id="bulkMsg" role="status">Les actions sur la sélection modifient seulement les choix affichés ; rien n'est enregistré avant « Enregistrer et recalculer ». L'export CSV reflète l'état enregistré.</p></section>
+<section class="panel"><h2>Rapprochement des heures</h2>
+<table><tr><th>Catégorie (indépendante de l'association des projets)</th><th>Lignes</th><th>Heures</th></tr>
+<tr><td>Valides (ajoutées sans décision)</td><td>{{groups.valid|length}}</td><td>{{rec.valid}}</td></tr>
+<tr><td>&nbsp;&nbsp;dont exclues par décision explicite (ex. 2e occurrence d'une paire)</td><td>{{rec.valid_exc[0]}}</td><td>{{rec.valid_exc[1]}}</td></tr>
+<tr><td>À arbitrer</td><td>{{groups.arbitrate|length}}</td><td>{{rec.arbitrate}}</td></tr>
+<tr><td>&nbsp;&nbsp;dont décidées « importer »</td><td>{{rec.inc[0]}}</td><td>{{rec.inc[1]}}</td></tr>
+<tr><td>&nbsp;&nbsp;dont décidées « ne pas importer »</td><td>{{rec.exc[0]}}</td><td>{{rec.exc[1]}}</td></tr>
+<tr><td>&nbsp;&nbsp;dont décision attendue</td><td>{{rec.pend[0]}}</td><td>{{rec.pend[1]}}</td></tr>
+{% if groups.overwrite %}<tr><td>Correspondant à une saisie existante : « écraser »</td><td>{{rec.ow[0]}}</td><td>{{rec.ow[1]}}</td></tr>
+<tr><td>Correspondant à une saisie existante : saisie conservée</td><td>{{rec.keep[0]}}</td><td>{{rec.keep[1]}}</td></tr>{% endif %}
+<tr><td>Bloquantes (jamais importées en l'état)</td><td>{{groups.blocking|length}}</td><td>{{rec.blocking}}</td></tr>
+<tr><td>Projet exclu</td><td>{{groups.excluded|length}}</td><td>{{rec.excluded}}</td></tr>
+<tr><td>Totaux / sous-totaux du classeur (jamais importés)</td><td>{{groups.totals|length}}</td><td>({{rec.totals}})</td></tr>
+<tr><th>Importable avec les décisions actuelles</th><th>{{summary.importable}}</th><th>{{summary.hours_importable}}</th></tr></table>
+<p class="hint">Heures qui seraient ajoutées, par année : {% for y,h in summary.hours_importable_by_year.items()|sort %}{{y}} = {{h}} h{% if not loop.last %} · {% endif %}{% else %}aucune{% endfor %}.
+{% if payload.ignored_blank %}Lignes vides du modèle ignorées (durée = 0, ni date ni projet ni motif) : {% for s,n in payload.ignored_blank.items() %}{{s}} {{n}}{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p></section>
+<section class="panel"><h2>1. Anomalies bloquantes ({{groups.blocking|length}}) — jamais importées en l'état</h2><p class="hint">À corriger dans le classeur source, puis recharger. Elles ne sont ni corrigées ni supprimées automatiquement.</p>{{ rowtable(groups.blocking, false) }}</section>
+<section class="panel"><h2>2. Anomalies à arbitrer ({{groups.arbitrate|length}})</h2><p class="hint">Chaque ligne exige une décision explicite. Les valeurs brutes du classeur sont affichées sous les valeurs lues ; aucune date ni durée n'est corrigée.</p>{{ rowtable(groups.arbitrate, true) }}</section>
+{% if groups.overwrite %}<section class="panel"><h2>2 bis. Lignes correspondant à une saisie existante ({{groups.overwrite|length}}) — réimport volontaire</h2><p class="hint">Même onglet et même ligne du classeur, une seule saisie importée depuis cette ligne, au moins 4 valeurs sur 6 identiques. Par défaut la saisie existante est conservée ; « écraser » la remplace par la valeur du classeur (correction tracée dans son historique, motif « réimport volontaire », factures émises inchangées). Jamais de seconde saisie.</p>{{ rowtable(groups.overwrite, true) }}</section>{% endif %}
+<section class="panel"><h2>3. Lignes valides ({{groups.valid|length}})</h2>{{ rowtable(groups.valid, false) }}</section>
+{% if groups.totals %}<section class="panel"><h2>5. Lignes de total / sous-total ({{groups.totals|length}}) — jamais importées</h2><p class="hint">Cellules de total du classeur : jamais des prestations.</p>{{ rowtable(groups.totals, false) }}</section>{% endif %}
+{% if groups.excluded %}<section class="panel"><h2>4. Projet exclu ({{groups.excluded|length}})</h2>{{ rowtable(groups.excluded, false) }}</section>{% endif %}
+<section class="panel"><h2>Validation</h2>
+<input type="hidden" name="fingerprint" value="{{summary.fingerprint}}">
+{% set excluded=summary.total-summary.importable-summary.overwrites %}
+{% if excluded %}<p><label><input type="checkbox" name="ack" value="1" id="ack"> Je confirme que <b>{{excluded}}</b> ligne(s) ne seront pas importées (erreurs, exclusions explicites, saisies existantes conservées ou projets exclus).</label></p>{% endif %}
+{% if summary.overwrites %}<p class="msg"><b>{{summary.overwrites}}</b> saisie(s) existante(s) seront écrasées par la valeur du classeur (corrections tracées). Un lot qui écrase des saisies ne peut pas être annulé en bloc : chaque écrasement se corrige depuis l'historique de la saisie.</p>{% endif %}
+<p class="hint">La validation crée un lot identifiable, prend une sauvegarde SQLite vérifiée, puis insère toutes les lignes dans une seule transaction : en cas d'échec, rien n'est enregistré. Le lot reste annulable tant qu'aucune de ses prestations n'est couverte par une facture émise.</p>
+<p class="msg" id="dirty" hidden>Modifications non enregistrées : cliquer sur « Enregistrer et recalculer » avant de valider.</p>
+<div class="actions"><button type="submit" name="action" value="save" class="secondary">Enregistrer et recalculer</button>
+<button type="submit" name="action" value="commit" id="commitBtn" {% if summary.unmapped_projects or st.get('needs_decision') or not (summary.importable or summary.overwrites) %}disabled{% endif %}>Valider l'import de {{summary.importable}} ligne(s){% if summary.overwrites %} et l'écrasement de {{summary.overwrites}} saisie(s){% endif %}</button></div>
+{% if summary.unmapped_projects or st.get('needs_decision') %}<p class="hint">Validation impossible tant que des projets ne sont pas associés ou que des décisions sont attendues.</p>{% endif %}
+</section></form>
+<form method="post" action="/import/review/{{token}}/cancel"><button class="secondary" type="submit">Abandonner cette prévisualisation</button></form>
+</main></div><script nonce="{{csp_nonce}}">
+document.querySelectorAll('[data-watch]').forEach(x=>x.addEventListener('change',()=>{document.getElementById('dirty').hidden=false;document.getElementById('commitBtn').disabled=true}));
+(function(){
+const rows=[...document.querySelectorAll('tr[data-cat]')];let f='all';
+const has=(r,c)=>(' '+r.dataset.issues+' ').includes(' '+c+' ');
+const P={all:()=>true,bloquante:r=>r.dataset.cat==='bloquante',a_arbitrer:r=>r.dataset.cat==='a_arbitrer',valide:r=>r.dataset.cat==='valide',attente:r=>r.dataset.cat==='a_arbitrer'&&!r.dataset.decision&&!['keep','overwrite'].includes(r.dataset.status),
+ proposition:r=>r.dataset.prop==='1',copie:r=>has(r,'duplicate_other_sheet'),repete:r=>has(r,'repeated_in_file'),chevauchement:r=>has(r,'time_overlap'),annee:r=>has(r,'year_differs_from_sheet'),
+ datesuspecte:r=>has(r,'date_suspect'),horsmois:r=>has(r,'date_outside_sheet_month'),exclues:r=>r.dataset.decision==='exclude'||r.dataset.status==='excluded_project'};
+const q=document.getElementById('q'),sh=document.getElementById('sheetSel'),msg=document.getElementById('bulkMsg');
+function sel(){return rows.filter(r=>{const c=r.querySelector('.sel');return c&&c.checked})}
+function count(){document.getElementById('selCount').textContent=sel().length}
+function apply(){const t=q.value.trim().toLowerCase();let n=0;rows.forEach(r=>{const ok=P[f](r)&&(!sh.value||r.dataset.sheet===sh.value)&&(!t||r.dataset.text.includes(t));r.hidden=!ok;if(ok)n++});document.getElementById('shown').textContent=n}
+document.querySelectorAll('#filters [data-f]').forEach(b=>b.addEventListener('click',()=>{f=b.dataset.f;document.querySelectorAll('#filters [data-f]').forEach(x=>x.classList.toggle('active',x===b));apply()}));
+q.addEventListener('input',apply);sh.addEventListener('change',apply);
+document.querySelectorAll('.sel').forEach(c=>c.addEventListener('change',count));
+document.getElementById('selVisible').addEventListener('click',()=>{rows.forEach(r=>{const c=r.querySelector('.sel');if(c)c.checked=!r.hidden});count()});
+document.getElementById('selNone').addEventListener('click',()=>{rows.forEach(r=>{const c=r.querySelector('.sel');if(c)c.checked=false});count()});
+function setDecision(r,v){const x=r.querySelector('input[type=radio][value='+v+']');if(!x||x.checked)return false;x.checked=true;x.dispatchEvent(new Event('change',{bubbles:true}));return true}
+function bulk(label,fn){const s=sel();if(!s.length){msg.textContent='Aucune ligne sélectionnée.';return}let n=0;s.forEach(r=>{if(fn(r))n++});msg.textContent=label+' : '+n+' ligne(s) modifiée(s) sur '+s.length+' sélectionnée(s). Non enregistré : cliquer sur « Enregistrer et recalculer ».'}
+document.getElementById('bulkInclude').addEventListener('click',()=>bulk('Importer',r=>setDecision(r,'include')));
+document.getElementById('bulkExclude').addEventListener('click',()=>bulk('Ne pas importer',r=>setDecision(r,'exclude')));
+document.getElementById('bulkProposals').addEventListener('click',()=>bulk('Propositions appliquées',r=>r.dataset.prop==='1'&&setDecision(r,'exclude')));
+const cb=document.getElementById('commitBtn');
+cb.addEventListener('click',e=>{if(!confirm("Confirmer l'import réel de {{summary.importable}} ligne(s) ({{summary.hours_importable}} h) ? {{summary.total-summary.importable-summary.overwrites}} ligne(s) ne seront pas importées.{% if summary.overwrites %} {{summary.overwrites}} saisie(s) existante(s) seront écrasées : ce lot ne pourra pas être annulé en bloc.{% else %} Le lot restera annulable par rollback.{% endif %}"))e.preventDefault()});
+apply();count();
+})();
+</script></body></html>

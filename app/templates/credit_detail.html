@@ -1,0 +1,50 @@
+{% extends "_page.html" %}{% block title %}Suivi note de crédit{% endblock %}{% block backlink %}/?tab=archive{% endblock %}{% block body %}
+<h1>Note de crédit {{cn.reference or 'brouillon'}} — suivi</h1>
+<section class="panel">{% if cn.status=='issued' and not pos.cancelled and pos.ttc|float>0 %}{% set t=pos.ttc|float %}{% if cn.treatment=='remboursement' %}{% set d1=pos.refunded|float %}{% set d2=0 %}{% else %}{% set d1=pos.applied|float %}{% set d2=pos.reserved|float %}{% endif %}{% set w1=[[d1/t,0]|max,1]|min %}{% set w2=[[d2/t,0]|max,1-w1]|min %}
+<div class="cn-sum"><div class="cn-fig"><span>Crédité TTC</span><strong>{{pos.ttc|chf}}</strong></div>{% if cn.treatment=='remboursement' %}<div class="cn-fig"><span><i class="sw bill"></i>Remboursement exécuté</span><strong>{{pos.refunded|chf}}</strong></div><div class="cn-fig hi"><span>Reste à rembourser</span><strong>{{pos.balance|chf}}</strong></div>{% else %}<div class="cn-fig"><span><i class="sw bill"></i>Imputé sur factures émises</span><strong>{{pos.applied|chf}}</strong></div><div class="cn-fig"><span><i class="sw unb"></i>Réservé sur brouillons</span><strong>{{pos.reserved|chf}}</strong></div><div class="cn-fig hi"><span>Solde disponible</span><strong>{{pos.balance|chf}}</strong></div>{% endif %}
+<div class="bal-bar cn-bar" role="img" aria-label="{{pos.status}} : {{(w1*100)|round|int}} % du montant crédité{% if d2 %}, {{(w2*100)|round|int}} % réservé{% endif %}">{% if w1>0 %}<span class="s-bill" style="width:{{(w1*100)|round(2)}}%"></span>{% endif %}{% if w2>0 %}<span class="s-unb" style="width:{{(w2*100)|round(2)}}%"></span>{% endif %}</div></div>{% endif %}<table>
+<tr><th>Facture d'origine</th><td>{{inv.number}} du {{(inv.invoice_date or (inv.issued_at|localdate))|d}} — {{inv.project}} ({{inv.client}}) — <a href="/invoice/{{inv.id}}.pdf">PDF facture</a> (inchangée)</td></tr>
+<tr><th>Motif</th><td>{{cn.reason}}</td></tr>
+<tr><th>Mode de traitement</th><td><b>{{pos.treatment_label}}</b> <span class="hint">(définitif depuis l'émission)</span></td></tr>
+{% if replaces %}<tr><th>Remplace</th><td><a href="/credit/{{replaces.id}}">{{replaces.reference}}</a> (annulée)</td></tr>{% endif %}
+{% if pos.cancelled %}<tr><th>Annulation</th><td><b>{{pos.cancelled.reference}}</b> du {{pos.cancelled.issued_at|ts}} — {{pos.cancelled.reason}} — <a href="/credit/{{cn.id}}/cancellation.pdf">PDF d'annulation</a>{% if replaced_by %} · remplacée par <a href="/credit/{{replaced_by.id}}">{{replaced_by.reference or 'brouillon'}}</a>{% else %} · <a href="/invoice/{{inv.id}}/credit">créer la note de remplacement</a>{% endif %}</td></tr>{% endif %}
+{% if note_lines %}<tr><th>Lignes manuelles créditées</th><td>{% for l in note_lines %}{{l.position}}. {{l.description}} — {{l.amount|chf}} HT ({{ 'hors TVA' if l.vat_mode=='hors_tva' else 'soumise à TVA' }})<br>{% endfor %}</td></tr>{% endif %}
+<tr><th>Montant crédité</th><td>HT {{pos.ht|chf}}{% if pos.lines_ht %} · lignes manuelles {{pos.lines_ht|chf}}{% endif %}{% if pos.other %} · AUTRES {{pos.other|chf}} ({{ovm_labels.get(cn.other_vat_mode or 'hors_tva')}}){% endif %} · TVA {{pos.tva|chf}} · <b>TTC {{pos.ttc|chf}}</b></td></tr>
+{% if cn.treatment=='remboursement' %}<tr><th>Remboursement exécuté</th><td>{{pos.refunded|chf}}</td></tr>
+<tr><th>Reste à rembourser</th><td><b>{{pos.balance|chf}}</b></td></tr>
+<tr><th>Échéance de remboursement</th><td>{% if pos.due_on %}{{pos.due_on|d}}{% if pos.overdue %} <b style="color:#a32020">dépassée</b>{% endif %}{% elif cn.status=='draft' and cn.refund_delay_days is not none %}{{cn.refund_delay_days}} jour(s) après émission (date fixée à l'émission){% else %}aucune (aucun délai fixé){% endif %}</td></tr>
+{% elif cn.treatment=='compensation' %}<tr><th>Imputé sur factures émises</th><td>{{pos.applied|chf}}</td></tr>
+<tr><th>Réservé sur brouillons</th><td>{{pos.reserved|chf}} <span class="hint">(définitif à l'émission de la facture cible)</span></td></tr>
+<tr><th>Solde disponible</th><td><b>{{pos.balance|chf}}</b></td></tr>{% endif %}
+<tr><th>Statut</th><td><b>{{pos.status}}</b></td></tr>
+<tr><th>Solde créditable restant sur la facture {{inv.number}}</th><td>{{k.remaining_ht|chf}} HT / {{k.remaining_ttc|chf}} TTC</td></tr>
+</table>{% if cn.status=='issued' %}<p><a class="btn" href="/credit/{{cn.id}}.pdf">PDF de la note de crédit (figé)</a></p>{% endif %}</section>
+
+{% if cn.status=='issued' and cn.treatment=='remboursement' and pos.balance>0 and not pos.cancelled %}
+<form class="fields panel" method="post" action="/credit/{{cn.id}}/refund"><h2 class="wide">Enregistrer un remboursement exécuté</h2>
+<div class="field"><label>Montant remboursé (CHF)</label><input name="amount" type="number" min="0.01" step="0.01" max="{{pos.balance}}" value="{{pos.balance}}" required></div>
+<div class="field"><label>Date d'exécution</label><input name="executed_on" type="date" max="{{today}}" required></div>
+<div class="field"><label>Référence du virement</label><input name="external_ref" placeholder="ex. référence bancaire"></div>
+<div class="field"><label>Note</label><input name="note"></div>
+<p class="hint wide">N'enregistrer qu'un virement effectivement exécuté. Le montant crédité ({{pos.ttc|chf}}) reste distinct des remboursements exécutés ; un remboursement partiel laisse un solde à rembourser.</p>
+<button class="wide">Enregistrer le remboursement</button></form>{% endif %}
+
+{% if cn.status=='issued' and cn.treatment=='compensation' and pos.balance>0 and not pos.cancelled %}
+<form class="fields panel" method="post" action="/credit/{{cn.id}}/offset"><h2 class="wide">Imputer sur une facture ultérieure</h2>
+{% if targets %}<div class="field wide"><label>Facture cible (même client juridique)</label><select name="target_invoice_id" required>{% for t in targets %}<option value="{{t.id}}" {% if t.room<=0 %}disabled{% endif %}>{% if t.status=='issued' %}Facture {{t.number}} (émise){% else %}Brouillon n° {{t.id}}{% endif %} — {{t.project}} — {{t.period_from|d}} → {{t.period_to|d}} — total {{t.ttc|chf}}, imputable {{t.room|chf}}</option>{% endfor %}</select>
+<div class="hint">Brouillon : l'imputation est imprimée sur la facture (« NET À PAYER ») et devient définitive à son émission. Facture déjà émise : l'imputation est enregistrée ici, le PDF émis n'est pas modifié.</div></div>
+<div class="field"><label>Montant imputé (CHF)</label><input name="amount" type="number" min="0.01" step="0.01" max="{{pos.balance}}" value="{{pos.balance}}" required></div>
+<div class="field"><label>Note</label><input name="note"></div>
+<button class="wide">Imputer</button>{% else %}<p class="hint wide">{{targets_why}}</p>{% endif %}</form>{% endif %}
+{% if cn.status=='issued' and not pos.cancelled %}<form class="fields panel" method="post" action="/credit/{{cn.id}}/cancel" data-confirm="Émettre un document d'annulation définitif pour cette note de crédit ?"><h2 class="wide">Corriger : annuler cette note de crédit</h2>
+<p class="hint wide">Le mode et le montant d'une note émise ne se modifient pas. Pour corriger, émettre un document d'annulation (ANN-{{cn.reference}}, PDF figé), puis une nouvelle note de crédit qui la remplace ; les deux restent liées et visibles.</p>
+{% if cancel_why %}<p class="warnbox wide">Annulation impossible pour l'instant : {{cancel_why}}</p>{% else %}<div class="field wide"><label>Motif d'annulation (imprimé)</label><input name="reason" required></div><button class="wide secondary">Émettre le document d'annulation</button>{% endif %}</form>{% endif %}
+
+<section class="panel"><h2>Opérations</h2><table><tr><th>N°</th><th>Date</th><th>Type</th><th>Montant</th><th>Détail</th><th></th></tr>
+{% for o in ops %}<tr><td>{{o.id}}</td><td>{{o.created_at|ts}}</td><td>{{kinds[o.kind]}}</td><td>{% if o.kind.endswith('_reversal') %}− {% endif %}{{(o.amount)|chf}}</td>
+<td>{{o.target_label|periods}}{{o.target_now}}{% if o.executed_on %} · exécuté le {{o.executed_on|d}}{% endif %}{% if o.external_ref %} · réf. {{o.external_ref}}{% endif %}{% if o.reverses_id %} · annule n° {{o.reverses_id}}{% endif %}{% if o.note %} · {{o.note}}{% endif %}{% if o.id in reversed_ids %} · <i>annulée</i>{% endif %}</td>
+<td>{% if o.kind in ('refund','offset') and o.id not in reversed_ids %}{% if frozen.get(o.id) %}<span class="hint">figée sur la facture émise</span>{% else %}<form method="post" action="/credit/{{cn.id}}/reverse/{{o.id}}" data-confirm="Annuler cette opération par une écriture d'annulation ?"><input name="note" placeholder="Motif d'annulation" aria-label="Motif d'annulation de l'opération" required><button class="secondary">Annuler</button></form>{% endif %}{% endif %}</td></tr>
+{% else %}<tr><td colspan="6">Aucune opération.</td></tr>{% endfor %}</table></section>
+<section class="panel"><h2>Historique complet</h2><table><tr><th>Date</th><th>Événement</th><th>Montant</th><th>Détail</th></tr>
+{% for e in hist %}<tr><td>{{e.at|ts}}</td><td>{{e.event}}</td><td>{% if e.amount is not none %}{{e.amount|chf}}{% endif %}</td><td>{{e.detail}}</td></tr>{% else %}<tr><td colspan="4">Brouillon non émis : aucune opération possible.</td></tr>{% endfor %}</table>
+<p class="hint">Les opérations ne sont jamais modifiées ni supprimées : une erreur se corrige par une écriture d'annulation, qui reste visible.</p></section>{% endblock %}

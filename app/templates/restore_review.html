@@ -1,0 +1,8 @@
+{% extends "_page.html" %}{% block title %}Restauration — prévisualisation{% endblock %}{% block backlink %}/?tab=settings{% endblock %}{% block body %}
+<h1>Restauration JSON — prévisualisation</h1>
+<section class="panel"><p class="hint">Fichier SHA-256 {{sha[:16]}}… · généré le {{pv.generated_at|ts}} · version {{pv.app_version}}. Rien n'a encore été modifié.</p>
+<table><tr><th>Table</th><th>Base actuelle</th><th>Sauvegarde</th><th>Écart</th></tr>{% for r in pv.counts %}<tr><td>{{r.table}}</td><td>{{r.current}}</td><td>{{r.file}}</td><td>{{r.file-r.current}}</td></tr>{% endfor %}</table></section>
+{% if pv.blocking %}<div class="warnbox"><b>Restauration bloquée</b> — sauvegarde incomplète, ou restauration qui ferait perdre ou modifierait des données protégées :<ul>{% for b in pv.blocking %}<li>{{b}}</li>{% endfor %}</ul></div>{% endif %}
+<form method="post" class="panel"><p>La restauration remplace <b>toute</b> la base par le contenu du fichier, sauf le journal d'audit : le journal actuel est conservé tel quel, les lignes du fichier qu'il ne contient pas y sont ajoutées. Une sauvegarde SQLite vérifiée est prise juste avant ; la base est reconstruite à part, contrôlée (intégrité, clés étrangères, empreintes des PDF figés), puis substituée en une opération. À effectuer hors utilisation.</p>
+<label>Saisir RESTAURER pour confirmer</label><input name="confirm" autocomplete="off">
+<p><button name="action" value="restore" {% if pv.blocking %}disabled{% endif %}>Restaurer</button></p><p><button class="secondary" name="action" value="cancel">Abandonner</button></p></form>{% endblock %}

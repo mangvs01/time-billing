@@ -1,0 +1,42 @@
+{
+  "_lisez_moi": "Vacances scolaires du canton de Genève (école obligatoire), une entrée par année scolaire. « du » et « au » sont INCLUS (premier et dernier jour sans école). SOURCE À CONSULTER : calendrier scolaire officiel du DIP (ge.ch). Les dates ci-dessous sont des ESTIMATIONS saisies sans accès à la source officielle (statut « a_verifier », estimation true) : les remplacer par celles du calendrier officiel, puis passer le statut à « confirme » et renseigner revue_le. Ajouter une année scolaire = ajouter un bloc dans « annees ».",
+  "revue_le": null,
+  "revue_par": "",
+  "canton": "GE",
+  "source": {"titre": "DIP Genève — Calendrier scolaire et vacances (ge.ch)", "url": "https://www.ge.ch/dossier/ecole-obligatoire/calendrier-scolaire"},
+  "annees": [
+    {
+      "annee": "2025-2026", "statut": "a_verifier", "estimation": true,
+      "periodes": [
+        {"nom": "Vacances d'automne", "du": "2025-10-27", "au": "2025-10-31"},
+        {"nom": "Vacances de Noël", "du": "2025-12-22", "au": "2026-01-02"},
+        {"nom": "Vacances de février", "du": "2026-02-16", "au": "2026-02-20"},
+        {"nom": "Vacances de Pâques", "du": "2026-04-03", "au": "2026-04-10"},
+        {"nom": "Pont de l'Ascension", "du": "2026-05-14", "au": "2026-05-15"},
+        {"nom": "Vacances d'été", "du": "2026-07-04", "au": "2026-08-23"}
+      ]
+    },
+    {
+      "annee": "2026-2027", "statut": "a_verifier", "estimation": true,
+      "periodes": [
+        {"nom": "Vacances d'automne", "du": "2026-10-26", "au": "2026-10-30"},
+        {"nom": "Vacances de Noël", "du": "2026-12-21", "au": "2027-01-01"},
+        {"nom": "Vacances de février", "du": "2027-02-15", "au": "2027-02-19"},
+        {"nom": "Vacances de Pâques", "du": "2027-03-26", "au": "2027-04-02"},
+        {"nom": "Pont de l'Ascension", "du": "2027-05-06", "au": "2027-05-07"},
+        {"nom": "Vacances d'été", "du": "2027-07-03", "au": "2027-08-22"}
+      ]
+    },
+    {
+      "annee": "2027-2028", "statut": "a_verifier", "estimation": true,
+      "periodes": [
+        {"nom": "Vacances d'automne", "du": "2027-10-25", "au": "2027-10-29"},
+        {"nom": "Vacances de Noël", "du": "2027-12-20", "au": "2028-01-01"},
+        {"nom": "Vacances de février", "du": "2028-02-14", "au": "2028-02-18"},
+        {"nom": "Vacances de Pâques", "du": "2028-04-14", "au": "2028-04-21"},
+        {"nom": "Pont de l'Ascension", "du": "2028-05-25", "au": "2028-05-26"},
+        {"nom": "Vacances d'été", "du": "2028-07-01", "au": "2028-08-20"}
+      ]
+    }
+  ]
+}

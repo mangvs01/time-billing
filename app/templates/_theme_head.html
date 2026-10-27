@@ -1,0 +1,11 @@
+{# rc35 (BILLING-THÈME) : thème sombre « graphite » par défaut (<html data-theme="dark"> dans le balisage), thème clair au choix.
+   Le choix est mémorisé dans ce navigateur (localStorage « tb-theme » : "light" ou "dark") et appliqué ICI, dans <head>, avant les feuilles de style :
+   aucun premier rendu clair. Script signé par le nonce CSP de la réponse ; aucun gestionnaire en ligne (les boutons portent data-theme-toggle).
+   Stockage indisponible (navigation privée stricte) : le thème sombre par défaut s'applique, la bascule reste valable pour la page. #}
+<script nonce="{{csp_nonce}}">(function(){var d=document.documentElement,K='tb-theme';
+function apply(t){d.setAttribute('data-theme',t==='light'?'light':'dark')}
+function sync(){var dark=d.getAttribute('data-theme')!=='light';document.querySelectorAll('[data-theme-toggle]').forEach(function(b){b.setAttribute('aria-pressed',dark?'true':'false');b.title=dark?'Passer au thème clair':'Passer au thème sombre'})}
+try{apply(localStorage.getItem(K))}catch(e){apply(null)}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-theme-toggle]');if(!b)return;var t=d.getAttribute('data-theme')==='light'?'dark':'light';apply(t);try{localStorage.setItem(K,t)}catch(x){}sync()});
+window.addEventListener('storage',function(e){if(e.key===K){apply(e.newValue);sync()}});
+document.addEventListener('DOMContentLoaded',sync)})()</script>

@@ -1,0 +1,37 @@
+<!doctype html><html lang="fr" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">{% include "_theme_head.html" %}<title>Calendrier — Time Billing V9.2{% if env_label %} — {{env_label}}{% endif %}</title>
+<style>{% include "_style.html" %}{% include "_ds.html" %}</style></head><body data-page="calendrier"><div class="shell">
+{% from "_calendrier_blocs.html" import evenement, alerte with context %}
+{% include "_navbar.html" %}
+<div class="cal-head"><h1>Calendrier</h1><div class="cal-actions"><a class="btn primary" href="/calendrier.ics" id="calIcs" title="Fichier .ics à importer dans l'agenda du téléphone ou de l'ordinateur">Exporter l'agenda (.ics)</a></div></div>
+<p class="hint">Échéances fiscales et sociales (Genève), jours fériés, vacances scolaires, jalons des mandats et alertes. Tout est calculé à l'affichage : rien n'est écrit dans la facturation.</p>
+{% if erreur %}<p class="warnbox" id="calErreur"><b>Calendrier incomplet.</b> {{erreur}}</p>{% endif %}
+{% if a_revoir %}<div class="msg cal-revue" id="calRevue"><b>Données à revoir.</b> Les dates viennent de fichiers de données (<code>app/donnees_calendrier/</code>) à relire chaque année sur les sources officielles :<ul>{% for r in a_revoir %}<li>{{r}}</li>{% endfor %}</ul>Tant qu'un fichier n'est pas relu, ses dates sont à contrôler avant de s'y fier (badge « à vérifier » ou « règle légale » sur chaque ligne).</div>{% endif %}
+
+<section class="panel wide cal-alertes" id="calAlertes" aria-labelledby="calAlertesT"><div class="todo-h"><h2 id="calAlertesT">Alertes <span class="badge {{ 'b-err' if alertes|selectattr('niveau','equalto','err')|list else 'b-neutral' }}">{{alertes|length}}</span></h2><span class="hint hide-m">calculées à l'ouverture de la page — seuils réglables plus bas</span></div>
+{% if alertes %}<ul class="cal-list">{% for a in alertes %}{{ alerte(a) }}{% endfor %}</ul>{% else %}<p class="hint" id="calAlertesVide">Aucune alerte : pas de travail non facturé au-dessus du seuil, aucun retard de facturation, aucun bon de commande presque consommé, aucun brouillon ancien.</p>{% endif %}</section>
+
+<div class="cal-cols">
+<section class="panel cal-next" id="calProchains" aria-labelledby="calProchainsT"><h2 id="calProchainsT">30 prochains jours <span class="badge b-neutral">{{prochains|length}}</span></h2>
+{% if prochains %}<ul class="cal-list">{% for e in prochains %}{{ evenement(e, genres) }}{% endfor %}</ul>{% else %}<p class="hint">Rien de prévu dans les 30 prochains jours.</p>{% endif %}</section>
+
+<section class="panel cal-month" id="calMois" aria-labelledby="calMoisT"><div class="cal-nav"><a class="btn" href="/calendrier?mois={{precedent}}" aria-label="Mois précédent">←</a><h2 id="calMoisT">{{mois_nom|capitalize}} {{annee}}</h2><a class="btn" href="/calendrier?mois={{suivant}}" aria-label="Mois suivant">→</a>{% if courant != '%04d-%02d'|format(annee,mois) %}<a class="btn" href="/calendrier">Aujourd'hui</a>{% endif %}</div>
+<table class="calgrid" aria-labelledby="calMoisT"><thead><tr>{% for j in ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'] %}<th scope="col">{{j}}</th>{% endfor %}</tr></thead><tbody>
+{% for sem in semaines %}<tr>{% for j in sem %}{% set autres=j.evenements|rejectattr('genre','equalto','vacances')|list %}<td class="{% if not j.dans_mois %}out{% endif %}{% if j.we %} we{% endif %}{% if j.aujourdhui %} today{% endif %}{% if j.ferie %} ferie{% endif %}{% if 'vacances' in j.genres %} vac{% endif %}" data-date="{{j.date.isoformat()}}">{% if autres and j.dans_mois %}<a href="#j-{{j.date.isoformat()}}" aria-label="{{j.date.isoformat()|d}} : {{autres|length}} événement{{ 's' if autres|length>1 }}">{% endif %}<span class="n">{{j.date.day}}</span>{% if j.dans_mois %}<span class="dots" aria-hidden="true">{% for g in j.genres if g!='vacances' %}<i class="dot g-{{g}}"></i>{% endfor %}</span>{% endif %}{% if autres and j.dans_mois %}</a>{% endif %}</td>{% endfor %}</tr>{% endfor %}
+</tbody></table>
+<p class="cal-legend hint"><span class="cal-genre g-echeance">Échéance</span> <span class="cal-genre g-jalon">Mandat</span> <span class="cal-genre g-ferie">Jour férié</span> <span class="cal-genre g-vacances">Vacances scolaires</span> <span class="cal-genre g-vacances-bar">fond ambré : jour de vacances</span></p>
+{% if mois_ev %}<ul class="cal-list cal-monthlist">{% for e in mois_ev %}{{ evenement(e, genres) }}{% endfor %}</ul>{% else %}<p class="hint">Aucun événement ce mois-ci.</p>{% endif %}</section>
+</div>
+
+<section class="panel wide" id="calExport" aria-labelledby="calExportT"><h2 id="calExportT">Agenda du téléphone ou de l'ordinateur</h2>
+<p><a class="btnlink" href="/calendrier.ics">Télécharger l'agenda complet (.ics)</a> <span class="hint">échéances, jours fériés, vacances scolaires et jalons des mandats ; fichier protégé par la connexion de l'application (il contient les noms des mandats). Il se télécharge à nouveau pour être mis à jour.</span></p>
+<h3 style="margin:14px 0 6px;font-size:14px">Abonnement automatique (facultatif)</h3>
+<p class="hint">Un lien secret permet à l'agenda de se mettre à jour tout seul. Ce lien ne donne accès à <b>aucune donnée client ni de mandat</b> : seulement les échéances fiscales et sociales, les jours fériés et les vacances scolaires. Seule l'empreinte du lien est conservée ; toute personne qui détient le lien peut lire ces dates, d'où la révocation immédiate ci-dessous.</p>
+{% if nouveau_lien %}<div class="msg" id="calNouveauLien"><b>Lien d'abonnement créé — à copier maintenant, il ne sera plus affiché :</b><br><code class="cal-link">{{nouveau_lien}}</code></div>{% endif %}
+<div class="row"><form method="post" action="/calendrier/abonnement" class="inline"><button class="secondary" type="submit">{{ 'Remplacer le lien (l\'ancien cesse de fonctionner)' if jeton_actif else 'Créer un lien d\'abonnement' }}</button></form>{% if jeton_actif %}<form method="post" action="/calendrier/abonnement/revoquer" class="inline"><button class="secondary" type="submit" data-confirm="Révoquer le lien d'abonnement ? Les agendas abonnés cesseront de se mettre à jour.">Révoquer le lien</button></form><span class="badge b-issued">lien actif</span>{% else %}<span class="badge">aucun lien</span>{% endif %}</div></section>
+
+<section class="panel wide" id="calReglages" aria-labelledby="calReglagesT"><h2 id="calReglagesT">Réglages du calendrier</h2>
+{% include "_calendrier_reglages.html" %}</section>
+
+<section class="panel wide" id="calSources"><h2>Sources et limites</h2>
+<ul class="hint"><li><b>Échéances</b> : <code>app/donnees_calendrier/echeances.json</code> — chaque échéance cite sa source officielle (LTVA/AFC, AFC-GE, caisse de compensation, OPP 3) et un statut. Les acomptes AVS et le délai genevois d'un indépendant sont « à vérifier ».</li><li><b>Jours fériés</b> : <code>jours_feries.json</code> — règles de la loi genevoise sur les jours fériés ; Pâques, Ascension, Pentecôte et Jeûne genevois sont calculés.</li><li><b>Vacances scolaires</b> : <code>vacances_scolaires_ge.json</code> — calendrier du DIP ; les dates fournies sont des estimations à remplacer.</li><li><b>Mandats</b> : début et fin prévue (début + durée) tirés de la base ; l'application ne conserve pas de date de fin de bon de commande.</li><li><b>Paiements</b> : le paiement des factures n'est pas suivi dans l'application, l'alerte « échéance de paiement atteinte » est une information à vérifier sur le compte.</li></ul></section>
+</main></div>{% include "_confirm.html" %}</body></html>

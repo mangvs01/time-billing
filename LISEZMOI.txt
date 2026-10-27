@@ -1,0 +1,1 @@
+Copie de publication 9.2-rc40 (UX lot 2 : À traiter, saisie mobile, émission en trois temps, brouillon guidé, barre basse téléphone ; aucune règle de facturation modifiée). Base : 9.2-rc33 (1bd79f1). git archive 4b8a98c.

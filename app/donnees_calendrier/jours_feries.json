@@ -1,0 +1,26 @@
+{
+  "_lisez_moi": "Jours fériés applicables à Genève (canton par défaut) : fédéraux + genevois. Les dates mobiles sont CALCULÉES (Pâques par l'algorithme de Meeus/Jones/Butcher, calendrier grégorien) : seules les règles sont dans ce fichier. Règles : « fixe » (mois, jour), « paques » (decalage en jours après Pâques), « jeune_genevois » (jeudi qui suit le premier dimanche de septembre). À revoir chaque année (janvier). Statuts : voir echeances.json.",
+  "revue_le": null,
+  "revue_par": "",
+  "canton": "GE",
+  "feries": [
+    {"id": "nouvel-an", "nom": "Nouvel An", "portee": "federal", "regle": {"type": "fixe", "mois": 1, "jour": 1}, "statut": "regle_legale",
+     "source": {"titre": "Loi genevoise sur les jours fériés (J 1 45) — SIL Genève", "url": "https://silgeneve.ch/legis/data/rsg_J1_45.htm"}},
+    {"id": "vendredi-saint", "nom": "Vendredi saint", "portee": "GE", "regle": {"type": "paques", "decalage": -2}, "statut": "regle_legale",
+     "source": {"titre": "Loi genevoise sur les jours fériés (J 1 45) — SIL Genève", "url": "https://silgeneve.ch/legis/data/rsg_J1_45.htm"}},
+    {"id": "lundi-paques", "nom": "Lundi de Pâques", "portee": "GE", "regle": {"type": "paques", "decalage": 1}, "statut": "regle_legale",
+     "source": {"titre": "Loi genevoise sur les jours fériés (J 1 45) — SIL Genève", "url": "https://silgeneve.ch/legis/data/rsg_J1_45.htm"}},
+    {"id": "ascension", "nom": "Ascension", "portee": "federal", "regle": {"type": "paques", "decalage": 39}, "statut": "regle_legale",
+     "source": {"titre": "Loi genevoise sur les jours fériés (J 1 45) — SIL Genève", "url": "https://silgeneve.ch/legis/data/rsg_J1_45.htm"}},
+    {"id": "lundi-pentecote", "nom": "Lundi de Pentecôte", "portee": "GE", "regle": {"type": "paques", "decalage": 50}, "statut": "regle_legale",
+     "source": {"titre": "Loi genevoise sur les jours fériés (J 1 45) — SIL Genève", "url": "https://silgeneve.ch/legis/data/rsg_J1_45.htm"}},
+    {"id": "fete-nationale", "nom": "Fête nationale suisse (1er août)", "portee": "federal", "regle": {"type": "fixe", "mois": 8, "jour": 1}, "statut": "regle_legale",
+     "source": {"titre": "Constitution fédérale art. 110 al. 3 (RS 101) — Fedlex", "url": "https://www.fedlex.admin.ch/eli/cc/1999/404/fr"}},
+    {"id": "jeune-genevois", "nom": "Jeûne genevois", "portee": "GE", "regle": {"type": "jeune_genevois"}, "statut": "regle_legale",
+     "source": {"titre": "Loi genevoise sur les jours fériés (J 1 45) — SIL Genève", "url": "https://silgeneve.ch/legis/data/rsg_J1_45.htm"}},
+    {"id": "noel", "nom": "Noël", "portee": "federal", "regle": {"type": "fixe", "mois": 12, "jour": 25}, "statut": "regle_legale",
+     "source": {"titre": "Loi genevoise sur les jours fériés (J 1 45) — SIL Genève", "url": "https://silgeneve.ch/legis/data/rsg_J1_45.htm"}},
+    {"id": "restauration", "nom": "Restauration de la République", "portee": "GE", "regle": {"type": "fixe", "mois": 12, "jour": 31}, "statut": "regle_legale",
+     "source": {"titre": "Loi genevoise sur les jours fériés (J 1 45) — SIL Genève", "url": "https://silgeneve.ch/legis/data/rsg_J1_45.htm"}}
+  ]
+}

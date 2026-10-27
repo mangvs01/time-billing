@@ -1,0 +1,6 @@
+{# Calendrier (candidat rc36) : réglages des alertes et de la TVA. Même formulaire dans Paramètres et dans la page Calendrier ; variables : cal_cfg, cal_reglages, cal_tva, retour. #}
+<form class="fields cal-reglages" method="post" action="/calendrier/reglages">
+<input type="hidden" name="retour" value="{{retour}}">
+{% for k,(label,defaut,aide) in cal_reglages.items() %}<div class="field"><label for="{{k}}">{{label}}</label>{% if k=='cal_tva_periodicite' %}<select name="{{k}}" id="{{k}}">{% for v,l in cal_tva.items() %}<option value="{{v}}" {% if cal_cfg[k]==v %}selected{% endif %}>{{l}}</option>{% endfor %}</select>{% elif k in ('cal_seuil_non_facture','cal_seuil_retard') %}<input name="{{k}}" id="{{k}}" inputmode="decimal" value="{{cal_cfg[k]}}">{% else %}<input name="{{k}}" id="{{k}}" inputmode="numeric" value="{{cal_cfg[k]}}">{% endif %}<div class="hint">{{aide}} (défaut : {{defaut}}).</div></div>{% endfor %}
+<button class="wide">Enregistrer les réglages du calendrier</button>
+</form>

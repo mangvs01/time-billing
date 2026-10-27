@@ -1,0 +1,10 @@
+{
+  "client": "EGG",
+  "source": "Commentaire du propriétaire sur le PDF brouillon annoté (26.10.2026) — docs/commentaire-pdf-adresses.txt",
+  "addresses": [
+    {"label": "EGG FR", "sort_order": 1, "lines": ["EGG FR", "55 avenue Victor Hugo", "75116 Paris", "France", "FR74 433 639 523"]},
+    {"label": "EGG BE", "sort_order": 2, "lines": ["EGG BE SPRL", "Avenue du Bourgmestre", "Etienne Demunter 5, boîte 10", "1090 JETTE", "Belgique"]},
+    {"label": "EGG CH", "sort_order": 3, "lines": ["EGG CH SA", "Route de Saint Julien 63", "1212 Lancy", "Switzerland"]},
+    {"label": "EGG MEA", "sort_order": 4, "lines": ["EGG MEA", "Office 28 - Floor 23", "The One Tower - TECOM", "Dubai", "Unites Arab Emirates"]}
+  ]
+}

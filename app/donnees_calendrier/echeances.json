@@ -1,0 +1,84 @@
+{
+  "_lisez_moi": "Échéances fiscales et sociales d'un indépendant à Genève. FICHIER DE DONNÉES À REVOIR CHAQUE ANNÉE (janvier) : aucune date n'est codée dans l'application. Chaque échéance porte sa source officielle (titre + URL) et un statut : « confirme » = relue sur la source officielle (renseigner revue_le), « regle_legale » = règle de loi connue, date calculée, source citée mais non rouverte, « a_verifier » = date non confirmée par une source officielle. Tant que revue_le est vide, la page Calendrier affiche un bandeau « données non revues ». Pour corriger une date : modifier ce fichier (lu à chaque affichage, sans cache applicatif) ; il fait partie de l'image de l'application, donc une correction en production passe par un nouveau déploiement.",
+  "revue_le": null,
+  "revue_par": "",
+  "canton": "GE",
+  "echeances": [
+    {
+      "id": "tva-trimestriel",
+      "titre": "Décompte TVA — {periode}",
+      "type": "tva",
+      "condition": {"reglage": "cal_tva_periodicite", "valeur": "trimestriel"},
+      "delai_jours": 60,
+      "periodes": [
+        {"nom": "1er trimestre", "du": "01-01", "au": "03-31"},
+        {"nom": "2e trimestre", "du": "04-01", "au": "06-30"},
+        {"nom": "3e trimestre", "du": "07-01", "au": "09-30"},
+        {"nom": "4e trimestre", "du": "10-01", "au": "12-31"}
+      ],
+      "statut": "regle_legale",
+      "note": "Méthode effective, décompte trimestriel : à remettre à l'AFC dans les 60 jours qui suivent la fin de la période (LTVA art. 71 al. 1). La date affichée est la fin de période + 60 jours ; l'échéancier publié par l'AFC peut indiquer la fin du 2e mois (ex. 28.02 pour le 4e trimestre) : en cas d'écart, la date de l'AFC fait foi — corriger ici via « dates ».",
+      "source": {"titre": "LTVA art. 71 (RS 641.20) — Fedlex", "url": "https://www.fedlex.admin.ch/eli/cc/2009/615/fr"},
+      "source_complementaire": {"titre": "AFC — Taxe sur la valeur ajoutée, décompte et délais", "url": "https://www.estv.admin.ch/estv/fr/accueil/taxe-sur-la-valeur-ajoutee.html"}
+    },
+    {
+      "id": "tva-semestriel",
+      "titre": "Décompte TVA — {periode}",
+      "type": "tva",
+      "condition": {"reglage": "cal_tva_periodicite", "valeur": "semestriel"},
+      "delai_jours": 60,
+      "periodes": [
+        {"nom": "1er semestre", "du": "01-01", "au": "06-30"},
+        {"nom": "2e semestre", "du": "07-01", "au": "12-31"}
+      ],
+      "statut": "regle_legale",
+      "note": "Décompte semestriel (méthode effective avec autorisation de l'AFC, ou taux de la dette fiscale nette / taux forfaitaires) : à remettre dans les 60 jours qui suivent la fin du semestre (LTVA art. 71 al. 1). Même réserve que pour le décompte trimestriel : la date de l'AFC fait foi.",
+      "source": {"titre": "LTVA art. 71 (RS 641.20) — Fedlex", "url": "https://www.fedlex.admin.ch/eli/cc/2009/615/fr"},
+      "source_complementaire": {"titre": "AFC — Taxe sur la valeur ajoutée, décompte et délais", "url": "https://www.estv.admin.ch/estv/fr/accueil/taxe-sur-la-valeur-ajoutee.html"}
+    },
+    {
+      "id": "impot-ge-declaration",
+      "titre": "Déclaration d'impôt Genève {annee_fiscale} (personne physique / indépendant)",
+      "type": "annuel",
+      "mois_jour": "03-31",
+      "decalage_annee": 1,
+      "statut": "a_verifier",
+      "note": "Délai ordinaire de retour de la déclaration des personnes physiques à Genève : 31 mars de l'année suivante, avec possibilité de demander une prolongation. Le délai applicable à un indépendant (comptabilité, bouclement) peut être différent et n'est pas confirmé ici : à vérifier sur la page de l'administration fiscale cantonale et sur la lettre de rappel du contribuable.",
+      "source": {"titre": "République et canton de Genève — Administration fiscale cantonale (AFC-GE)", "url": "https://www.ge.ch/organisation/administration-fiscale-cantonale"}
+    },
+    {
+      "id": "avs-acomptes",
+      "titre": "Acompte de cotisations AVS/AI/APG (caisse de compensation)",
+      "type": "dates",
+      "dates": [
+        {"mois_jour": "03-31", "precision": "1er trimestre"},
+        {"mois_jour": "06-30", "precision": "2e trimestre"},
+        {"mois_jour": "09-30", "precision": "3e trimestre"},
+        {"mois_jour": "12-31", "precision": "4e trimestre"}
+      ],
+      "statut": "a_verifier",
+      "note": "Un indépendant verse des cotisations provisoires (acomptes) fixées par sa caisse de compensation, en principe par trimestre ; les dates et montants exacts figurent sur la décision d'acomptes de la caisse. Dates ci-contre = fins de trimestre, À REMPLACER par celles de la décision de la caisse.",
+      "source": {"titre": "Centre d'information AVS/AI — Cotisations des indépendants", "url": "https://www.ahv-iv.ch/fr/"}
+    },
+    {
+      "id": "pilier-3a",
+      "titre": "Dernier jour pour verser au pilier 3a (déduction de l'année)",
+      "type": "annuel",
+      "mois_jour": "12-31",
+      "decalage_annee": 0,
+      "statut": "regle_legale",
+      "note": "Le versement doit être crédité au compte de prévoyance au plus tard le 31 décembre pour être déductible de l'année (OPP 3 art. 7). Prévoir quelques jours ouvrables de traitement bancaire.",
+      "source": {"titre": "OPP 3 (RS 831.461.3) — Fedlex", "url": "https://www.fedlex.admin.ch/eli/cc/1985/1184_1184_1184/fr"}
+    },
+    {
+      "id": "icc-acomptes",
+      "titre": "Acompte d'impôt cantonal et communal / fédéral direct",
+      "type": "dates",
+      "actif": false,
+      "dates": [],
+      "statut": "a_verifier",
+      "note": "MODÈLE DÉSACTIVÉ. Les acomptes provisionnels dépendent du bordereau d'acomptes de l'AFC-GE de chaque contribuable. Pour les suivre : mettre « actif » à true et saisir chaque date, par exemple {\"date\": \"2027-02-28\", \"precision\": \"1er acompte\"} (date complète AAAA-MM-JJ, ou \"mois_jour\" pour une date qui revient chaque année).",
+      "source": {"titre": "AFC-GE — Acomptes provisionnels (à confirmer sur le bordereau)", "url": "https://www.ge.ch/organisation/administration-fiscale-cantonale"}
+    }
+  ]
+}
