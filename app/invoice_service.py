@@ -72,6 +72,7 @@ def live_data(conn, iid):
     header["period_hours"] = round(sum(r["hours"] for r in rows if i["period_from"] <= r["work_date"] <= i["period_to"] and not r.get("billed_elsewhere")), 6)
     elsewhere = sorted({r["billed_elsewhere"] for r in rows if r.get("billed_elsewhere")})
     if elsewhere: header["period_billed_elsewhere"] = elsewhere      # only then: the frozen header of an ordinary invoice keeps its keys
+    if rules.exception_mandate(p): header["exception"] = rules.EXCEPTION_LABEL      # rc41: only then (the frozen header of any other invoice keeps its keys); the PDF does not print it
     header["issuer"] = rules.get_settings(conn)
     # rc37 (P1): manual lines. A draft reads its live rows; an issued invoice read at the freeze moment reads the same (now immutable) rows, and its snapshot header
     # keeps the printed copy: a document issued is never rendered again from the table.

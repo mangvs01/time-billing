@@ -1,5 +1,6 @@
 """G4: the fourteen checks before a draft invoice may be issued (user directive 2026-10-05, section 9; check 13 and the derogations: decision D8, 2026-10-06;
-check 14 (NOT derogable) and the zero over-billing tolerance of check 12: owner decisions of 2026-10-09, rc25).
+check 14 (NOT derogable) and the zero over-billing tolerance of check 12: owner decisions of 2026-10-09, rc25; rc41, owner decisions of 2026-10-28: zero under-billing
+tolerance too, and the « STC GEM » exception: for the mandates named by billing_rules.exception_mandate() NO check blocks the issuance, see run_checks).
 
 Every figure is RECOMPUTED here from the database by a path independent of the one that builds the document, then compared with what the document
 will print (the header of `invoice_service.live_data`, the single source of what the PDF shows). A failing check never lets an invoice be considered
@@ -33,7 +34,7 @@ GOLDEN_FILE = os.path.join(os.path.dirname(__file__), "golden_layout.json")
 DEROGABLE = (12, 13)          # D8 (2026-10-06): the only checks a written reason, given for that very check, may override at issuance (14 is NOT one of them)
 MIN_REASON = 10               # characters of a derogation reason
 OVER_TOLERANCE = 0.0          # rc25 (decision 6): days invoiced beyond the days worked in the period, tolerated by check 12 (zero: any excess is an exception)
-UNDER_TOLERANCE = 0.5         # days invoiced below the days worked in the period, tolerated by check 12 (unchanged)
+UNDER_TOLERANCE = 0.0         # rc41 (owner decision 28.10.2026): days invoiced below the days worked in the period, tolerated by check 12 (zero, like the over-billing: it was 0.5 j up to rc40)
 
 
 def forbidden_words():
@@ -80,7 +81,7 @@ def period_story(qdays, pdays, has_entries, pf, pt):
     if qdays - pdays > OVER_TOLERANCE + EPS:
         notes.append(f"sur-facturation : quantité facturée {round(qdays, 4)} j pour {round(pdays, 4)} j réalisé(s) dans la période (tolérance de sur-facturation : {OVER_TOLERANCE:g} j)")
     elif pdays - qdays > UNDER_TOLERANCE + EPS:
-        notes.append(f"quantité facturée {round(qdays, 4)} j pour {round(pdays, 4)} j réalisé(s) dans la période (sous-facturation tolérée jusqu'à {UNDER_TOLERANCE:g} j)")
+        notes.append(f"quantité facturée {round(qdays, 4)} j pour {round(pdays, 4)} j réalisé(s) dans la période (tolérance de sous-facturation : {UNDER_TOLERANCE:g} j)")
     return notes
 
 
@@ -96,7 +97,12 @@ def run_checks(conn, iid):
     res = []
     fr = rules.fr_date
 
+    exc = rules.exception_mandate(p)      # rc41: an exception mandate keeps every check and every detail, but a failure is only a warning (flag would_fail), never blocking, no reason asked
+
     def add(n, title, ok, detail, warn=False, derogable=False):
+        if not ok and not warn and exc:
+            res.append({"n": n, "title": title, "status": "warning", "detail": detail, "derogable": False, "would_fail": True, "exception": exc})
+            return
         res.append({"n": n, "title": title, "status": "ok" if ok else ("warning" if warn else "fail"), "detail": detail, "derogable": bool(derogable and not ok and not warn)})
 
     # 1 — detail of the period: exactly the entries of the mandate dated within it
@@ -238,6 +244,11 @@ def run_checks(conn, iid):
         f"facturé net {round(net14, 5)} j (historique validé {round(hist14, 5)} + Time Billing jusqu'au {fr(pt)} {round(prev14, 5)} + cette facture {round(cur14, 5)} − notes de crédit {round(cr14, 5)}) "
         + (f"≤ réalisé jusqu'au {fr(pt)} : {round(real14, 5)} j" if ok14 else f"> réalisé jusqu'au {fr(pt)} : {round(real14, 5)} j (excédent {round(net14 - real14, 5)} j facturés au-delà du travail enregistré ; aucune dérogation possible : enregistrer le travail manquant, corriger la quantité ou créditer)"))
     return res
+
+
+def exception_gaps(checks):
+    """rc41: the checks that would have failed but only warn because the mandate is an exception mandate (to display and to write in the audit log)."""
+    return [c for c in checks if c.get("would_fail")]
 
 
 def failures(checks):

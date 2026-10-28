@@ -12,6 +12,9 @@ from app import billing_rules as rules, pdf_layout
 
 PLAIN_NUMBER = re.compile(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)")
 MAX_QTY = Decimal("1000000"); MAX_RATE = Decimal("1000000000"); MAX_DESCRIPTION_CHARS = 200
+MAX_AMOUNT = Decimal("1000000000")      # review rc40: one line, and all the lines of an invoice together, stay under the 1 000 000 000 CHF that the credit-note form accepts (money_field)
+# review rc40: the description is printed and shown as plain text: no control, zero-width, direction (embedding / override / isolate) or soft-hyphen character
+_FORBIDDEN_CHARS = re.compile("[\x00-\x08\x0e-\x1b\x7f-\x9f\u00ad\u061c\u200b-\u200f\u2028\u2029\u202a-\u202e\u2060-\u2069\ufeff]")
 FIELDS = ("line_id", "line_uid", "line_description", "line_qty", "line_unit", "line_rate", "line_vat_mode")
 DEFAULT_UNIT = "flat"; DEFAULT_VAT_MODE = "soumis"        # a manual line is subject to the invoice's VAT unless the user chooses « hors TVA » (decision D2)
 
@@ -49,12 +52,14 @@ def _number(raw, label, n, hi, lo_open):
 
 def validate(rows, table_unit=None):
     """Validated lines [{id, uid, description, qty, unit, unit_rate, vat_mode}], raises ValueError (message prefixed « ligne n : »). Same rules at the form and at the server."""
-    out = []; seen_uid = set()
+    out = []; seen_uid = set(); total = Decimal(0)
     for n, r in enumerate(rows, 1):
         desc = " ".join(r["line_description"].split())
         if not desc: raise ValueError(f"ligne {n} : description obligatoire (pour retirer une ligne, utiliser « Supprimer »)")
         if len(desc) > MAX_DESCRIPTION_CHARS: raise ValueError(f"ligne {n} : description trop longue ({MAX_DESCRIPTION_CHARS} caractères au maximum)")
+        if _FORBIDDEN_CHARS.search(desc): raise ValueError(f"ligne {n} : description invalide (caractère de contrôle, invisible ou de direction du texte)")
         qty = _number(r["line_qty"], "quantité", n, MAX_QTY, True).quantize(Decimal("0.000001"), ROUND_HALF_UP)
+        if qty <= 0: raise ValueError(f"ligne {n} : quantité invalide ou hors limites")        # 0.0000004 is > 0 as typed but 0 once rounded to 6 decimals (the table refuses it)
         rate = _number(r["line_rate"], "prix unitaire (CHF)", n, MAX_RATE, False).quantize(Decimal("0.0001"), ROUND_HALF_UP)
         unit = r["line_unit"] or DEFAULT_UNIT
         if unit not in rules.MANUAL_UNITS: raise ValueError(f"ligne {n} : unité inconnue")
@@ -69,6 +74,10 @@ def validate(rows, table_unit=None):
         if uid:
             if uid in seen_uid: raise ValueError(f"ligne {n} : ligne en double (même identifiant de saisie)")
             seen_uid.add(uid)
+        amount = rules.line_amount(qty, rate)
+        if amount > MAX_AMOUNT: raise ValueError(f"ligne {n} : montant {rules.fr_chf(amount)} au-dessus de la limite ({rules.fr_chf(MAX_AMOUNT)})")
+        total += amount
+        if total > MAX_AMOUNT: raise ValueError(f"ligne {n} : le total des lignes manuelles dépasse la limite ({rules.fr_chf(MAX_AMOUNT)})")
         out.append({"id": lid, "uid": uid, "description": desc, "qty": float(qty), "unit": unit, "unit_rate": float(rate), "vat_mode": vat_mode})
     problem = pdf_layout.manual_lines_problem(out, table_unit)
     if problem: raise ValueError(problem)

@@ -14,6 +14,7 @@ DDL = """CREATE TABLE IF NOT EXISTS billing_addresses(id INTEGER PRIMARY KEY AUT
   active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)), sort_order INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT, UNIQUE(client_key,label))"""
 MAX_LABEL = 60; MAX_CONTACT = 120; MAX_LINES = 6; MAX_LINE = 80
 _CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f​-‏‪-‮⁠﻿]")
+_CTRL_MORE = re.compile("[\\x80-\\x84\\x86-\\x9f\\u00ad\\u061c\\u2066-\\u2069]")       # review rc40: C1 controls, soft hyphen, Arabic letter mark and direction isolates (the class above stops at the embeddings / overrides)
 
 
 def client_key(project):
@@ -25,7 +26,7 @@ def client_key(project):
 
 
 def clean_text(value, label, maxlen):
-    v = _CTRL.sub("", (value or "").replace("\r\n", "\n").replace("\r", "\n")).strip()
+    v = _CTRL_MORE.sub("", _CTRL.sub("", (value or "").replace("\r\n", "\n").replace("\r", "\n"))).strip()
     if len(v) > maxlen: raise ValueError(f"{label} trop long ({maxlen} caractères au maximum)")
     return v
 

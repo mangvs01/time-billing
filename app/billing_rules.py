@@ -29,6 +29,51 @@ def fr_g(v):
     return ("−" if d < 0 and s.strip("0.") else "") + i + ("," + f if f else "")
 
 
+# --- mandate exception « STC GEM » (rc41, owner decision 28.10.2026) ------------------------------------------------------------------
+# The mandates named here are exempt from the blocking of the invoice checks (they are still computed, shown as warnings and kept in the audit) and may have the
+# rate of a draft changed before issuance. Setting: environment variable BILLING_EXCEPTION_MANDATES, a comma-separated list. Unset = the default below; set to an
+# empty string = no exception at all (the switch-off). An entry is a mandate name (or short name), compared without case and without spaces, a prefix « STC GEM* » (every mandate whose name starts with these words, whole words only), or « id:<number> » to
+# name one mandate by its identifier when several names could match. The client name is NOT matched (a client may hold several mandates).
+EXCEPTION_MANDATES_DEFAULT = ("STC GEM*",)   # rc42 : « * » à la fin = tous les mandats dont le nom COMMENCE par ces mots (« STC GEM Avril », « STC GEM Oct - DM job »…)
+EXCEPTION_LABEL = "exception STC GEM"      # the words written in the audit log and shown next to each gap
+MAX_UNIT_RATE = Decimal("1000000000")      # upper bound of a unit rate typed on an exception mandate (same bound as the manual lines: invoice_lines.MAX_RATE)
+
+
+def _exc_key(s):
+    return "".join(str(s or "").split()).casefold()
+
+
+def exception_mandate_names():
+    v = os.environ.get("BILLING_EXCEPTION_MANDATES")
+    return EXCEPTION_MANDATES_DEFAULT if v is None else tuple(x.strip() for x in v.split(",") if x.strip())
+
+
+def exception_mandate(p):
+    """The configured entry that matches the mandate (a projects row / dict with id, name, short_name), else None. Read on every call: the setting is never cached."""
+    if not p: return None
+    keys = {_exc_key(p["name"]), _exc_key(p["short_name"])} - {""} if "short_name" in p.keys() else {_exc_key(p["name"])} - {""}
+    for entry in exception_mandate_names():
+        e = entry.strip()
+        if e.lower().startswith("id:"):
+            if e[3:].strip() == str(p["id"]): return entry
+        elif e.endswith("*"):
+            want = e[:-1].casefold().split()
+            if want and any(str(n or "").casefold().split()[:len(want)] == want for n in (p["name"], p["short_name"] if "short_name" in p.keys() else "")): return entry
+        elif _exc_key(e) in keys: return entry
+    return None
+
+
+def unit_rate_typed(v):
+    """A unit rate typed on an exception mandate: positive, at most MAX_UNIT_RATE, at most 4 decimals (refused, never rounded silently). Returns a Decimal."""
+    raw = str(v if v is not None else "").replace(",", ".").strip()
+    if not re.fullmatch(r"[0-9]+(?:\.[0-9]*)?|\.[0-9]+", raw): raise ValueError("tarif invalide (nombre positif attendu, 4 décimales au plus)")
+    d = Decimal(raw)
+    if d.quantize(Decimal("0.0001")) != d: raise ValueError("tarif invalide : 4 décimales au plus")
+    if d <= 0: raise ValueError("tarif invalide : il doit être strictement positif")
+    if d > MAX_UNIT_RATE: raise ValueError("tarif hors limites (1 000 000 000 au maximum)")
+    return d.quantize(Decimal("0.0001"))
+
+
 # --- time (RC8): technical timestamps are stored in UTC (naive ISO, 'YYYY-MM-DDTHH:MM:SS', the format already in
 # the database); everything shown to a person is in Europe/Zurich, summer / winter time handled by zoneinfo. --------
 ZURICH = ZoneInfo("Europe/Zurich")
@@ -333,9 +378,14 @@ INVOICE_NUMBER_OK = re.compile(r"[A-Za-z0-9][A-Za-z0-9/-]{0,%d}" % (INVOICE_NUMB
 NUMBER_SEQ = re.compile(r"(\d{4})-(\d{1,6})(?:-\d{1,6})?")
 
 
+_NUMBER_DIGITS = re.compile(r"[0-9]{1,6}(?:-[0-9]{1,6}){1,2}")
+
+
 def number_key(n):
-    """Comparison key of an invoice number: case and surrounding spaces never make two numbers different."""
-    return (n or "").strip().upper()
+    """Comparison key of an invoice number: case and surrounding spaces never make two numbers different. Review rc40 (F-N1): neither do leading zeros in the numeric format
+    (« 2026-09 », « 2026-9 » and « 2026-009 » are ONE number, as are « 2026-09-2 » and « 2026-9-2 »): the format of the earlier releases and the proposed one share the same sequence."""
+    k = (n or "").strip().upper()
+    return "-".join(str(int(g)) for g in k.split("-")) if _NUMBER_DIGITS.fullmatch(k) else k
 
 
 def check_invoice_number(raw):
@@ -389,7 +439,7 @@ def propose_invoice_number(c, year, exclude_id=None):
     top = max([p[1] for n, kind, _, _ in rows if kind != "draft" and (p := parse_number(n)) and p[0] == year] + [0])
     reserved = {number_key(n) for n, _, _, _ in rows}
     n = top + 1
-    while f"{year}-{n}".upper() in reserved: n += 1
+    while number_key(f"{year}-{n}") in reserved: n += 1
     return f"{year}-{n}"
 
 

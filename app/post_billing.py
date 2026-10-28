@@ -226,8 +226,9 @@ def owners(conn, project_id, cache=None):
     the owner confirmed. It does NOT assert that a late entry, added after a period was invoiced, was included in a later quantity, even when that
     quantity was deliberately raised (the raise needs a written exception of check 12): such an entry stays without owner, the variance and the
     credit-note proposals never attach it to a later invoice, and only a future explicit declaration at issuance could change that (not implemented).
-    Conversely, an entry owned by an invoice may in fact never have been counted in a quantity typed below the period's hours (within the 0.5 day
-    under-billing tolerance): the variance then measures the entry, not the quantity."""
+    Conversely, an entry owned by an invoice may in fact never have been counted in a quantity typed below the period's hours (up to rc40: within the 0.5 day
+    under-billing tolerance, removed in rc41; still possible on an invoice issued before rc41 or by a written derogation of check 12, and on an exception mandate):
+    the variance then measures the entry, not the quantity."""
     cache = {} if cache is None else cache
     own = {}
     for f in conn.execute("""SELECT id,number,period_from,period_to FROM invoices WHERE project_id=? AND status='issued'

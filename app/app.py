@@ -17,7 +17,7 @@ if SEC["trust_proxy"]:
  APP.wsgi_app=ProxyFix(APP.wsgi_app,x_for=1,x_proto=1,x_host=1)
 APP.config["MAX_CONTENT_LENGTH"]=15*1024*1024
 # Calendrier : rc36 CANDIDATE (tests only; not built, not deployed) — rc35 = thème sombre (autre mission)
-VERSION="9.2-rc40"
+VERSION="9.2-rc42"
 # Optional label shown in the page title (e.g. "STAGING" on the test instance); empty in production.
 ENV_LABEL=(os.environ.get("ENV_LABEL") or "").strip()[:30]
 DB=os.environ.get("DB_PATH","/data/timebilling.db")
@@ -1408,6 +1408,21 @@ def edit_rate(i,unit):
  """Unit price the draft would have once saved with this unit: its own rate, or the mandate's when the unit changes (same rule as the save)."""
  want=float(i["rate"] or 0) if unit=="day" else float(i["rate"] or 0)/(i["day_hours"] or 8)
  return float(i["unit_rate"]) if unit==i["unit"] and not (float(i["unit_rate"])<=0<want) else want
+def fmt_rate(x):
+ """Unit rate as shown in the editor field: 4 decimals at most, 2 at least, no useless zero."""
+ s=f"{Decimal(str(round(float(x),4))):.4f}".rstrip("0"); a,_,b=s.partition(".")
+ return a+"."+b.ljust(2,"0")
+def typed_rate(exc,form):
+ """rc41 (exception mandate only): the rate TYPED in the editor, as a float, or None when the field is absent, empty or still the one displayed (an untouched field leaves the
+ usual rule: the draft keeps its rate, or takes the mandate's when the unit changes). Raises ValueError for an invalid rate. Always None for any other mandate: a forged field is ignored."""
+ if not exc or form is None: return None
+ raw=form.get("unit_rate")
+ if raw is None or not raw.strip(): return None
+ d=rules.unit_rate_typed(raw)
+ try:
+  if d==rules.unit_rate_typed(form.get("unit_rate_shown")): return None
+ except ValueError: pass
+ return float(d)
 def edit_address_context(c,i,choice=None):
  """Billing-address menu of the editor: the active addresses of this client (grouped by legal identity), the one the draft carries even when deactivated, and the
  text that the draft prints for the current choice (the mandate's own address while no choice was saved: decision D8)."""
@@ -1432,8 +1447,15 @@ def edit_number_context(c,i,v):
  return {"value":v.get("number_shown") if v.get("number_shown") not in (None,"") else (i["number"] or proposal),"reserved":i["number"] is not None,"manual":bool(i["number_manual"]),
          "proposal":proposal,"unsaved_proposal":i["number"] is None,"max":rules.INVOICE_NUMBER_MAX,"history":[dict(r) for r in c.execute("SELECT * FROM invoice_number_changes WHERE invoice_id=? ORDER BY id",(i["id"],))]}
 def render_edit(c,i,iid,v,rows,hist):
- return render_template("invoice_edit.html",i=v,iid=iid,rows=rows,num=edit_number_context(c,i,v),addr=edit_address_context(c,i,request.form.get("billing_address_id") if request.method=="POST" and "billing_address_id" in request.form else None),other_vat_modes=rules.OTHER_VAT_MODES,date_hist=hist,units=rules.MANUAL_UNITS,max_lines=pdf_layout.MAX_MANUAL_LINES,
-                        max_rows_budget=pdf_layout.MANUAL_ROWS_BUDGET,recap=edit_recap(v,rows,edit_rate(i,v.get("unit"))),revision=(request.form.get("revision") if request.method=="POST" and request.form.get("revision") is not None else i["revision"]),
+ proj=c.execute("SELECT * FROM projects WHERE id=?",(i["project_id"],)).fetchone(); exc=rules.exception_mandate(proj)
+ posted=request.method=="POST"
+ try: typed=typed_rate(exc,request.form if posted else None)
+ except ValueError: typed=None
+ rate=typed if typed is not None else edit_rate(i,v.get("unit"))
+ rate_field=(request.form.get("unit_rate") if posted and exc and request.form.get("unit_rate") is not None else fmt_rate(rate))
+ rate_shown=(request.form.get("unit_rate_shown") if posted and exc and request.form.get("unit_rate_shown") is not None else fmt_rate(i["unit_rate"]))
+ return render_template("invoice_edit.html",rate_exception=exc,rate_field=rate_field,rate_shown=rate_shown,max_unit_rate=rules.MAX_UNIT_RATE,i=v,iid=iid,rows=rows,num=edit_number_context(c,i,v),addr=edit_address_context(c,i,request.form.get("billing_address_id") if request.method=="POST" and "billing_address_id" in request.form else None),other_vat_modes=rules.OTHER_VAT_MODES,date_hist=hist,units=rules.MANUAL_UNITS,max_lines=pdf_layout.MAX_MANUAL_LINES,
+                        max_rows_budget=pdf_layout.MANUAL_ROWS_BUDGET,recap=edit_recap(v,rows,rate),revision=(request.form.get("revision") if request.method=="POST" and request.form.get("revision") is not None else i["revision"]),
                         project_rate=float(i["rate"] or 0),new_uid=secrets.token_urlsafe(9),status=200)
 @APP.route("/invoice/<int:iid>/edit",methods=["GET","POST"])
 @login_required
@@ -1458,6 +1480,9 @@ def invoice_edit(iid):
     want=float(i["rate"] or 0) if v["unit"]=="day" else float(i["rate"] or 0)/(i["day_hours"] or 8)
     # rc11 (QA-02): an edit keeps the draft's rate; G4 (R-PO-B2): except a rate of 0, never issuable, once the mandate has one (draft n°1, D5 c)
     v["unit_rate"]=float(i["unit_rate"]) if v["unit"]==i["unit"] and not (float(i["unit_rate"])<=0<want) else want
+    exc=rules.exception_mandate(c.execute("SELECT * FROM projects WHERE id=?",(i["project_id"],)).fetchone())
+    override=typed_rate(exc,request.form)      # rc41: the one place where a draft rate may differ from the mandate's, and only on an exception mandate
+    if override is not None: v["unit_rate"]=override
     v["vat"]=num_field(request.form.get("vat"),"taux de TVA",0.0,100.0,default=float(i["vat"]))
     empty_description=not v["description"]
     v["description"]=v["description"] or i["project"]
@@ -1497,11 +1522,15 @@ def invoice_edit(iid):
     if chosen is not None: c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("draft_billing_address_set",f"id={iid};address_id={chosen['billing_address_id']};label={chosen['bill_label']};refresh={'yes' if request.form.get('refresh_address') else 'no'}"))
     record_date_change(c,iid,i["invoice_date"],v["invoice_date"],"modification du brouillon")
     c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("draft_updated",f"id={iid};qty={v['qty']};manual_lines={len(lines)};lines_added={ins};lines_changed={upd};lines_removed={gone}"))
+    if override is not None and abs(override-float(i["unit_rate"]))>1e-9:
+     c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("draft_rate_changed",json.dumps({"invoice_id":iid,"number":newnum,"mandate":i["project"],"unit":v["unit"],"old_rate":float(i["unit_rate"]),"new_rate":override,
+               "by":SEC["user"],"at":rules.utc_now().isoformat(timespec="seconds"),"exception":rules.EXCEPTION_LABEL},ensure_ascii=False)))
+     flash(f"Tarif du brouillon modifié ({rules.EXCEPTION_LABEL}) : {fr_chf(override)} par {'jour' if v['unit']=='day' else 'heure'} (il était de {fr_chf(float(i['unit_rate']))}). Les totaux et le PDF sont calculés avec ce tarif.")
     flash("Brouillon modifié."+(f" {len(lines)} ligne(s) manuelle(s) enregistrée(s)." if lines or gone else "")+(f" Adresse de facturation : {chosen['bill_label']}." if chosen and chosen["bill_label"] else " Adresse de facturation : celle de la fiche du mandat." if chosen is not None else "")+(f" Numéro de facture {'saisi' if newman and newnum!=cur else 'proposé'} : {newnum}." if newnum!=cur else ""))
     if empty_description: flash(f"Description vide : le nom du mandat (« {i['project']} ») sera imprimé à sa place.")
     if v["other_label"] and not v["other_amount"]: flash("Le libellé « AUTRES » n'est imprimé que si un montant est saisi : avec un montant nul, la facture affiche « AUTRES » seul. Saisir le montant, ou ajouter une ligne manuelle.")
     po_warning(c,c.execute("SELECT * FROM projects WHERE id=?",(i["project_id"],)).fetchone())
-    if v["unit"]==i["unit"] and abs(v["unit_rate"]-float(i["unit_rate"]))>1e-9:
+    if override is None and v["unit"]==i["unit"] and abs(v["unit_rate"]-float(i["unit_rate"]))>1e-9:
      flash(f"Tarif du brouillon repris du mandat : {fr_chf(v['unit_rate'])} par {'jour' if v['unit']=='day' else 'heure'} (il était de {fr_chf(float(i['unit_rate']))}).")
     return back("archive")
    except Exception as e:
@@ -1515,7 +1544,9 @@ def invoice_preview(iid):
  with db() as c:
   i=c.execute("SELECT i.*,p.rate,p.day_hours FROM invoices i JOIN projects p ON p.id=i.project_id WHERE i.id=?",(iid,)).fetchone()
   if not i or i["status"]!="draft": abort(404)
-  v=edit_view(i,request.form); r=edit_recap(v,manual_lines.from_form(request.form),edit_rate(i,v.get("unit")))
+  try: typed=typed_rate(rules.exception_mandate(c.execute("SELECT * FROM projects WHERE id=?",(i["project_id"],)).fetchone()),request.form)
+  except ValueError as e: return jsonify(ok=False,error=str(e))
+  v=edit_view(i,request.form); r=edit_recap(v,manual_lines.from_form(request.form),typed if typed is not None else edit_rate(i,v.get("unit")))
  if r["a"] is None: return jsonify(ok=False,error=r["error"])
  a=r["a"]; f=lambda d: fr_chf(d)
  return jsonify(ok=True,service=f(a["ht"]),lines=[f(l["amount"]) for l in r["lines"]],subtotal=f(a["subtotal"]),vat=f(a["tva"]),other=f(a["other"]),total=f(a["ttc"]))
@@ -1582,6 +1613,7 @@ def issue(iid):
   clash=credits.period_clash(c,i["project_id"],i["period_from"],i["period_to"],exclude_id=iid)
   if clash: raise ValueError(f"la période chevauche la facture déjà émise {clash['number']} : modifier la période ou supprimer ce brouillon")
   derog=invoice_checks.derogations(ctx["checks"],request.form)   # G4/D8: strict; only 12 and 13 may be overridden, each with a written reason
+  gaps=invoice_checks.exception_gaps(ctx["checks"])   # rc41: empty for every mandate but an exception mandate
   if ctx["date_problem"]: raise ValueError(ctx["date_problem"])
   if not pdf_layout.block_fits(invoice_service.live_data(c,iid)[0]): raise ValueError("adresse trop longue pour le document imprimé (bloc émetteur ou facturation) : la raccourcir dans les paramètres ou la fiche du mandat")
   if ctx["amounts"]["ttc"]<=0: raise ValueError("le total de la facture est nul ou négatif : modifier le brouillon (quantité, montant « autres »)")
@@ -1611,10 +1643,13 @@ def issue(iid):
   except sqlite3.IntegrityError as e: raise ValueError(f"le numéro {number} vient d'être pris ({e}) : modifier le numéro du brouillon (numéro libre proposé : {number_hint(c,iid,number_year(inv_date))})")
   record_number_change(c,iid,i["number"],number,bool(i["number_manual"]),"émission")
   n=invoice_service.freeze(c,iid,"issue")
-  c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("invoice_issued",f"{number};invoice_date={inv_date};issued_at={now.isoformat(timespec='seconds')};backdated={'confirmed' if backdated else 'no'};annex_entries={n};reliquat={ctx['reliquat']};treatment={treatment};derogations={','.join(str(k) for k in sorted(derog)) or 'none'}"))
+  c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("invoice_issued",f"{number};invoice_date={inv_date};issued_at={now.isoformat(timespec='seconds')};backdated={'confirmed' if backdated else 'no'};annex_entries={n};reliquat={ctx['reliquat']};treatment={treatment};derogations={','.join(str(k) for k in sorted(derog)) or 'none'}"+(f";{rules.EXCEPTION_LABEL}=yes;exception_gaps={','.join(str(x['n']) for x in gaps) or 'none'}" if rules.exception_mandate(ctx["p"]) else "")))
   for x in ctx["check_failed"]:   # D8: reason, author, date and the exact anomaly overridden; printed nowhere
    c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("invoice_check_derogation",json.dumps({"invoice_id":iid,"number":number,"check":x["n"],"title":x["title"],"anomaly":x["detail"],
              "reason":derog[x["n"]],"by":SEC["user"],"at":now.isoformat(timespec="seconds")},ensure_ascii=False)))
+  for x in gaps:   # rc41: the gaps of an exception mandate do not block, but each is kept with the exact anomaly, the author and the mention « exception STC GEM »
+   c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("invoice_check_exception",json.dumps({"invoice_id":iid,"number":number,"check":x["n"],"title":x["title"],"anomaly":x["detail"],
+             "exception":rules.EXCEPTION_LABEL,"mandate":ctx["p"]["name"],"by":SEC["user"],"at":now.isoformat(timespec="seconds")},ensure_ascii=False)))
   for o in credits.active_offsets_on(c,iid):
    c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("credit_offset_applied",f"{o['reference']};op={o['id']};amount={o['amount']};invoice={number}"))
   c.execute("COMMIT"); flash(f"Facture {number} émise le {rules.fr_ts(now.isoformat(timespec='seconds'))}"+(f", datée du {rules.fr_date(inv_date)} (antidatage confirmé)." if backdated else "."))
@@ -1633,7 +1668,7 @@ def pdf(iid):
    # Issued invoices are never re-rendered: serve the bytes frozen at issuance.
    number,data=invoice_service.frozen_pdf(c,iid)
    if data is None:return "Facture émise sans PDF figé : émission à reprendre par un mécanisme de correction.",409
-   return send_file(io.BytesIO(data),mimetype="application/pdf",as_attachment=True,download_name=f"facture-{number}.pdf")
+   return send_file(io.BytesIO(data),mimetype="application/pdf",as_attachment=True,download_name=f"facture-{_safe_name(number)}.pdf")
   data,_=invoice_service.render(c,iid)
  return send_file(io.BytesIO(data),mimetype="application/pdf",as_attachment=True,download_name="facture-brouillon.pdf")
 
@@ -1869,7 +1904,7 @@ def credit_cancel(cid):
 def credit_cancellation_pdf(cid):
  with db() as c: ref,data=invoice_service.frozen_cancellation_pdf(c,cid)
  if data is None: return "Not found",404
- return send_file(io.BytesIO(data),mimetype="application/pdf",as_attachment=True,download_name=f"annulation-{ref}.pdf")
+ return send_file(io.BytesIO(data),mimetype="application/pdf",as_attachment=True,download_name=f"annulation-{_safe_name(ref)}.pdf")
 @APP.route("/credit/<int:cid>/refund",methods=["POST"])
 @login_required
 def credit_refund(cid):
@@ -1897,7 +1932,7 @@ def credit_pdf(cid):
   if not cn: return "Not found",404
   if cn["status"]=="issued":
    ref,data=invoice_service.frozen_credit_pdf(c,cid)
-   return send_file(io.BytesIO(data),mimetype="application/pdf",as_attachment=True,download_name=f"note-de-credit-{ref}.pdf")
+   return send_file(io.BytesIO(data),mimetype="application/pdf",as_attachment=True,download_name=f"note-de-credit-{_safe_name(ref)}.pdf")
   data,_=invoice_service.render_credit(c,cid)
  return send_file(io.BytesIO(data),mimetype="application/pdf",as_attachment=True,download_name="note-de-credit-brouillon.pdf")
 

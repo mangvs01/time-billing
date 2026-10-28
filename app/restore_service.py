@@ -10,6 +10,7 @@ CURRENT append-only audit log verbatim: the file's audit rows are only appended 
 """
 import base64, hashlib, json, os, re, secrets, sqlite3
 from collections import Counter
+from decimal import Decimal
 
 SNAPSHOT_TABLES = {"invoice_snapshots": "invoice_id", "credit_note_snapshots": "credit_note_id", "credit_note_cancellations": "credit_note_id"}
 # parents before children so the rebuilt file never depends on deferred FK checks
@@ -132,6 +133,7 @@ def preview(conn, data):
     from app import historical_billing
     blocking += historical_billing.validation_conflicts(data["tables"].get("historical_invoices", []))
     blocking += annex_consistency(data)
+    blocking += lines_consistency(data)
     blocking += annex_trail(data)
     return {"counts": counts, "blocking": blocking, "generated_at": data["meta"].get("generated_at"), "app_version": data["meta"].get("app_version")}
 
@@ -147,6 +149,7 @@ IMMUTABLE = {
     "invoice_snapshots": (("invoice_id",), ""),
     "credit_note_snapshots": (("credit_note_id",), ""),
     "credit_note_lines": (("id",), "WHERE credit_note_id IN (SELECT id FROM credit_notes WHERE status='issued')"),   # rc38: the credited manual lines of an issued note
+    "invoice_lines": (("id",), "WHERE invoice_id IN (SELECT id FROM invoices WHERE status='issued')"),     # review rc40: the manual lines of an issued invoice (credit notes, turnover and exports read this table)
     "credit_note_cancellations": (("credit_note_id",), ""),
     "invoice_annex_entries": (("invoice_id", "entry_id"), ""),
     # rc19: annexed entries are no longer frozen here (a newer backup may carry a traced correction): annex_trail() requires instead that
@@ -176,6 +179,34 @@ def annex_consistency(data):
         except (ValueError, KeyError, TypeError): out.append(f"annexe figée illisible (facture {r.get('number')})"); continue
         if ids != linked.get(r.get("invoice_id"), set()): out.append(f"les saisies liées à la facture {r.get('number')} ne correspondent pas à son annexe figée")
     return out
+
+
+def lines_consistency(data):
+    """Review rc40: the manual lines of an issued invoice (and the credited lines of an issued credit note) in the file must be exactly the printed copy frozen in its snapshot:
+    the credit-note caps, the turnover and the exports read the tables, the PDF and the screens of the document read the snapshot, so a forged file may not make them differ."""
+    t = data["tables"]; out = []
+    by_inv = {}
+    for r in t.get("invoice_lines", []):
+        if isinstance(r, dict): by_inv.setdefault(r.get("invoice_id"), []).append(r)
+    for r in t.get("invoice_snapshots", []):
+        try: header = json.loads(r["header_json"]); frozen = header.get("lines") or []
+        except (ValueError, KeyError, TypeError, AttributeError): out.append(f"copie figée illisible (facture {r.get('number')})"); continue
+        try:
+            want = [(int(x["position"]), x["description"], float(x["qty"]), x["unit"], float(x["unit_rate"]), x["vat_mode"]) for x in frozen]
+            have = sorted((int(x.get("position")), x.get("description"), float(x.get("qty")), x.get("unit"), float(x.get("unit_rate")), x.get("vat_mode")) for x in by_inv.get(r.get("invoice_id"), []))
+        except (KeyError, TypeError, ValueError): out.append(f"lignes manuelles illisibles (facture {r.get('number')})"); continue
+        if sorted(want) != have: out.append(f"les lignes manuelles de la facture {r.get('number')} ne correspondent pas à sa copie figée")
+    by_cn = {}
+    for r in t.get("credit_note_lines", []):
+        if isinstance(r, dict): by_cn.setdefault(r.get("credit_note_id"), []).append(r)
+    for r in t.get("credit_note_snapshots", []):
+        try:
+            frozen = json.loads(r["header_json"]).get("lines") or []
+            want = sorted((int(x["invoice_line_id"]), x["description"], str(Decimal(str(x["amount"])).quantize(Decimal("0.01"))), x["vat_mode"]) for x in frozen)
+            have = sorted((int(x.get("invoice_line_id")), x.get("description"), str(Decimal(str(x.get("amount"))).quantize(Decimal("0.01"))), x.get("vat_mode")) for x in by_cn.get(r.get("credit_note_id"), []))
+        except (ValueError, KeyError, TypeError, AttributeError, ArithmeticError): out.append(f"lignes créditées illisibles (note de crédit {r.get('reference')})"); continue
+        if want != have: out.append(f"les lignes créditées de la note de crédit {r.get('reference')} ne correspondent pas à sa copie figée")
+    return out[:10]
 
 
 def annex_trail(data):
