@@ -18,6 +18,7 @@ and 13 and no business decision has extended it; no reason, for 14 or for 12, is
   6 the cumulative is computed up to the cutoff     12 invoice, annex and position tell the same story
                                                     13 the invoiced period ends on or before the invoice date
   14 the net quantity invoiced, cumulated, does not exceed the quantity worked, cumulated (never derogable)
+  15 (BQR3, only when the box « Ajouter la QR-facture » is ticked) the Swiss payment slip can be produced (never derogable; untick the box to leave)
 """
 import hashlib, json, os, re, unicodedata
 from decimal import Decimal, ROUND_HALF_UP
@@ -100,7 +101,8 @@ def run_checks(conn, iid):
     exc = rules.exception_mandate(p)      # rc41: an exception mandate keeps every check and every detail, but a failure is only a warning (flag would_fail), never blocking, no reason asked
 
     def add(n, title, ok, detail, warn=False, derogable=False):
-        if not ok and not warn and exc:
+        # BQR6 (owner decision 04/11): check 15 (QR-bill requested) stays a blocking failure even on an exception mandate: the box was ticked on purpose, the bulletin must not vanish silently
+        if not ok and not warn and exc and n != 15:
             res.append({"n": n, "title": title, "status": "warning", "detail": detail, "derogable": False, "would_fail": True, "exception": exc})
             return
         res.append({"n": n, "title": title, "status": "ok" if ok else ("warning" if warn else "fail"), "detail": detail, "derogable": bool(derogable and not ok and not warn)})
@@ -243,12 +245,39 @@ def run_checks(conn, iid):
     add(14, "La quantité nette facturée cumulée ne dépasse pas la quantité réalisée cumulée", ok14,
         f"facturé net {round(net14, 5)} j (historique validé {round(hist14, 5)} + Time Billing jusqu'au {fr(pt)} {round(prev14, 5)} + cette facture {round(cur14, 5)} − notes de crédit {round(cr14, 5)}) "
         + (f"≤ réalisé jusqu'au {fr(pt)} : {round(real14, 5)} j" if ok14 else f"> réalisé jusqu'au {fr(pt)} : {round(real14, 5)} j (excédent {round(net14 - real14, 5)} j facturés au-delà du travail enregistré ; aucune dérogation possible : enregistrer le travail manquant, corriger la quantité ou créditer)"))
+    # 15 — BQR3: only when the box « Ajouter la QR-facture » is ticked on this draft (and the global safeguard is on): the bulletin must be buildable. NOT derogable:
+    # the way out is to correct the missing piece or to untick the box. Box not ticked: no such check (the list keeps its fourteen rows).
+    from app import qr_bill
+    qr_why = qr_bill.blocking_problem(h)
+    if qr_why is not None or qr_bill.wanted(h):
+        add(15, "La QR-facture demandée peut être produite", qr_why is None,
+            "toutes les informations du bulletin sont présentes (IBAN, adresses du créancier et du client, montant)" if qr_why is None else
+            qr_why + " — à corriger : " + _qr_where(qr_why) + " ; ou décocher « Ajouter la QR-facture » (case de cet écran, étape 1)")
+        res[-1]["links"] = _qr_links(qr_why, pid)
     return res
 
 
 def exception_gaps(checks):
     """rc41: the checks that would have failed but only warn because the mandate is an exception mandate (to display and to write in the audit log)."""
     return [c for c in checks if c.get("would_fail")]
+
+
+def _qr_where(why):
+    """BQR4: which screen to correct, from the message of the QR-bill module (it names the faulty field)."""
+    w = why or ""
+    client, issuer = "du client" in w, ("créancier" in w or "IBAN" in w or "QR-IBAN" in w or "QRR" in w)
+    if client and not issuer: return "l'adresse du client : dans la fiche du mandat (section « Adresse de facturation en champs séparés ») ou, si une adresse de la liste (EGG FR/BE/CH/MEA) est choisie sur le brouillon, dans la page Adresses de facturation puis « Actualiser » dans le brouillon"
+    if issuer and not client: return "l'IBAN ou l'adresse de l'émetteur, dans les Paramètres (section « Adresse de l'émetteur en champs séparés et compte QR »)"
+    return "l'IBAN et l'adresse de l'émetteur dans les Paramètres, l'adresse du client dans la fiche du mandat"
+
+
+def _qr_links(why, pid):
+    w = why or ""
+    client, issuer = "du client" in w, ("créancier" in w or "IBAN" in w or "QR-IBAN" in w or "QRR" in w)
+    settings_l, mandate_l = ("Paramètres de l'émetteur", "/?tab=settings#adresse-emetteur"), ("Fiche du mandat", f"/project/{pid}/edit#adresse-structuree")
+    list_l = ("Adresses de facturation (liste)", "/adresses")
+    links = [settings_l] if issuer and not client else [mandate_l, list_l] if client and not issuer else [settings_l, mandate_l, list_l]
+    return links + [("Case « QR-facture »", "#qrBillOption")]
 
 
 def failures(checks):

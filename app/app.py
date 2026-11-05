@@ -17,7 +17,7 @@ if SEC["trust_proxy"]:
  APP.wsgi_app=ProxyFix(APP.wsgi_app,x_for=1,x_proto=1,x_host=1)
 APP.config["MAX_CONTENT_LENGTH"]=15*1024*1024
 # Calendrier : rc36 CANDIDATE (tests only; not built, not deployed) — rc35 = thème sombre (autre mission)
-VERSION="9.2-rc42"
+VERSION="9.2-rc43"
 # Optional label shown in the page title (e.g. "STAGING" on the test instance); empty in production.
 ENV_LABEL=(os.environ.get("ENV_LABEL") or "").strip()[:30]
 DB=os.environ.get("DB_PATH","/data/timebilling.db")
@@ -159,9 +159,17 @@ def init(path=None):
                   # rc37 (P3): 1 = the number of the draft was typed by the user (never replaced automatically), 0 = proposed by the application
                   ("invoices","number_manual","INTEGER NOT NULL DEFAULT 0"),
                   # rc38: HT credited on the manual lines of the invoice, by VAT regime (the detail is in credit_note_lines, see app/credit_lines.py)
-                  ("credit_notes","lines_taxed","REAL NOT NULL DEFAULT 0"),("credit_notes","lines_untaxed","REAL NOT NULL DEFAULT 0")]:
+                  ("credit_notes","lines_taxed","REAL NOT NULL DEFAULT 0"),("credit_notes","lines_untaxed","REAL NOT NULL DEFAULT 0"),
+                  # BQR5: structured form of the billing address chosen from the EGG list, COPIED into the invoice with the text (instantané; NULL = nothing chosen / not structured)
+                  ("invoices","bill_street","TEXT"),("invoices","bill_house_num","TEXT"),("invoices","bill_pcode","TEXT"),("invoices","bill_city","TEXT"),
+                  ("invoices","bill_country","TEXT"),("invoices","bill_addr_verified","INTEGER"),
+                  # BQR3: per-invoice option « Ajouter la QR-facture » (0 = no, the default; additive, existing rows untouched)
+                  ("invoices","qr_bill","INTEGER NOT NULL DEFAULT 0"),
+                  # BQR4: structured billing address of the mandate (empty by default, never filled automatically) + « adresse vérifiée » confirmed by the owner
+                  ("projects","client_street","TEXT DEFAULT ''"),("projects","client_house_num","TEXT DEFAULT ''"),("projects","client_pcode","TEXT DEFAULT ''"),
+                  ("projects","client_city","TEXT DEFAULT ''"),("projects","client_country","TEXT DEFAULT ''"),("projects","client_addr_verified","INTEGER NOT NULL DEFAULT 0")]:
    ensure_column(c, t, col, f"{col} {d}")
-  c.execute(addresses.DDL); addresses.make_global(c)   # rc37 (P2) ; rc40: the four seeded addresses become the global list: reusable billing addresses (one definition, shared with scripts/seed_adresses_egg.py)
+  c.execute(addresses.DDL); addresses.migrate(c); addresses.make_global(c)   # rc37 (P2) ; rc40: the four seeded addresses become the global list: reusable billing addresses (one definition, shared with scripts/seed_adresses_egg.py)
   c.executescript("""
   CREATE TABLE IF NOT EXISTS import_batch_rows(id INTEGER PRIMARY KEY, batch_id TEXT NOT NULL REFERENCES import_batches(id), source_sheet TEXT NOT NULL, source_row INTEGER NOT NULL, raw_json TEXT NOT NULL, issues TEXT NOT NULL DEFAULT '', decision TEXT NOT NULL, entry_id INTEGER, UNIQUE(batch_id,source_sheet,source_row));
   CREATE INDEX IF NOT EXISTS idx_import_rows_source ON import_batch_rows(source_sheet,source_row);
@@ -575,7 +583,7 @@ def index():
   with db() as _c: d=_c.execute("SELECT i.id,i.period_from,i.period_to,i.qty,i.unit,i.invoice_date,p.name project FROM invoices i JOIN projects p ON p.id=i.project_id WHERE i.id=? AND i.status='draft'",(did,)).fetchone()
   if d: draft_done=dict(d,after_date=d["period_to"]>(d["invoice_date"] or _today.isoformat()))
  return render_template("index.html",month_hours=month_hours,month_label=month_label,cnotes=cnotes,projects=ps,active=[p for p in ps if p["active"]],closed=[p for p in ps if not p["active"]],positions=positions,recent=es,invoices=ins,
-  fc=fc,batches=batches,tab=tab,settings=settings,fields=rules.ISSUER_FIELDS,settings_missing=missing,treatments=rules.TREATMENTS,options=rules.OPTION_FIELDS,other_vat_modes=rules.OTHER_VAT_MODES,fonts_used=FONTS_USED,version=VERSION,env_label=ENV_LABEL,no_mandate=not ps,current_year=rules.local_today().year,
+  fc=fc,batches=batches,tab=tab,settings=settings,fields=rules.ISSUER_FIELDS,qr_fields=rules.ISSUER_QR_FIELDS,settings_missing=missing,treatments=rules.TREATMENTS,options=rules.OPTION_FIELDS,other_vat_modes=rules.OTHER_VAT_MODES,fonts_used=FONTS_USED,version=VERSION,env_label=ENV_LABEL,no_mandate=not ps,current_year=rules.local_today().year,
   last_backup=last_backup,backup_stale=backup_stale,has_docs=has_docs,todo=todo,
   cal_resume=cal_resume,cal_cfg=cal.reglages(settings),cal_reglages=cal.REGLAGES,cal_tva=cal.TVA_PERIODICITES,retour="settings",
   open_variances=open_variances,entry_date=entry_date,entry_pid=entry_pid,entry_pname=active_ids.get(entry_pid,""),entry_saved=bool(saved and entry_pid==saved.get("pid")),
@@ -688,6 +696,12 @@ def project_values(form):
  if v["rate"]<0 or v["ordered_days"]<0 or v["vat"]<0 or v["day_hours"]<=0: raise ValueError("valeurs numériques invalides")
  if not (v["rate"]<=1e6 and v["ordered_days"]<=1e5 and v["vat"]<=100 and v["day_hours"]<=24 and v["duration_months"]<=600): raise ValueError("valeurs numériques hors limites (tarif ≤ 1 000 000, jours ≤ 100 000, TVA ≤ 100 %, heures par jour ≤ 24, durée ≤ 600 mois)")
  v.update({k:form_text(form.get(k)) for k in PROJECT_TEXT})
+ if any(k in form for k in rules.CLIENT_ADDR_FIELDS):      # BQR4: a form without these fields (older screens) leaves the stored structured address alone
+  from app import qr_bill
+  a={k:" ".join(form_text(form.get(k)).split()) for k in rules.CLIENT_ADDR_FIELDS}; a["client_country"]=a["client_country"].upper()
+  bad=qr_bill.address_problems(*(a[k] for k in rules.CLIENT_ADDR_FIELDS),who="Adresse du client")
+  if bad: raise ValueError(" ".join(bad))
+  v.update(a); v["client_addr_verified"]=1 if form.get("client_addr_verified")=="1" and any(a.values()) else 0
  return v
 @APP.route("/project",methods=["POST"])
 @login_required
@@ -719,7 +733,14 @@ def project_edit(pid):
     flash("Mandat mis à jour. Les factures déjà émises conservent les données figées à leur émission.")
     return back("mandates")
    except Exception as e: refused("Mandat non modifié : "+str(e))
- return render_template("project_edit.html",p=p,legal_display=rules.legal_display(p["client_legal_id"]))
+ # BQR4: structured address shown in the form; when nothing is stored yet, an unambiguous EGG split (address_presets) is PROPOSED, never stored by this page
+ from app import address_presets
+ addr={k:(p[k] or "") for k in rules.CLIENT_ADDR_FIELDS}; proposed=None
+ if not any(addr.values()):
+  hit=address_presets.match_text(p["billing_address"])
+  if hit and hit["fields"]: proposed=hit["label"]; addr=dict(hit["fields"])
+ return render_template("project_edit.html",p=p,legal_display=rules.legal_display(p["client_legal_id"]),addr=addr,addr_proposed=proposed,presets=address_presets.PRESETS,
+                        addr_state=("propose" if proposed else "verifie" if p["client_addr_verified"] and any(addr.values()) else "a_confirmer" if any(addr.values()) else "vide"))
 def address_groups(c):
  """P2: the clients as the application knows them (the legal identity of their mandates, no clients table) with their reusable billing addresses and how many invoices copied each."""
  groups={}
@@ -743,8 +764,9 @@ def address_add():
    key=request.form.get("client_key","")
    if key not in {g["key"] for g in address_groups(c)}: raise ValueError("client inconnu")
    label,contact,address=addresses.validate(request.form.get("label"),request.form.get("contact"),request.form.get("address"))
+   st=addresses.clean_struct(request.form)      # BQR5: structured form (optional, empty = not structured)
    nxt=c.execute("SELECT COALESCE(MAX(sort_order),0)+1 FROM billing_addresses WHERE client_key=?",(key,)).fetchone()[0]
-   try: c.execute("INSERT INTO billing_addresses(client_key,label,contact,address,active,sort_order,created_at) VALUES(?,?,?,?,1,?,?)",(key,label,contact,address,nxt,rules.utc_now_iso()))
+   try: c.execute("INSERT INTO billing_addresses(client_key,label,contact,address,active,sort_order,created_at,addr_street,addr_house_num,addr_pcode,addr_city,addr_country,addr_verified) VALUES(?,?,?,?,1,?,?,?,?,?,?,?,?)",(key,label,contact,address,nxt,rules.utc_now_iso(),*st))
    except sqlite3.IntegrityError: raise ValueError(f"une adresse « {label} » existe déjà pour ce client")
    c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("billing_address_added",f"client_key={key};label={label}"))
   flash(f"Adresse « {label} » ajoutée.")
@@ -763,8 +785,10 @@ def address_update(aid):
     c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("billing_address_"+request.form["act"],f"id={aid};label={a['label']}")); flash(f"Adresse « {a['label']} » {'réactivée' if request.form['act']=='activer' else 'désactivée'}.")
    else:
     label,contact,address=addresses.validate(request.form.get("label"),request.form.get("contact"),request.form.get("address"))
+    st=addresses.clean_struct(request.form) if "addr_street" in request.form else None      # BQR5: a form without the structured fields (older screen) leaves them alone
     try: c.execute("UPDATE billing_addresses SET label=?,contact=?,address=?,updated_at=? WHERE id=?",(label,contact,address,rules.utc_now_iso(),aid))
     except sqlite3.IntegrityError: raise ValueError(f"une adresse « {label} » existe déjà pour ce client")
+    if st is not None: c.execute("UPDATE billing_addresses SET addr_street=?,addr_house_num=?,addr_pcode=?,addr_city=?,addr_country=?,addr_verified=? WHERE id=?",(*st,aid))
     c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("billing_address_updated",f"id={aid};label={label}")); flash(f"Adresse « {label} » enregistrée. Les brouillons qui l'ont déjà choisie gardent leur copie jusqu'à « Actualiser ».")
  except HTTPException: raise
  except Exception as e: flash("Adresse non modifiée : "+str(e))
@@ -1332,7 +1356,10 @@ def draft_values(c,form,pid,exclude=None):
   inv_date=iso_date(inv_date,"date de facture")
   if inv_date<f: raise ValueError("la date de facture ne peut pas précéder le début de la période facturée")
  return {"invoice_date":inv_date or None,"other_vat_mode":ovm,"period_from":f,"period_to":t,"qty":qty,"unit":unit,"rounding":mode,"rounding_step":float(step),"note":_checked_note(form.get("note")),
-         "description":_checked_description(form.get("description")),"other_amount":(oa:=_other_amount(form.get("other_amount"))),"other_label":_checked_other_label(form.get("other_label"),oa,ovm)}
+         "description":_checked_description(form.get("description")),"other_amount":(oa:=_other_amount(form.get("other_amount"))),"other_label":_checked_other_label(form.get("other_label"),oa,ovm),**qr_bill_choice(form)}
+def qr_bill_choice(form):
+ """BQR3: {'qr_bill':0|1} when the form carries the box (field qr_bill_present, sent only while QR_BILL_ENABLED is on), else {} (the stored choice is left alone)."""
+ return {"qr_bill":1 if form.get("qr_bill")=="1" else 0} if form.get("qr_bill_present") else {}
 ISSUE_DAY="date d'émission"
 def record_date_change(c,iid,old,new,context):
  """Trace an invoice-date change on a draft (rc5). Empty = the real issuance day will be printed."""
@@ -1454,7 +1481,7 @@ def render_edit(c,i,iid,v,rows,hist):
  rate=typed if typed is not None else edit_rate(i,v.get("unit"))
  rate_field=(request.form.get("unit_rate") if posted and exc and request.form.get("unit_rate") is not None else fmt_rate(rate))
  rate_shown=(request.form.get("unit_rate_shown") if posted and exc and request.form.get("unit_rate_shown") is not None else fmt_rate(i["unit_rate"]))
- return render_template("invoice_edit.html",rate_exception=exc,rate_field=rate_field,rate_shown=rate_shown,max_unit_rate=rules.MAX_UNIT_RATE,i=v,iid=iid,rows=rows,num=edit_number_context(c,i,v),addr=edit_address_context(c,i,request.form.get("billing_address_id") if request.method=="POST" and "billing_address_id" in request.form else None),other_vat_modes=rules.OTHER_VAT_MODES,date_hist=hist,units=rules.MANUAL_UNITS,max_lines=pdf_layout.MAX_MANUAL_LINES,
+ return render_template("invoice_edit.html",rate_exception=exc,rate_field=rate_field,rate_shown=rate_shown,max_unit_rate=rules.MAX_UNIT_RATE,i=v,iid=iid,rows=rows,num=edit_number_context(c,i,v),addr=edit_address_context(c,i,request.form.get("billing_address_id") if request.method=="POST" and "billing_address_id" in request.form else None),other_vat_modes=rules.OTHER_VAT_MODES,date_hist=hist,qr=qr_option(c,iid,request.form if posted else None),units=rules.MANUAL_UNITS,max_lines=pdf_layout.MAX_MANUAL_LINES,
                         max_rows_budget=pdf_layout.MANUAL_ROWS_BUDGET,recap=edit_recap(v,rows,rate),revision=(request.form.get("revision") if request.method=="POST" and request.form.get("revision") is not None else i["revision"]),
                         project_rate=float(i["rate"] or 0),new_uid=secrets.token_urlsafe(9),status=200)
 @APP.route("/invoice/<int:iid>/edit",methods=["GET","POST"])
@@ -1568,6 +1595,29 @@ def invoice_delete(iid):
  flash(("Brouillon supprimé."+(f" {released} imputation(s) de note de crédit libérée(s) ; le solde redevient disponible." if released else "")) if n else "Suppression refusée : seul un brouillon non émis peut être supprimé.")
  return back("archive")
 
+# --- BQR3: per-invoice option « Ajouter la QR-facture » ------------------------------------------
+def qr_option(c,iid,form=None):
+ """{'state':'off'|'unsupported'|'ok','why':text|None,'checked':bool} for the box of a draft (editor and issue screen read the same stored value; a refused save of the editor shows the box as typed)."""
+ if not os.environ.get("QR_BILL_ENABLED"): return {"state":"off","why":None,"checked":False}
+ from app import qr_bill, invoice_service as _is
+ h=_is.live_data(c,iid)[0]; st,why=qr_bill.availability(h)
+ return {"state":st,"why":why,"checked":bool(h.get("qr_bill")) if not (form and form.get("qr_bill_present")) else form.get("qr_bill")=="1"}
+@APP.route("/invoice/<int:iid>/qr-bill",methods=["POST"])
+@login_required
+def invoice_qr_bill(iid):
+ # Saves the box on a draft from the issue screen (same stored value as the editor). Never touches an issued invoice.
+ try:
+  with db() as c:
+   if not os.environ.get("QR_BILL_ENABLED"): raise ValueError("la QR-facture n'est pas proposée sur ce serveur")
+   want=1 if request.form.get("qr_bill")=="1" else 0
+   if want and qr_option(c,iid)["state"]=="unsupported": raise ValueError("pas de bulletin pour ce compte")
+   n=c.execute("UPDATE invoices SET qr_bill=? WHERE id=? AND status='draft'",(want,iid)).rowcount
+   if n!=1: raise ValueError("seul un brouillon peut être modifié")
+   c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("draft_qr_bill",f"id={iid};qr_bill={want}"))
+  flash("QR-facture ajoutée à ce brouillon." if want else "QR-facture retirée de ce brouillon.")
+ except Exception as e: flash("Choix de la QR-facture non enregistré : "+str(e))
+ return redirect(url_for("issue_confirm",iid=iid))
+
 # --- issuance with explicit reliquat decision ---------------------------------------------------
 def issue_number(c,i):
  """Number the invoice will carry once issued (rc37, P3): the one its draft reserved; when the draft has none (created before rc37) or when an AUTOMATIC number is not of the year of the
@@ -1582,7 +1632,8 @@ def issue_context(c,iid):
  pos=rules.contract(c,p,upto=i["period_to"],exclude_invoice=iid,historical_upto=i["invoice_date"] or rules.local_today().isoformat(),through=i["period_to"])   # G4: historical invoices dated up to the printed date; rc25: invoices of later periods do not weigh on this reliquat
  this=rules.days(i["qty"],i["unit"],p["day_hours"])
  reliquat=round(pos["consumed_days"]-pos["billed_through_days"]-pos["offered_through_days"]-this,5)
- return {"i":i,"p":p,"pos":pos,"this_days":this,"reliquat":reliquat,"number":issue_number(c,i),
+ qr=qr_option(c,iid)   # BQR3: the box (flag off: nothing computed); a ticked box with a missing piece of information fails the blocking check 15
+ return {"qr":qr,"i":i,"p":p,"pos":pos,"this_days":this,"reliquat":reliquat,"number":issue_number(c,i),
          "missing":rules.missing_for_issue(rules.get_settings(c),dict(p,billing_address=addresses.effective(i,p)[2]),i["vat"]),"amounts":rules.invoice_amounts_full(c,i),"manual_lines":rules.invoice_lines(c,iid),"lines_block":rules.manual_lines_issuance_problem(c,iid),
          "checks":(chk:=invoice_checks.run_checks(c,iid)),"check_failed":invoice_checks.failures(chk),"check_blocking":invoice_checks.blocking(chk),"min_reason":invoice_checks.MIN_REASON,
          "date_problem":rules.issue_date_problem(i,rules.local_today()),"printed_date":i["invoice_date"] or rules.local_today().isoformat(),"date_hist":date_history(c,iid),
@@ -1994,7 +2045,16 @@ def settings_save():
     # par défaut ; avant, enregistrer sans rien changer réécrivait l'horodatage des 9 champs et ajoutait 2 options : « paramètres modifiés » pour 90-rollback
     r=c.execute("SELECT value FROM settings WHERE key=?",(k,)).fetchone()
     if (r[0] if r else default)!=v: c.execute("INSERT INTO settings(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP",(k,v))
+   from app import qr_bill
+   if any(k in request.form for k in rules.ISSUER_QR_FIELDS):      # BQR4: structured address and QR-IBAN of the issuer (a partial form leaves them alone)
+    qa={k:" ".join(form_text(request.form.get(k)).split()) for k in rules.ISSUER_QR_FIELDS}; qa["issuer_country"]=qa["issuer_country"].upper(); qa["qr_iban"]=qa["qr_iban"].replace(" ","").upper()
+    bad=qr_bill.address_problems(qa["issuer_street"],qa["issuer_house_num"],qa["issuer_pcode"],qa["issuer_city"],qa["issuer_country"],who="Adresse de l'émetteur")
+    if qa["qr_iban"] and (why:=qr_bill.iban_problem(qa["qr_iban"],qr_iban=True)): bad.append("QR-IBAN : "+why)
+    if bad: raise ValueError(" ".join(bad))
    for k in rules.ISSUER_FIELDS: put(k,form_text(request.form.get(k)))
+   if any(k in request.form for k in rules.ISSUER_QR_FIELDS):
+    for k,v in qa.items(): put(k,v)
+   iban_why=qr_bill.iban_problem(request.form.get("iban"))
    for k in rules.OPTION_FIELDS:
     if k not in request.form: continue  # option fields absent from a partial form keep their value
     v=(request.form.get(k) or "").strip()
@@ -2015,6 +2075,7 @@ def settings_save():
    if request.form.get("remove_logo")=="1": c.execute("DELETE FROM settings WHERE key='logo_png_b64'")
    c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("settings_updated","issuer"))
   flash("Paramètres enregistrés. Ils s'appliquent aux prochaines émissions ; les documents émis restent figés.")
+  if iban_why: flash("Attention : "+iban_why+" Enregistré tel quel ; la QR-facture restera bloquée tant que l'IBAN n'est pas corrigé.")
  except Exception as e: flash("Paramètres non enregistrés : "+str(e))
  return back("settings")
 

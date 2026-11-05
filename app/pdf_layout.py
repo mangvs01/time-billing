@@ -668,6 +668,12 @@ def render_invoice(h, annex, issued=True):
     if not issued: d.text(W / 2, 30, "BROUILLON — document non émis, sans valeur comptable", size=9, color=RED, align="center")
     if not issued and h.get("checks_failed"):
         d.text(W / 2, 42, "Contrôles avant émission en échec : n° " + ", ".join(str(n) for n in h["checks_failed"]) + " (voir l'écran d'émission)", size=8, color=RED, align="center")
+    # QR-bill insertion point (BQR1/BQR3, docs/QR-FACTURE.md): ONE extra portrait page holding the Swiss payment slip follows page 1 and the annex starts after it
+    # (its « Page x of y » numbering is untouched), only for an invoice whose box « Ajouter la QR-facture » is ticked (header key qr_bill) with QR_BILL_ENABLED on.
+    # Box not ticked (default): nothing is imported, drawn or changed here.
+    if h.get("qr_bill") and os.environ.get("QR_BILL_ENABLED"):
+        from app import qr_bill
+        if qr_bill.wanted(h): qr_bill.page_for_header(d.c, h, issued=issued)
     period = (h["period_from"], h["period_to"]) if h.get("period_from") and h.get("period_to") else None
     plan = annex_plan(annex, period); n = len(plan) + 1
     mixed = any(pl[5] != "P" for pl in plan)            # captions only when the annex holds history before the period (or rows billed elsewhere)

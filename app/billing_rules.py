@@ -154,6 +154,18 @@ ISSUER_FIELDS = {
     "payment_terms": ("Conditions de paiement", True, "texte affiché avant les coordonnées bancaires"),
     "thanks_text": ("Formule de remerciement", False, "facultatif"),
 }
+# BQR4: structured address and QR-IBAN of the issuer (settings keys, optional, not required for issuing; shown in their own block of the settings form).
+# key: (label, hint). The name printed on the slip is the account holder (else the company name) entered above.
+ISSUER_QR_FIELDS = {
+    "issuer_street": ("Rue", "sans le numéro"),
+    "issuer_house_num": ("Numéro", "dans son propre champ (facultatif s'il n'y en a pas)"),
+    "issuer_pcode": ("Code postal", "obligatoire pour la QR-facture"),
+    "issuer_city": ("Localité", "obligatoire pour la QR-facture"),
+    "issuer_country": ("Pays (code à 2 lettres)", "CH pour la Suisse, FR, BE… obligatoire pour la QR-facture"),
+    "qr_iban": ("QR-IBAN (facultatif)", "compte spécial donné par la banque (chiffres 5 à 9 entre 30000 et 31999) ; s'il est rempli, la QR-facture l'utilise avec une référence QRR de 27 chiffres tirée du numéro de facture ; vide : l'IBAN ci-dessus avec une référence « RF… » tirée du numéro de facture"),
+}
+# BQR4: structured billing address of a mandate (projects columns), copied as it is into the frozen header of an invoice that carries the QR-bill
+CLIENT_ADDR_FIELDS = ("client_street", "client_house_num", "client_pcode", "client_city", "client_country")
 PROJECT_REQUIRED = {"client": "Client (nom court)", "billing_address": "Adresse de facturation"}
 TREATMENTS = {"offert": "Offert au client", "reporte": "Reporté sur une prochaine facture", "autre": "Autre traitement (préciser)"}
 

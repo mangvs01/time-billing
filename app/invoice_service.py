@@ -34,6 +34,7 @@ def live_data(conn, iid):
     label, contact, address, source = address_service.effective(i, i)
     header["billing_contact"], header["billing_address"] = contact, address
     header["billing_label"], header["billing_source"], header["billing_address_id"] = label, source, i["billing_address_id"]
+    if "qr_bill" in i.keys() and i["qr_bill"]: header["qr_bill"] = 1    # BQR3: only when ticked, so that the header of an ordinary invoice keeps its keys
     header["other_vat_mode"] = rules.other_vat_mode(i["other_vat_mode"])  # explicit in the frozen copy, even for legacy NULL
     header["client_legal_id_display"] = rules.legal_display(i["client_legal_id"])  # rc5: printed form; client_legal_id stays as entered
     # rc5: invoice-date changes made on the draft, frozen with the invoice
@@ -73,7 +74,15 @@ def live_data(conn, iid):
     elsewhere = sorted({r["billed_elsewhere"] for r in rows if r.get("billed_elsewhere")})
     if elsewhere: header["period_billed_elsewhere"] = elsewhere      # only then: the frozen header of an ordinary invoice keeps its keys
     if rules.exception_mandate(p): header["exception"] = rules.EXCEPTION_LABEL      # rc41: only then (the frozen header of any other invoice keeps its keys); the PDF does not print it
+    if header.get("qr_bill"):      # BQR3/BQR4/BQR5: the structured client address is frozen with a ticked invoice: the COPY made with the address chosen from the EGG list (the one that is printed), else the mandate's own columns
+        if i["billing_address_id"] is not None:
+            header.update({"client_street": i["bill_street"] or "", "client_house_num": i["bill_house_num"] or "", "client_pcode": i["bill_pcode"] or "",
+                           "client_city": i["bill_city"] or "", "client_country": i["bill_country"] or ""}); header["client_addr_verified"] = int(i["bill_addr_verified"] or 0)
+        else:
+            header.update({k: p[k] or "" for k in rules.CLIENT_ADDR_FIELDS}); header["client_addr_verified"] = int(p["client_addr_verified"] or 0)
     header["issuer"] = rules.get_settings(conn)
+    if not header.get("qr_bill"):  # BQR4: the structured issuer address / QR-IBAN only enter the frozen header of an invoice that carries the QR-bill (ordinary invoice: same keys as before)
+        for k in rules.ISSUER_QR_FIELDS: header["issuer"].pop(k, None)
     # rc37 (P1): manual lines. A draft reads its live rows; an issued invoice read at the freeze moment reads the same (now immutable) rows, and its snapshot header
     # keeps the printed copy: a document issued is never rendered again from the table.
     # rc37 (P3): a draft prints the number it reserved, or (a draft created before rc37 that has none yet) the free number that would be proposed; issued: the number as frozen
