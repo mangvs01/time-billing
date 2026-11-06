@@ -309,3 +309,60 @@ def page_for_header(c, h, issued=True):
         c.drawString(50, c._pagesize[1] - 85, "BROUILLON — bulletin non valable, facture non émise")
         c.setFillColorRGB(0, 0, 0)
     return bill
+
+
+# --- BQR7 : rappel hebdomadaire à la connexion -----------------------------------------------------------------------------------------------------------------
+# Pure helpers (no database, no Flask): app.py reads the settings and the mandates, asks `setup_gaps`, and shows the pop-up when `reminder_due`.
+REMINDER_KEY = "qr_rappel_dernier"      # settings key: UTC time (ISO) of the last time the pop-up was shown
+REMINDER_DAYS = 7
+GAPS_MAX_CLIENTS = 4                    # clients named one by one in the pop-up, the rest is counted
+
+
+def reminder_due(last_iso, now, days=REMINDER_DAYS):
+    """True when the pop-up has never been shown, when the stored value cannot be read, or when `days` days have passed since it was last shown.
+    `last_iso`: stored ISO text (or None); `now`: naive UTC datetime. A value in the future (clock set back) counts as due, so the reminder cannot stay silent for months."""
+    from datetime import datetime, timedelta
+    try:
+        last = datetime.fromisoformat(str(last_iso).strip())
+    except (TypeError, ValueError):
+        return True
+    if last.tzinfo is not None:
+        from datetime import timezone
+        last = last.astimezone(timezone.utc).replace(tzinfo=None)
+    return last > now or now - last >= timedelta(days=days)
+
+
+def setup_gaps(settings, projects):
+    """What is still missing before the QR-bill can be switched on, as a list of {"texte", "lien", "action"} in plain French; [] when everything is in place.
+    `settings`: dict of the settings table; `projects`: rows/dicts of the mandates (keys id, name, client, active, client_addr_verified).
+    Three kinds of gap: the creditor account (an ordinary Swiss IBAN is enough: a QR-IBAN stays optional), the creditor's structured address, and the
+    structured address of each ACTIVE client that has not been confirmed yet."""
+    out = []
+    s = lambda k: str((settings or {}).get(k) or "").strip()
+    reglages = "/?tab=settings#adresse-emetteur"
+    iban = "".join(s("iban").split()).upper()
+    if not iban:
+        out.append({"texte": "Votre IBAN n'est pas encore saisi : un IBAN suisse ordinaire (celui de votre compte habituel) suffit, pas besoin de compte spécial de la banque.",
+                    "lien": "/?tab=settings", "action": "Saisir l'IBAN"})
+    elif (why := iban_problem(iban)):
+        out.append({"texte": why, "lien": "/?tab=settings", "action": "Corriger l'IBAN"})
+    elif iban[:2] not in ("CH", "LI") and not s("qr_iban"):
+        out.append({"texte": "Le compte saisi n'est pas un compte suisse ou liechtensteinois (il commence par " + iban[:2] + ") : la QR-facture n'existe que pour un IBAN commençant par CH ou LI.",
+                    "lien": "/?tab=settings", "action": "Revoir l'IBAN"})
+    if s("qr_iban") and (why := iban_problem(s("qr_iban"), qr_iban=True)):
+        out.append({"texte": why, "lien": "/?tab=settings", "action": "Corriger le QR-IBAN"})
+    street, num, pcode, city, country = (s(k) for k in ("issuer_street", "issuer_house_num", "issuer_pcode", "issuer_city", "issuer_country"))
+    if not (pcode or city or country):
+        out.append({"texte": "Votre adresse n'est pas encore saisie en champs séparés : code postal, localité et pays (la rue et le numéro si vous en avez).",
+                    "lien": reglages, "action": "Saisir l'adresse"})
+    elif (probs := address_problems(street, num, pcode, city, country, who="Votre adresse")):
+        out.append({"texte": " ".join(probs), "lien": reglages, "action": "Corriger l'adresse"})
+    todo = [p for p in (projects or []) if p["active"] and not p["client_addr_verified"]]
+    for p in todo[:GAPS_MAX_CLIENTS]:
+        nom = (p["client"] or p["name"] or "").strip() or "client"
+        out.append({"texte": "Adresse du client « " + nom + " » à compléter ou à confirmer (rue, numéro, code postal, localité, pays).",
+                    "lien": "/project/" + str(p["id"]) + "/edit", "action": "Ouvrir le mandat"})
+    if len(todo) > GAPS_MAX_CLIENTS:
+        out.append({"texte": "… et " + str(len(todo) - GAPS_MAX_CLIENTS) + " autre(s) mandat(s) actif(s) dont l'adresse du client n'est pas confirmée.",
+                    "lien": "/adresses", "action": "Voir les adresses"})
+    return out

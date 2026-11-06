@@ -17,7 +17,7 @@ if SEC["trust_proxy"]:
  APP.wsgi_app=ProxyFix(APP.wsgi_app,x_for=1,x_proto=1,x_host=1)
 APP.config["MAX_CONTENT_LENGTH"]=15*1024*1024
 # Calendrier : rc36 CANDIDATE (tests only; not built, not deployed) — rc35 = thème sombre (autre mission)
-VERSION="9.2-rc43"
+VERSION="9.2-rc45"
 # Optional label shown in the page title (e.g. "STAGING" on the test instance); empty in production.
 ENV_LABEL=(os.environ.get("ENV_LABEL") or "").strip()[:30]
 DB=os.environ.get("DB_PATH","/data/timebilling.db")
@@ -508,6 +508,16 @@ def login():
     c.execute("DELETE FROM web_sessions WHERE created_at<?",((rules.utc_now()-timedelta(hours=2*SESSION_MAX_HOURS)).isoformat(timespec="seconds"),))
     c.execute("INSERT INTO web_sessions(sid,created_at,last_seen) VALUES(?,?,?)",(sid,now_,now_))
     session.clear(); session["auth"]=True; session["sid"]=sid; session.permanent=True  # fresh session (no fixation), bounded lifetime, revocable server-side
+    # BQR7: weekly QR-bill reminder, decided here (login is already a write): shown at most once in 7 days, only while something needed is still missing
+    # (works whether the QR option is on or off). The pop-up itself appears on the next dashboard page; viewing that page writes nothing.
+    from app import qr_bill
+    _gaps=qr_bill.setup_gaps(rules.get_settings(c),c.execute("SELECT id,name,client,active,client_addr_verified FROM projects").fetchall())
+    if _gaps:
+     _r=c.execute("SELECT value FROM settings WHERE key=?",(qr_bill.REMINDER_KEY,)).fetchone()
+     if qr_bill.reminder_due(_r[0] if _r else None,rules.utc_now()):
+      c.execute("INSERT INTO settings(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP",(qr_bill.REMINDER_KEY,now_))
+      c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("qr_rappel_affiche",f"{len(_gaps)} point(s) à compléter"))
+      session["qr_popup_pending"]=True
     return redirect(nxt)
    # neither the typed name nor the password is ever recorded
    security.record_failure(c,ip); c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("login_failed",f"ip={ip}"))
@@ -582,7 +592,12 @@ def index():
  if isinstance(did,int):
   with db() as _c: d=_c.execute("SELECT i.id,i.period_from,i.period_to,i.qty,i.unit,i.invoice_date,p.name project FROM invoices i JOIN projects p ON p.id=i.project_id WHERE i.id=? AND i.status='draft'",(did,)).fetchone()
   if d: draft_done=dict(d,after_date=d["period_to"]>(d["invoice_date"] or _today.isoformat()))
- return render_template("index.html",month_hours=month_hours,month_label=month_label,cnotes=cnotes,projects=ps,active=[p for p in ps if p["active"]],closed=[p for p in ps if not p["active"]],positions=positions,recent=es,invoices=ins,
+ # BQR7: the reminder was decided and recorded AT LOGIN (a POST, see login()); a page view writes nothing: here we only read what is still missing.
+ qr_popup=None
+ if session.pop("qr_popup_pending",None):
+  from app import qr_bill
+  qr_popup=qr_bill.setup_gaps(settings,ps) or None
+ return render_template("index.html",month_hours=month_hours,month_label=month_label,qr_popup=qr_popup,cnotes=cnotes,projects=ps,active=[p for p in ps if p["active"]],closed=[p for p in ps if not p["active"]],positions=positions,recent=es,invoices=ins,
   fc=fc,batches=batches,tab=tab,settings=settings,fields=rules.ISSUER_FIELDS,qr_fields=rules.ISSUER_QR_FIELDS,settings_missing=missing,treatments=rules.TREATMENTS,options=rules.OPTION_FIELDS,other_vat_modes=rules.OTHER_VAT_MODES,fonts_used=FONTS_USED,version=VERSION,env_label=ENV_LABEL,no_mandate=not ps,current_year=rules.local_today().year,
   last_backup=last_backup,backup_stale=backup_stale,has_docs=has_docs,todo=todo,
   cal_resume=cal_resume,cal_cfg=cal.reglages(settings),cal_reglages=cal.REGLAGES,cal_tva=cal.TVA_PERIODICITES,retour="settings",
@@ -751,6 +766,10 @@ def address_groups(c):
  for a in c.execute("SELECT a.*,(SELECT COUNT(*) FROM invoices i WHERE i.billing_address_id=a.id) used FROM billing_addresses a ORDER BY a.client_key,a.sort_order,a.label,a.id"):
   g=groups.setdefault(a["client_key"],{"key":a["client_key"],"client":"Tous les mandats" if a["client_key"]==addresses.GLOBAL_KEY else "(aucun mandat actuel)","legal":"","mandates":[],"addresses":[]}); g["addresses"].append(dict(a))
  return sorted(groups.values(),key=lambda g:(g["client"] or "").casefold())
+@APP.route("/aide/qr-facture")
+@login_required
+def aide_qr():       # BQR8: step-by-step guide opened from the weekly reminder (read-only page)
+ return render_template("aide_qr.html",active_tab="settings")
 @APP.route("/adresses")
 @login_required
 def addresses_page():

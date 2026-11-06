@@ -1,0 +1,24 @@
+{% if qr_popup %}<style>
+dialog.qr-rappel{max-width:min(560px,calc(100vw - 32px));width:100%;border:1px solid var(--line-strong);border-radius:24px;padding:22px 22px 18px;background:var(--raised,#fff);color:var(--ink);box-shadow:0 24px 60px rgba(14,22,33,.28)}
+dialog.qr-rappel::backdrop{background:rgba(14,22,33,.45)}
+dialog.qr-rappel h2{margin:0 0 6px;font-size:19px}
+dialog.qr-rappel p{margin:6px 0;color:var(--ink-2);line-height:1.45}
+dialog.qr-rappel ul{margin:10px 0;padding:0;list-style:none;display:grid;gap:8px}
+dialog.qr-rappel li{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--line);border-radius:14px;line-height:1.4}
+dialog.qr-rappel li span{flex:1 1 240px;min-width:0}
+dialog.qr-rappel .qr-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;justify-content:flex-end}
+dialog.qr-rappel .qr-actions>*{flex:1 1 150px;justify-content:center;text-align:center}
+dialog.qr-rappel:not([open]){display:none}
+</style>
+<dialog id="qr-rappel" class="qr-rappel" aria-labelledby="qr-rappel-t" aria-describedby="qr-rappel-d">
+<form method="dialog">
+<h2 id="qr-rappel-t">QR-facture : il reste des informations à compléter</h2>
+<p id="qr-rappel-d">Pour pouvoir ajouter la QR-facture suisse à vos factures, il manque encore :</p>
+<ul>{% for g in qr_popup %}<li><span>{{ g.texte }}</span><a class="btnlink" href="{{ g.lien }}">{{ g.action }}</a></li>{% endfor %}</ul>
+<p>Ce rappel revient au plus une fois par semaine, à la connexion, tant que ces informations manquent. La QR-facture reste éteinte d'ici là : vos factures actuelles ne changent pas.</p>
+<p><a class="btnlink" href="/aide/qr-facture">Guide pas à pas : où cliquer, écran par écran</a></p>
+<div class="qr-actions"><button type="submit" class="secondary" value="plus-tard">Plus tard</button><a class="btn primary" href="{{ qr_popup[0].lien }}">Compléter maintenant</a></div>
+</form>
+</dialog>
+<script nonce="{{csp_nonce}}">(function(){var d=document.getElementById('qr-rappel');if(!d)return;try{if(d.showModal){d.showModal();}else{d.setAttribute('open','');}}catch(e){d.setAttribute('open','');}})();</script>
+{% endif %}

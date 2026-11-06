@@ -1,1 +1,1 @@
-Copie de publication 9.2-rc43 (QR-facture suisse en option éteinte par défaut, adresses en champs séparés, contrôle n° 15 bloquant aussi sur STC GEM). git archive 1cc1d3e, branche campaign/billing-qr.
+Copie de publication 9.2-rc45 (rc44 + guide pas à pas de la QR-facture accessible depuis le rappel, BQR8). git archive eb4b6a8, branche campaign/billing-qr.

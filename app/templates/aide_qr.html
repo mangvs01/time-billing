@@ -1,0 +1,32 @@
+{% extends "_page.html" %}{% block title %}QR-facture : guide pas à pas{% endblock %}{% block backlink %}/{% endblock %}{% block body %}
+<h1>QR-facture : compléter vos informations, pas à pas</h1>
+<section class="panel"><p>Il y a <b>trois choses</b> à saisir, environ dix minutes en tout : votre IBAN, votre adresse en champs séparés, puis l'adresse de chacun de vos clients. Tant que ce n'est pas fait, <b>rien ne change</b> : la QR-facture reste éteinte et vos factures sont exactement comme avant. Elle sera allumée avec vous, après un essai de scan avec votre application bancaire.</p>
+<p class="hint">Le rappel qui s'affiche à la connexion disparaît tout seul quand tout est complet.</p></section>
+
+<section class="panel" id="etape-iban"><h2>1. Votre IBAN (1 minute)</h2><ol>
+<li>Dans le menu de gauche, cliquez sur <b>« Paramètres &amp; sauvegardes »</b>.</li>
+<li>Dans la section <b>« Paramètres de l'émetteur »</b>, repérez le champ <b>« IBAN »</b>.</li>
+<li>Saisissez votre <b>IBAN suisse ordinaire</b>, celui de votre compte habituel : il commence par <b>CH</b>. Les espaces ne gênent pas. <b>Il ne faut pas demander de compte spécial à votre banque.</b></li>
+<li>Vérifiez que <b>« Titulaire du compte »</b> porte le nom exact du compte.</li>
+<li>Plus bas, le champ <b>« QR-IBAN (facultatif) »</b> : laissez-le <b>vide</b>.</li></ol>
+<p class="hint">Si l'IBAN est faux (une lettre ou un chiffre mal recopié), l'écran l'indique en français au moment d'enregistrer : recopiez-le depuis un document de la banque.</p></section>
+
+<section class="panel" id="etape-adresse"><h2>2. Votre adresse en champs séparés (2 minutes)</h2><ol>
+<li>Toujours sur <b>« Paramètres &amp; sauvegardes »</b>, descendez au cadre <b>« Adresse de l'émetteur en champs séparés et compte QR »</b>.</li>
+<li>Remplissez : <b>Rue</b> (sans le numéro), <b>Numéro</b>, <b>Code postal</b>, <b>Localité</b>, <b>Pays</b> (deux lettres : <b>CH</b> pour la Suisse).</li>
+<li>Cliquez sur <b>« Enregistrer les paramètres »</b>. Si un champ est refusé, un message dit lequel et pourquoi.</li></ol>
+<p class="hint">La raison : depuis le 20 novembre 2026, les banques suisses refusent les paiements dont l'adresse est écrite en un seul bloc de texte.</p></section>
+
+<section class="panel" id="etape-clients"><h2>3. L'adresse de chaque client (2 minutes par mandat actif)</h2><ol>
+<li>Le plus simple : dans le rappel de la connexion, cliquez <b>« Ouvrir le mandat »</b> sous le client concerné. Sinon : menu <b>« Mandats &amp; prévisionnel »</b>, puis <b>« Modifier »</b> sur le mandat.</li>
+<li>Sur la page du mandat, trouvez les cases <b>Rue, Numéro, Code postal, Localité, Pays</b> (adresse du client).</li>
+<li>Si l'adresse est déjà proposée (par exemple pour les sociétés EGG), <b>relisez-la</b> ; sinon recopiez-la depuis une facture ou une signature de courriel. Une adresse à l'étranger : le pays se note avec deux lettres (<b>FR</b>, <b>BE</b>, <b>DE</b>…).</li>
+<li>Cochez <b>« adresse vérifiée (je l'ai relue : elle peut figurer sur une QR-facture) »</b>, puis cliquez <b>« Enregistrer »</b>.</li>
+<li>Recommencez pour chaque mandat actif. Les mandats clôturés n'ont rien à compléter.</li></ol></section>
+
+<section class="panel" id="etape-fin"><h2>Et ensuite ?</h2><ul>
+<li>Revenez au <b>Tableau de bord</b> : à la prochaine connexion, le rappel ne s'affiche plus s'il ne manque plus rien.</li>
+<li>Prévenez simplement la personne qui gère le serveur : elle fera avec vous l'essai de scan avec votre application bancaire, puis allumera la QR-facture. Vous pourrez alors cocher <b>« Ajouter la QR-facture »</b> facture par facture.</li>
+<li>Échéance à retenir : <b>avant le 20 novembre 2026</b>.</li></ul>
+<p><a class="btnlink" href="/?tab=settings#adresse-emetteur">Aller aux Paramètres</a> <a class="btnlink" href="/adresses">Voir les adresses de facturation</a></p></section>
+{% endblock %}
