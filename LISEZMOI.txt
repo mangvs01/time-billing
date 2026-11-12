@@ -1,1 +1,1 @@
-Copie de publication 9.2-rc45 (rc44 + guide pas à pas de la QR-facture accessible depuis le rappel, BQR8). git archive eb4b6a8, branche campaign/billing-qr.
+Copie de publication 9.2-rc46 (rc45 + référence de paiement QR unique par numéro de facture, BQR9). git archive c1aa397, branche campaign/billing-qr. QR-facture toujours éteinte.

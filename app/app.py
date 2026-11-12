@@ -17,7 +17,7 @@ if SEC["trust_proxy"]:
  APP.wsgi_app=ProxyFix(APP.wsgi_app,x_for=1,x_proto=1,x_host=1)
 APP.config["MAX_CONTENT_LENGTH"]=15*1024*1024
 # Calendrier : rc36 CANDIDATE (tests only; not built, not deployed) — rc35 = thème sombre (autre mission)
-VERSION="9.2-rc45"
+VERSION="9.2-rc46"
 # Optional label shown in the page title (e.g. "STAGING" on the test instance); empty in production.
 ENV_LABEL=(os.environ.get("ENV_LABEL") or "").strip()[:30]
 DB=os.environ.get("DB_PATH","/data/timebilling.db")
@@ -1396,7 +1396,11 @@ def number_hint(c,iid=None,year=None):
  return rules.propose_invoice_number(c,year or number_year(None),exclude_id=iid)
 def number_refusal(c,number,iid,year):
  x=rules.number_conflict(c,number,exclude_id=iid)
- return None if not x else (f"le numéro {number} est déjà utilisé par {rules.describe_conflict(x)} ; numéro libre proposé : {number_hint(c,iid,year)}. "
+ if not x:
+  y=rules.reference_conflict(c,number,exclude_id=iid)      # BQR9: another number giving the same payment reference
+  from app import qr_bill
+  return qr_bill.clash_message(y["number"]) if y else None
+ return (f"le numéro {number} est déjà utilisé par {rules.describe_conflict(x)} ; numéro libre proposé : {number_hint(c,iid,year)}. "
                             "Rien n'a été modifié : aucun numéro n'est jamais remplacé automatiquement")
 def date_history(c,iid): return [dict(r) for r in c.execute("SELECT * FROM invoice_date_changes WHERE invoice_id=? ORDER BY id",(iid,))]
 def po_warning(c,p):

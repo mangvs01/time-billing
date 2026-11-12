@@ -171,6 +171,32 @@ def qrr_reference(seed):
     return body + str((10 - carry) % 10)
 
 
+def payment_reference(seed, qr_iban=None):
+    """BQR9: THE rule giving the payment reference of an invoice number, used everywhere (slip, attribution check, slip check): a QR-IBAN set => QRR (27 digits),
+    otherwise SCOR (RF…); no number and no QR-IBAN => None (a draft has no reference). May raise QrBillError (number too long for the mode)."""
+    if str(qr_iban or "").strip(): return qrr_reference(seed)
+    return scor_reference(seed) if str(seed or "").strip() else None
+
+
+def reference_clash(number, others, qr_iban=None):
+    """BQR9: the first number of `others` (numbers of the other numbered invoices of the issuer) that gives the SAME payment reference as `number` while being
+    another number (compared after trimming and upper-casing; the caller drops the numbers it already treats as « the same number »), else None.
+    Numbers for which no reference can be built are ignored."""
+    def ref(n):
+        try: return payment_reference(n, qr_iban)
+        except QrBillError: return None
+    mine = ref(number)
+    if not mine or not str(number or "").strip(): return None
+    me = str(number).strip().upper()
+    for o in others:
+        if o is not None and str(o).strip() and str(o).strip().upper() != me and ref(o) == mine: return o
+    return None
+
+
+def clash_message(other):
+    return f"Ce numéro donnerait la même référence de paiement que la facture {other} : choisissez un autre numéro"
+
+
 # --- bill ----------------------------------------------------------------------------------------------
 def build_bill(creditor, iban, amount, currency="CHF", debtor=None, reference=None, message="", language="fr"):
     """Validated library object. creditor/debtor: structured address dicts; debtor may be None (the slip then leaves a box to fill in by hand)."""
@@ -246,8 +272,7 @@ def inputs_from_header(h):
     amount = h["net_due"] if h.get("offsets") else a.get("ttc")
     number = h.get("number")
     qr_iban = (s.get("qr_iban") or "").strip()
-    if qr_iban: iban, reference = qr_iban, qrr_reference(number)
-    else: iban, reference = s.get("iban"), scor_reference(number) if number else None
+    iban = qr_iban or s.get("iban"); reference = payment_reference(number, qr_iban)
     return dict(creditor=creditor, iban=iban, amount=amount, currency=h.get("currency") or "CHF", debtor=debtor,
                 reference=reference, message=f"Facture {number}" if number else "")
 
@@ -260,6 +285,7 @@ def assess(h):
         kw = inputs_from_header(h)
         s = "".join(str(kw.get("iban") or "").split()).upper()
         if s[:2].isalpha() and s[:2] not in ("CH", "LI") and _iban_checksum_ok(s): return None, None
+        if h.get("reference_clash"): raise QrBillError(clash_message(h["reference_clash"]))      # BQR9: never a slip with a reference already used by another invoice
         return build_bill(**kw), None
     except QrBillError as err:
         return None, str(err)

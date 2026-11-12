@@ -439,6 +439,20 @@ def number_conflict(c, number, exclude_id=None):
     return None
 
 
+def reference_conflict(c, number, exclude_id=None, qr_iban=None):
+    """BQR9: another numbered invoice (any status, historical invoices, external numbers: the sources of number_conflict; drafts without a number do not exist there) whose payment reference
+    (qr_bill.payment_reference: QRR if a QR-IBAN is set, else SCOR) equals the one of `number` while being another number (number_key). Returns {'kind','label','id','number'} or None.
+    qr_iban None = read the setting."""
+    from app import qr_bill
+    if qr_iban is None: qr_iban = get_settings(c).get("qr_iban") or ""
+    k = number_key(number)
+    rows = [r for r in _number_sources(c, exclude_id) if number_key(r[0]) != k]
+    other = qr_bill.reference_clash(number, [r[0] for r in rows], qr_iban)
+    if other is None: return None
+    n, kind, label, i = next(r for r in rows if r[0] == other)
+    return {"kind": kind, "label": label, "id": i, "number": n}
+
+
 def describe_conflict(x):
     return {"issued": f"la facture émise {x['number']} (mandat « {x['label']} »)", "draft": f"le brouillon n° {x['id']} (mandat « {x['label']} », numéro réservé)",
             "historical": f"une facture historique (hors application) n° {x['number']}", "external": f"un numéro de facture externe réservé ({x['number']})"}[x["kind"]]
@@ -451,7 +465,7 @@ def propose_invoice_number(c, year, exclude_id=None):
     top = max([p[1] for n, kind, _, _ in rows if kind != "draft" and (p := parse_number(n)) and p[0] == year] + [0])
     reserved = {number_key(n) for n, _, _, _ in rows}
     n = top + 1
-    while number_key(f"{year}-{n}") in reserved: n += 1
+    while number_key(f"{year}-{n}") in reserved or reference_conflict(c, f"{year}-{n}", exclude_id): n += 1      # BQR9: nor a number whose payment reference is already used
     return f"{year}-{n}"
 
 

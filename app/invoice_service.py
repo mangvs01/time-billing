@@ -89,6 +89,9 @@ def live_data(conn, iid):
     header["number_reserved"] = i["number"] is not None
     if i["status"] == "draft" and i["number"] is None:
         header["number"] = rules.propose_invoice_number(conn, int((i["invoice_date"] or rules.local_today().isoformat())[:4]), exclude_id=iid)
+    if header.get("qr_bill") and header.get("number"):      # BQR9: only a ticked invoice, and only when a clash exists (the frozen header of any other invoice keeps its keys)
+        clash = rules.reference_conflict(conn, header["number"], exclude_id=iid, qr_iban=header["issuer"].get("qr_iban") or "")
+        if clash: header["reference_clash"] = clash["number"]
     header["lines"] = [{k: ln[k] for k in ("position", "description", "qty", "unit", "unit_rate", "vat_mode")} for ln in rules.invoice_lines(conn, iid)]
     header["amounts"] = rules.invoice_amounts(i, header["lines"])
     # credit notes imputed on this invoice (offset mode): printed, and frozen with it at issuance
