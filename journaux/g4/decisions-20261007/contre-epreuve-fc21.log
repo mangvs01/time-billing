@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_quantities_and_amounts_are_plain_ascii_decimals (tests.test_g4_decisions.PlainNumbers.test_quantities_and_amounts_are_plain_ascii_decimals)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_decisions.py", line 129, in test_quantities_and_amounts_are_plain_ascii_decimals
+    self.assertEqual(self.scalar('SELECT COUNT(*) FROM invoices'), n, bad); self.assertIn('quantité invalide', ' '.join(fl), bad)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : 1_5
+
+----------------------------------------------------------------------
+Ran 1 test in 0.944s
+
+FAILED (failures=1)

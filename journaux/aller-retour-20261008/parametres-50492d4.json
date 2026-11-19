@@ -1,0 +1,36 @@
+{
+ "formulaires": {
+  "saisie": 2247,
+  "mandat": 24,
+  "brouillon": 1,
+  "paramètres": 1
+ },
+ "refus": [],
+ "n_refus": 0,
+ "valeurs_modifiees": {
+  "projects": {
+   "avant": [
+    "{\"active\": 0, \"billing_address\": \"EGG BE\\nAvenue du Bourgmestre Etienne Demunter 5, bo\\u00eete 10\\nJette, 1090\\nBelgique\", \"billing_contact\": \"Claudia Ntampaka\", \"client\": \"BSCI\", \"client_legal_id\": \"\", \"client_legal_name\": \"EGG BE\", \"closed_reason\": \"Termin\\u00e9 selon le SUIVI 2025/2026 ; factur\\u00e9 hors application (historique import\\u00e9)\", \"dates_label\": \"05-09 Sept 2026\", \"day_hours\": 8.0, \"duration_months\": 12, \"id\": 11, \"name\": \"CIRSE 2026\", \"ordered_days\": 12.0, \"po\": \"PO-2600403BE-03082026-001\", \"project_number\": \"2600403BE\", \"rate\": 650.0, \"short_name\": \"\", \"start_date\": \"\", \"vat\": 0.0}",
+    "{\"active\": 1, \"billing_address\": \"EGG BE\\nAvenue du Bourgmestre Etienne Demunter 5, bo\\u00eete 10\\nJette, 1090\\nBelgique\", \"billing_contact\": \"Claudia Ntampaka\", \"client\": \"\", \"client_legal_id\": \"\", \"client_legal_name\": \"EGG BE\", \"closed_reason\": \"\", \"dates_label\": \"\", \"day_hours\": 8.0, \"duration_months\": 12, \"id\": 22, \"name\": \"EUROPCR 2027\", \"ordered_days\": 0.0, \"po\": \"\", \"project_number\": \"\", \"rate\": 0.0, \"short_name\": \"\", \"start_date\": \"\", \"vat\": 0.0}",
+    "{\"active\": 1, \"billing_address\": \"EGG BE\\nAvenue du Bourgmestre Etienne Demunter 5, bo\\u00eete 10\\nJette, 1090\\nBelgique\", \"billing_contact\": \"Claudia Ntampaka\", \"client\": \"BSCI\", \"client_legal_id\": \"\", \"client_legal_name\": \"EGG BE\", \"closed_reason\": \"\", \"dates_label\": \"\", \"day_hours\": 8.0, \"duration_months\": 12, \"id\": 13, \"name\": \"NHAF 2026\", \"ordered_days\": 16.0, \"po\": \"PO-2600903BE-17062026-001\", \"project_number\": \"2600903BE\", \"rate\": 650.0, \"short_name\": \"\", \"start_date\": \"\", \"vat\": 0.0}"
+   ],
+   "après": [
+    "{\"active\": 0, \"billing_address\": \"EGG BE\\r\\nAvenue du Bourgmestre Etienne Demunter 5, bo\\u00eete 10\\r\\nJette, 1090\\r\\nBelgique\", \"billing_contact\": \"Claudia Ntampaka\", \"client\": \"BSCI\", \"client_legal_id\": \"\", \"client_legal_name\": \"EGG BE\", \"closed_reason\": \"Termin\\u00e9 selon le SUIVI 2025/2026 ; factur\\u00e9 hors application (historique import\\u00e9)\", \"dates_label\": \"05-09 Sept 2026\", \"day_hours\": 8.0, \"duration_months\": 12, \"id\": 11, \"name\": \"CIRSE 2026\", \"ordered_days\": 12.0, \"po\": \"PO-2600403BE-03082026-001\", \"project_number\": \"2600403BE\", \"rate\": 650.0, \"short_name\": \"\", \"start_date\": \"\", \"vat\": 0.0}",
+    "{\"active\": 1, \"billing_address\": \"EGG BE\\r\\nAvenue du Bourgmestre Etienne Demunter 5, bo\\u00eete 10\\r\\nJette, 1090\\r\\nBelgique\", \"billing_contact\": \"Claudia Ntampaka\", \"client\": \"\", \"client_legal_id\": \"\", \"client_legal_name\": \"EGG BE\", \"closed_reason\": \"\", \"dates_label\": \"\", \"day_hours\": 8.0, \"duration_months\": 12, \"id\": 22, \"name\": \"EUROPCR 2027\", \"ordered_days\": 0.0, \"po\": \"\", \"project_number\": \"\", \"rate\": 0.0, \"short_name\": \"\", \"start_date\": \"\", \"vat\": 0.0}",
+    "{\"active\": 1, \"billing_address\": \"EGG BE\\r\\nAvenue du Bourgmestre Etienne Demunter 5, bo\\u00eete 10\\r\\nJette, 1090\\r\\nBelgique\", \"billing_contact\": \"Claudia Ntampaka\", \"client\": \"BSCI\", \"client_legal_id\": \"\", \"client_legal_name\": \"EGG BE\", \"closed_reason\": \"\", \"dates_label\": \"\", \"day_hours\": 8.0, \"duration_months\": 12, \"id\": 13, \"name\": \"NHAF 2026\", \"ordered_days\": 16.0, \"po\": \"PO-2600903BE-17062026-001\", \"project_number\": \"2600903BE\", \"rate\": 650.0, \"short_name\": \"\", \"start_date\": \"\", \"vat\": 0.0}"
+   ],
+   "n": 6
+  },
+  "settings": {
+   "avant": [
+    "{\"key\": \"issuer_address\", \"value\": \"Bvd de la Tour 2\\n1205 Gen\\u00e8ve\"}"
+   ],
+   "après": [
+    "{\"key\": \"issuer_address\", \"value\": \"Bvd de la Tour 2\\r\\n1205 Gen\\u00e8ve\"}",
+    "{\"key\": \"other_vat_default\", \"value\": \"hors_tva\"}",
+    "{\"key\": \"refund_delay_days\", \"value\": \"\"}"
+   ],
+   "n": 4
+  }
+ }
+}

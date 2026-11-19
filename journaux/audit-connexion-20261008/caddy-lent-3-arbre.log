@@ -1,0 +1,28 @@
+options reverse_proxy : request_buffers 64KB
+cible :8473 /login Content-Length 200000, 70000 octet(s) d emblée puis 1 octet / 5 s
+avant : 60 ms
+pendant (24 connexions lentes) : 11 ms
+pendant (24 connexions lentes) : 6 ms
+pendant (24 connexions lentes) : 6 ms
+après : 5 ms
+options reverse_proxy : request_buffers 64KB
+cible :8473 /login Content-Length 10000, 1 octet(s) d emblée puis 1 octet / 5 s
+avant : 32 ms
+pendant (24 connexions lentes) : 8 ms
+pendant (24 connexions lentes) : 4 ms
+pendant (24 connexions lentes) : 7 ms
+après : 11 ms
+options reverse_proxy : request_buffers 64KB
+cible :8473 /login Content-Length 65000, 60000 octet(s) d emblée puis 1 octet / 5 s
+avant : 28 ms
+pendant (24 connexions lentes) : 6 ms
+pendant (24 connexions lentes) : 14 ms
+pendant (24 connexions lentes) : 3 ms
+après : 4 ms
+options reverse_proxy : (aucune : bloc actuel de 80-site-caddy.sh)
+cible :8473 /login Content-Length 10000, 1 octet(s) d emblée puis 1 octet / 5 s
+avant : 68 ms
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+pendant (24 connexions lentes) : 11 ms
+après : 9 ms

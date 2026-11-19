@@ -1,0 +1,137 @@
+{
+ "original / mapping historique": {
+  "sha": "c93c610c",
+  "statuts": {
+   "error": 2293,
+   "excluded_project": 1,
+   "needs_decision": 3
+  },
+  "importables_sans_decision": 0,
+  "importables_si_tout_importer": 3,
+  "already_imported": 2205,
+  "source_row_changed": 0,
+  "previously_excluded": 0,
+  "exemples_importables": [
+   "JAN 26!90 2026-10-23 1 h ['date_outside_sheet_month', 'date_suspect']",
+   "APR 26!125 2026-04-28 0.5 h ['possible_existing_entry']",
+   "APR 26!129 2026-04-29 0.5 h ['possible_existing_entry']"
+  ]
+ },
+ "original / tout vers un mandat actif": {
+  "sha": "c93c610c",
+  "statuts": {
+   "error": 2225,
+   "needs_decision": 62,
+   "ok": 10
+  },
+  "importables_sans_decision": 10,
+  "importables_si_tout_importer": 72,
+  "already_imported": 2205,
+  "source_row_changed": 0,
+  "previously_excluded": 0,
+  "exemples_importables": [
+   "JAN!9 2015-01-07 1 h ['year_differs_from_sheet']",
+   "JAN!10 2015-01-07 0.75 h ['year_differs_from_sheet']",
+   "JAN!11 2015-01-09 0.5 h ['year_differs_from_sheet']",
+   "JAN!12 2015-01-09 0.5 h ['year_differs_from_sheet']",
+   "JAN!13 2015-01-09 0.5 h ['year_differs_from_sheet']",
+   "FEV!28 2025-02-13 0.25 h ['repeated_in_file']",
+   "FEV!62 2025-06-26 0.75 h ['date_outside_sheet_month', 'time_overlap']",
+   "FEV!63 2025-03-26 1.5 h ['date_outside_sheet_month']"
+  ]
+ },
+ "R1 / mapping historique": {
+  "sha": "a6f6b7ef",
+  "statuts": {
+   "error": 1980,
+   "excluded_project": 1,
+   "ok": 71,
+   "needs_decision": 245
+  },
+  "importables_sans_decision": 71,
+  "importables_si_tout_importer": 316,
+  "already_imported": 42,
+  "source_row_changed": 0,
+  "previously_excluded": 0,
+  "exemples_importables": [
+   "AUG!37 2025-08-07 0.5 h []",
+   "AUG!43 2025-08-08 0.5 h []",
+   "JAN 26!22 2026-01-12 1.5 h []",
+   "JAN 26!25 2026-01-12 0.5 h []",
+   "JAN 26!43 2026-01-15 1.25 h []",
+   "JAN 26!44 2026-01-15 2 h []",
+   "JAN 26!46 2026-01-15 2.5 h []",
+   "JAN 26!48 2026-01-16 0.5 h []"
+  ]
+ },
+ "R1 / tout vers un mandat actif": {
+  "sha": "a6f6b7ef",
+  "statuts": {
+   "ok": 2146,
+   "error": 61,
+   "needs_decision": 90
+  },
+  "importables_sans_decision": 2146,
+  "importables_si_tout_importer": 2236,
+  "already_imported": 42,
+  "source_row_changed": 0,
+  "previously_excluded": 0,
+  "exemples_importables": [
+   "JAN!6 2025-01-06 1 h []",
+   "JAN!7 2025-01-06 0.25 h []",
+   "JAN!8 2025-01-06 2.5 h []",
+   "JAN!14 2025-01-10 0.5 h []",
+   "JAN!15 2025-01-10 0.8000000000000007 h []",
+   "JAN!16 2025-01-10 1.5 h []",
+   "JAN!17 2025-01-10 0.5 h []",
+   "JAN!18 2025-01-13 0.5 h []"
+  ]
+ },
+ "original réenregistré / mapping historique": {
+  "sha": "0262b3a8",
+  "statuts": {
+   "error": 1977,
+   "excluded_project": 1,
+   "ok": 71,
+   "needs_decision": 248
+  },
+  "importables_sans_decision": 71,
+  "importables_si_tout_importer": 319,
+  "already_imported": 0,
+  "source_row_changed": 0,
+  "previously_excluded": 0,
+  "exemples_importables": [
+   "AUG!37 2025-08-07 0.5 h []",
+   "AUG!43 2025-08-08 0.5 h []",
+   "JAN 26!22 2026-01-12 1.5 h []",
+   "JAN 26!25 2026-01-12 0.5 h []",
+   "JAN 26!43 2026-01-15 1.25 h []",
+   "JAN 26!44 2026-01-15 2 h []",
+   "JAN 26!46 2026-01-15 2.5 h []",
+   "JAN 26!48 2026-01-16 0.5 h []"
+  ]
+ },
+ "original réenregistré / tout vers un mandat actif": {
+  "sha": "0262b3a8",
+  "statuts": {
+   "ok": 2144,
+   "needs_decision": 133,
+   "error": 20
+  },
+  "importables_sans_decision": 2144,
+  "importables_si_tout_importer": 2277,
+  "already_imported": 0,
+  "source_row_changed": 0,
+  "previously_excluded": 0,
+  "exemples_importables": [
+   "JAN!6 2025-01-06 1 h []",
+   "JAN!7 2025-01-06 0.25 h []",
+   "JAN!8 2025-01-06 2.5 h []",
+   "JAN!9 2015-01-07 1 h ['year_differs_from_sheet']",
+   "JAN!10 2015-01-07 0.75 h ['year_differs_from_sheet']",
+   "JAN!11 2015-01-09 0.5 h ['year_differs_from_sheet']",
+   "JAN!12 2015-01-09 0.5 h ['year_differs_from_sheet']",
+   "JAN!13 2015-01-09 0.5 h ['year_differs_from_sheet']"
+  ]
+ }
+}

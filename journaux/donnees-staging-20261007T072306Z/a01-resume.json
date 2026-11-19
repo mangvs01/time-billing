@@ -1,0 +1,24 @@
+{
+ "mode": "APPLICATION",
+ "classeur_sha256": "c93c610cdffe66d150fbb05d64513054d297f6170158effef99eb461eddac438",
+ "corrigees": [
+  1069,
+  1537,
+  2146,
+  1214,
+  1599,
+  2056,
+  2057,
+  2060,
+  2061,
+  2062,
+  2063,
+  2076,
+  2078,
+  2079,
+  2080
+ ],
+ "deja_faites": [],
+ "chiffres_inchanges": true,
+ "toutes_conformes": true
+}

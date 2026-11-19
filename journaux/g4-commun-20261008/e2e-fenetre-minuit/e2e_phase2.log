@@ -1,0 +1,19 @@
+PASS login
+PASS santé après redémarrage
+PASS données persistées après redémarrage
+PASS PDF émis identique après redémarrage
+PASS statuts des lots persistés
+PASS rollback après redémarrage
+PASS page d'accueil : onglet Édition des factures
+PASS opérations de crédit persistées après redémarrage
+PASS PDF note de crédit identique après redémarrage
+PASS sauvegarde JSON téléchargée
+PASS saisie ajoutée après sauvegarde
+PASS prévisualisation de restauration
+PASS restauration effectuée (saisie ultérieure retirée)
+PASS PDF émis identique après restauration
+PASS opérations de crédit conservées après restauration
+PASS suivi compensation après restauration
+PASS sauvegarde pré-restauration présente
+PASS intégrité SQLite
+RESULT phase2: 18/18 passed

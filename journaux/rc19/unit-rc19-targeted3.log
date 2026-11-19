@@ -1,0 +1,32 @@
+F..............................................................................................[2026-10-05 12:55:25,423] ERROR in app: erreur interne
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/app.py", line 271, in inner
+    return fn(*a,**k)
+           ^^^^^^^^^^
+  File "/app/app/app.py", line 420, in index
+    fc=forecast_mod.build(c,rules.local_today())
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/tests/test_rc10_security.py", line 181, in boom
+    def boom(*a, **k): raise RuntimeError('SELECT secret FROM hidden_table')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: SELECT secret FROM hidden_table
+......................................
+======================================================================
+FAIL: test_R5_old_entries_of_a_closed_mandate_stay_editable_new_ones_refused (tests.test_rc19.ClosedMandate.test_R5_old_entries_of_a_closed_mandate_stay_editable_new_ones_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_rc19.py", line 155, in test_R5_old_entries_of_a_closed_mandate_stay_editable_new_ones_refused
+    r, fl = self.edit(o, project_id=str(self.pid2), allow_closed='1'); self.assertIn('modifiée', fl); self.assertEqual(self.row(o)['project_id'], self.pid2)
+                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 3 != 4
+
+----------------------------------------------------------------------
+Ran 133 tests in 50.706s
+
+FAILED (failures=1)

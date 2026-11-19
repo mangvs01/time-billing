@@ -1,0 +1,273 @@
+{
+ "results": [
+  {
+   "phase": "phase1",
+   "section": "0 connexion et paramètres",
+   "name": "redirection vers la connexion sans session",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "0 connexion et paramètres",
+   "name": "version 9.2-rc37 absente de la page publique de connexion (B-7) et présente sur /health",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "0 connexion et paramètres",
+   "name": "connexion",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "0 connexion et paramètres",
+   "name": "exception",
+   "ok": false,
+   "detail": "Error: ENOENT: no such file or directory, stat '/root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/logo-fictif.png'\n    at async Object.stat (node:internal/fs/promises:1037:18)\n    at async resolvePathsAndDirectoryForInputFiles (/root/node_modules/playwright-core/lib/coreBundle.js:60728:18)\n    at async convertInputFiles (/root/node_modules/playwright-core/lib/coreBundle.js:60747:42)\n    at async _Frame.setInputFiles (/root/node_modules/playwright-core/lib/coreBundle.js:6059"
+  },
+  {
+   "phase": "phase1",
+   "section": "1 création du mandat",
+   "name": "mandat créé",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "1 création du mandat",
+   "name": "décision 4 : identifiant affiché normalisé CHE-000.001.234",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "1 création du mandat",
+   "name": "décision 4 : valeur saisie conservée et visible (che000001234)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "2 saisie des temps",
+   "name": "exception",
+   "ok": false,
+   "detail": "locator.click: Error: strict mode violation: locator('#entryForm').locator('button') resolved to 4 elements:\n    1) <button type=\"button\" class=\"secondary\" data-setdate=\"2026-10-26\">Aujourd'hui</button> aka getByRole('button', { name: 'Aujourd\\'hui' })\n    2) <button type=\"button\" class=\"secondary\" data-setdate=\"2026-10-25\">Hier</button> aka getByRole('button', { name: 'Hier' })\n    3) <button id=\"entrySubmit\">Enregistrer le temps — 3 h 30</button> aka getByRole('button', { name: 'Enregistrer le"
+  },
+  {
+   "phase": "phase1",
+   "section": "3 préparation et émission de la facture F1 (antidatée)",
+   "name": "exception",
+   "ok": false,
+   "detail": "locator.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('#invoiceForm').locator('[name=description]')\n    - locator resolved to <input name=\"description\" id=\"fld-29-description\" placeholder=\"Par défaut : nom du projet. Ex. Production PM/DM - Projet - 2600137BE\"/>\n    - fill(\"Assistance à maîtrise d'ouvrage — juillet 2026 (fictif)\")\n  - attempting fill action\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill action"
+  },
+  {
+   "phase": "phase1",
+   "section": "4 annexe cumulative (F2 août)",
+   "name": "exception",
+   "ok": false,
+   "detail": "locator.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('#invoiceForm').locator('[name=description]')\n    - locator resolved to <input name=\"description\" id=\"fld-29-description\" placeholder=\"Par défaut : nom du projet. Ex. Production PM/DM - Projet - 2600137BE\"/>\n    - fill(\"Assistance à maîtrise d'ouvrage — août 2026 (fictif)\")\n  - attempting fill action\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill action\n  "
+  },
+  {
+   "phase": "phase1",
+   "section": "5 crédit partiel avec remboursement (NC1 sur F1)",
+   "name": "exception",
+   "ok": false,
+   "detail": "page.inputValue: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('input[name=refund_delay_days]')\n\n    at /root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:232:60\n    at async step (/root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:36:60)\n    at async /root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:230:5"
+  },
+  {
+   "phase": "phase1",
+   "section": "6 crédit partiel avec compensation (NC2 sur F1)",
+   "name": "exception",
+   "ok": false,
+   "detail": "locator.check: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('input[name=treatment][value=compensation]')\n\n    at creditNote (/root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:98:94)\n    at async /root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:253:18\n    at async step (/root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:36:60)\n    at async /root/rc25-ui-20261014/."
+  },
+  {
+   "phase": "phase1",
+   "section": "7 crédit total après annulation d'une compensation en brouillon",
+   "name": "exception",
+   "ok": false,
+   "detail": "locator.selectOption: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('form[action=\"/credit/undefined/offset\"]').locator('select')\n\n    at offset (/root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:116:31)\n    at async /root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:264:16\n    at async step (/root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:36:60)\n    at async /roo"
+  },
+  {
+   "phase": "phase1",
+   "section": "9 seconde facture avec compensation (F3 septembre)",
+   "name": "exception",
+   "ok": false,
+   "detail": "locator.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('#invoiceForm').locator('[name=description]')\n    - locator resolved to <input name=\"description\" id=\"fld-29-description\" placeholder=\"Par défaut : nom du projet. Ex. Production PM/DM - Projet - 2600137BE\"/>\n    - fill(\"Assistance à maîtrise d'ouvrage — septembre 2026 (fictif)\")\n  - attempting fill action\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill acti"
+  },
+  {
+   "phase": "phase1",
+   "section": "8 tentative de crédit total après compensation définitive",
+   "name": "exception",
+   "ok": false,
+   "detail": "locator.isDisabled: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('input[name=scope][value=total]')\n\n    at /root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:316:129\n    at async step (/root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:36:60)\n    at async /root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:313:5"
+  },
+  {
+   "phase": "phase1",
+   "section": "7bis recette visuelle NC / annulation (correction traçable)",
+   "name": "exception",
+   "ok": false,
+   "detail": "locator.check: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('input[name=treatment][value=compensation]')\n\n    at creditNote (/root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:98:94)\n    at async /root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:334:16\n    at async step (/root/rc25-ui-20261014/.claude/worktrees/billing-factures/tests/browser/recette-metier.js:36:60)\n    at async /root/rc25-ui-20261014/."
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "archive : 2026-07 présent",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "archive : 2026-08 présent",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "archive : 2026-09 présent",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "archive : NC-2026-07 présent",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "archive : NC-2026-07.2 présent",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "archive : NC-2026-07.3 présent",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "archive : NC-2026-07.4 présent",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "archive : NC-2026-08 présent",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "archive : F1 créditée partiellement (solde 2 250,00 HT = 3 150 − 450 − 225 − 225)",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "A4 : colonnes « Jours réalisés cumulés », « Jours facturés (émis) », « Jours annulés par notes de crédit », « Solde contractuel (j) »",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "A4 : 72,50 h, 9,06 j réalisés cumulés (2 décimales, valeur exacte en infobulle : décision B-2), facturés − annulés = 5,00 j nets, solde contractuel 25,00 j, 4,06 j non facturés",
+   "ok": false,
+   "detail": "Mandat Recette Alpha\nClient Recette — Direction des Infrastructures · PO-RECETTE-0001 | 01.07.2026 | 12 mois | 27 000,00 CHF | 0,00 | 0,00 | 30,00 | 0,00 | 0,00 | 30,00 | 0,00 | Saisies\nModifier"
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "A4 : tableau de bord distingue réalisés / facturés / annulés / solde contractuel",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "A3 : aucune date ISO visible dans l'archive",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "10 archive et suivi",
+   "name": "format français à l'écran (aucun « CHF 1… » ni « 1.00 »)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "phase": "phase1",
+   "section": "11 export et restauration JSON",
+   "name": "sauvegarde : 3 factures, 5 notes, 1 annulation, opérations, historique des dates",
+   "ok": false,
+   "detail": "{\"audit\":3,\"billing_addresses\":0,\"credit_note_cancellations\":0,\"credit_note_snapshots\":0,\"credit_notes\":0,\"credit_operations\":0,\"entries\":0,\"entry_changes\":0,\"historical_invoices\":0,\"import_batch_rows\":0,\"import_batches\":0,\"invoice_annex_entries\":0,\"invoice_date_changes\":0,\"invoice_lines\":0,\"invoice_number_changes\":0,\"invoice_snapshots\":0,\"invoice_variance_decisions\":0,\"invoices\":0,\"projects\":1,\"settings\":0}"
+  },
+  {
+   "phase": "phase1",
+   "section": "11 export et restauration JSON",
+   "name": "exception",
+   "ok": false,
+   "detail": "locator.click: Error: strict mode violation: locator('#entryForm').locator('button') resolved to 4 elements:\n    1) <button type=\"button\" class=\"secondary\" data-setdate=\"2026-10-26\">Aujourd'hui</button> aka getByRole('button', { name: 'Aujourd\\'hui' })\n    2) <button type=\"button\" class=\"secondary\" data-setdate=\"2026-10-25\">Hier</button> aka getByRole('button', { name: 'Hier' })\n    3) <button id=\"entrySubmit\">Enregistrer le temps — 2 h</button> aka getByRole('button', { name: 'Enregistrer le te"
+  }
+ ],
+ "consoleErrors": [
+  "http://127.0.0.1:18982/invoice/undefined/credit : Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+  "http://127.0.0.1:18982/invoice/undefined/credit : Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+  "http://127.0.0.1:18982/credit/undefined : Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+  "http://127.0.0.1:18982/invoice/undefined/credit : Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+  "http://127.0.0.1:18982/invoice/undefined/credit : Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+  "http://127.0.0.1:18982/credit/undefined : Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+  "http://127.0.0.1:18982/invoice/undefined/credit : Failed to load resource: the server responded with a status of 404 (NOT FOUND)"
+ ],
+ "state": {
+  "pdf": {},
+  "ids": {
+   "pid": "1"
+  },
+  "a4": {
+   "realises": "0,00",
+   "factures": "0,00",
+   "annules": "0,00",
+   "solde": "30,00",
+   "non_factures": "0,00"
+  },
+  "counts": {
+   "audit": 3,
+   "billing_addresses": 0,
+   "credit_note_cancellations": 0,
+   "credit_note_snapshots": 0,
+   "credit_notes": 0,
+   "credit_operations": 0,
+   "entries": 0,
+   "entry_changes": 0,
+   "historical_invoices": 0,
+   "import_batch_rows": 0,
+   "import_batches": 0,
+   "invoice_annex_entries": 0,
+   "invoice_date_changes": 0,
+   "invoice_lines": 0,
+   "invoice_number_changes": 0,
+   "invoice_snapshots": 0,
+   "invoice_variance_decisions": 0,
+   "invoices": 0,
+   "projects": 1,
+   "settings": 0
+  },
+  "mobileOverflow": false
+ }
+}

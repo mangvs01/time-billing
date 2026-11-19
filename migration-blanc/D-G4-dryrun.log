@@ -1,0 +1,180 @@
+
+=== 0. bac à sable : arborescence staging rc18 (sans données ni secrets), base = copie cohérente du staging, secrets de test
+ Container tbmb-dg4 Started 
+santé avant : {"status":"ok","version":"9.2-rc18"}
+OK    version d'origine rc18
+
+=== 1. déploiement rc19 + G4 : 10 → 20 → 30 → 40 → 50
+2026-10-06T00:55:06Z  cible /root/time-billing-v9-rc10-20261004/migration-blanc/D-G4/opt/tb (projet tbmb-dg4, conteneur tbmb-dg4) — santé : {"status":"ok","version":"9.2-rc18"}
+2026-10-06T00:55:06Z  Dockerfile identique : oui
+2026-10-06T00:55:06Z  requirements identiques : oui
+2026-10-06T00:55:06Z  propriétaire du dossier de données : 10001 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-06T00:55:06Z  préparation conforme
+ Container tbmb-dg4 Stopping 
+ Container tbmb-dg4 Stopped 
+2026-10-06T00:55:08Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/D-G4/backups/pre-rc19-20261006T005506Z conforme (service arrêté ; relancer l'ancienne version : docker compose -p tbmb-dg4 start)
+OK   integrity_check
+OK   foreign_key_check vide
+OK   projects : 24 ligne(s), colonnes d origine inchangées
+OK   entries : 2247 ligne(s), colonnes d origine inchangées
+OK   invoices : 1 ligne(s), colonnes d origine inchangées
+OK   credit_notes : 0 ligne(s), colonnes d origine inchangées
+OK   audit : 128 ligne(s), colonnes d origine inchangées
+OK   aucune facture émise sans copie figée
+OK   empreintes des PDF figés valides
+OK   PDF figés servis
+OK   42 déclencheurs d immuabilité présents
+OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (0)
+OK   rc19 : 0 ligne(s) d historique des corrections identiques
+OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+OK   migration idempotente (2e passage sans erreur)
+OK   rc19 : schéma toujours conforme après le 2e passage
+GO
+ Image tbmb-dg4-time-billing-v9-staging Building 
+ Image tbmb-dg4-time-billing-v9-staging Built 
+ Container tbmb-dg4 Recreate 
+ Container tbmb-dg4 Recreated 
+ Container tbmb-dg4 Starting 
+ Container tbmb-dg4 Started 
+2026-10-06T00:55:12Z  déployé — santé : {"status":"ok","version":"9.2-rc19"}
+2026-10-06T00:55:12Z  OK    santé 9.2-rc19
+2026-10-06T00:55:12Z  OK    page de connexion 200
+2026-10-06T00:55:12Z  OK    en-têtes de sécurité
+2026-10-06T00:55:12Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-06T00:55:12Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-06T00:55:12Z  OK    archive ZIP protégée
+2026-10-06T00:55:12Z  OK    service non privilégié (uid 10001)
+2026-10-06T00:55:12Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-06T00:55:12Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-06T00:55:12Z  OK    écoute locale uniquement
+2026-10-06T00:55:12Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-06T00:55:12Z  OK    secrets absents des journaux du conteneur
+2026-10-06T00:55:15Z  après redémarrage :
+2026-10-06T00:55:15Z  OK    santé 9.2-rc19
+2026-10-06T00:55:15Z  OK    page de connexion 200
+2026-10-06T00:55:15Z  OK    en-têtes de sécurité
+2026-10-06T00:55:15Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-06T00:55:15Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-06T00:55:15Z  OK    archive ZIP protégée
+2026-10-06T00:55:15Z  OK    service non privilégié (uid 10001)
+2026-10-06T00:55:15Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-06T00:55:15Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-06T00:55:15Z  OK    écoute locale uniquement
+2026-10-06T00:55:15Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-06T00:55:15Z  OK    secrets absents des journaux du conteneur
+2026-10-06T00:55:15Z  VÉRIFICATIONS CONFORMES
+
+=== 2. contrôles G4 (HTTP, lecture seule de la base)
+OK    version rc19
+OK    registre des factures historiques présent et vide
+OK    page Factures historiques servie
+OK    2 247 saisies
+OK    brouillon n°1 conservé
+OK    13 contrôles affichés sur le brouillon n°1
+OK    brouillon n°1 : contrôles 10 (données de test), 12 (0 h dans la période) et 13 (fin de période après la date) en échec
+OK    brouillon n°1 : tarif 0 refusé à l émission (champs à compléter)
+OK    brouillon n°1 : émission impossible (bouton désactivé)
+OK    PDF du brouillon n°1 rendu
+OK    tableau de bord servi
+
+=== 3. retour arrière (aucune donnée écrite depuis la sauvegarde) : accepté, base = sauvegarde, rc18
+2026-10-06T00:55:16Z  base vivante copiée avant retour : /root/time-billing-v9-rc10-20261004/migration-blanc/D-G4/backups/ecarte-20261006T005506Z-retour-20261006T005516Z/timebilling-avant-retour.db (sha 565a7c3e8938)
+ Container tbmb-dg4 Stopping 
+ Container tbmb-dg4 Stopped 
+2026-10-06T00:55:18Z  .env d'origine restauré
+2026-10-06T00:55:18Z  requirements.lock d'origine restauré
+2026-10-06T00:55:18Z  .dockerignore d'origine restauré
+ Container tbmb-dg4 Creating 
+ Container tbmb-dg4 Created 
+ Container tbmb-dg4 Starting 
+ Container tbmb-dg4 Started 
+2026-10-06T00:55:20Z  retour arrière effectué — santé : {"status":"ok","version":"9.2-rc18"} ; base = sauvegarde 20261006T005506Z (SHA-256 identique)
+OK    90-rollback accepté
+OK    base = sauvegarde d'avant déploiement (SHA-256 identique)
+OK    base = copie d'origine du staging (SHA-256 identique)
+OK    version rc18 de retour
+
+=== 4. redéploiement rc19 + G4 : 10 → 50
+2026-10-06T00:55:20Z  cible /root/time-billing-v9-rc10-20261004/migration-blanc/D-G4/opt/tb (projet tbmb-dg4, conteneur tbmb-dg4) — santé : {"status":"ok","version":"9.2-rc18"}
+2026-10-06T00:55:20Z  Dockerfile identique : oui
+2026-10-06T00:55:20Z  requirements identiques : oui
+2026-10-06T00:55:20Z  propriétaire du dossier de données : 10001 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-06T00:55:20Z  préparation conforme
+ Container tbmb-dg4 Stopping 
+ Container tbmb-dg4 Stopped 
+2026-10-06T00:55:22Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/D-G4/backups/pre-rc19-20261006T005520Z conforme (service arrêté ; relancer l'ancienne version : docker compose -p tbmb-dg4 start)
+OK   integrity_check
+OK   foreign_key_check vide
+OK   projects : 24 ligne(s), colonnes d origine inchangées
+OK   entries : 2247 ligne(s), colonnes d origine inchangées
+OK   invoices : 1 ligne(s), colonnes d origine inchangées
+OK   credit_notes : 0 ligne(s), colonnes d origine inchangées
+OK   audit : 128 ligne(s), colonnes d origine inchangées
+OK   aucune facture émise sans copie figée
+OK   empreintes des PDF figés valides
+OK   PDF figés servis
+OK   42 déclencheurs d immuabilité présents
+OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (0)
+OK   rc19 : 0 ligne(s) d historique des corrections identiques
+OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+OK   migration idempotente (2e passage sans erreur)
+OK   rc19 : schéma toujours conforme après le 2e passage
+GO
+ Image tbmb-dg4-time-billing-v9-staging Building 
+ Image tbmb-dg4-time-billing-v9-staging Built 
+ Container tbmb-dg4 Recreate 
+ Container tbmb-dg4 Recreated 
+ Container tbmb-dg4 Starting 
+ Container tbmb-dg4 Started 
+2026-10-06T00:55:26Z  déployé — santé : {"status":"ok","version":"9.2-rc19"}
+2026-10-06T00:55:26Z  OK    santé 9.2-rc19
+2026-10-06T00:55:26Z  OK    page de connexion 200
+2026-10-06T00:55:26Z  OK    en-têtes de sécurité
+2026-10-06T00:55:26Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-06T00:55:26Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-06T00:55:26Z  OK    archive ZIP protégée
+2026-10-06T00:55:26Z  OK    service non privilégié (uid 10001)
+2026-10-06T00:55:26Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-06T00:55:26Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-06T00:55:26Z  OK    écoute locale uniquement
+2026-10-06T00:55:26Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-06T00:55:26Z  OK    secrets absents des journaux du conteneur
+2026-10-06T00:55:29Z  après redémarrage :
+2026-10-06T00:55:29Z  OK    santé 9.2-rc19
+2026-10-06T00:55:29Z  OK    page de connexion 200
+2026-10-06T00:55:29Z  OK    en-têtes de sécurité
+2026-10-06T00:55:29Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-06T00:55:29Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-06T00:55:29Z  OK    archive ZIP protégée
+2026-10-06T00:55:29Z  OK    service non privilégié (uid 10001)
+2026-10-06T00:55:29Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-06T00:55:29Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-06T00:55:29Z  OK    écoute locale uniquement
+2026-10-06T00:55:29Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-06T00:55:29Z  OK    secrets absents des journaux du conteneur
+2026-10-06T00:55:29Z  VÉRIFICATIONS CONFORMES
+
+=== 5. répétition du chargement D1 (copie ; le classeur est lu en lecture seule)
+OK    simulation : 23 lignes, aucun effet tant qu'à valider
+OK    simulation : base inchangée (SHA-256)
+OK    écriture refusée sans --confirmer
+OK    écriture : CHARGÉ : 23 ligne(s) « à valider » (ids [1]…[23]), 0 déjà présente(s) à l'identique. Aucune validée.
+OK    rejeu idempotent : CHARGÉ : 0 ligne(s) « à valider » (ids []…[]), 23 déjà présente(s) à l'identique. Aucune validée.
+OK    23 lignes « à valider », aucune validée
+OK    total 205,63 j / 133 659,50 CHF
+OK    M15 (D2) et AL (D3) absentes
+OK    5 notes de provenance D4
+OK    CIRSE 2026 : n° 2026-09 repris de la facture réelle
+OK    page : 23 lignes à valider affichées
+OK    validation du mandat CIRSE 2026 par la page
+OK    validation tracée (auteur, date)
+
+=== 6. retour arrière après chargement : refusé (données écrites depuis la sauvegarde)
+2026-10-06T00:55:35Z  base vivante copiée avant retour : /root/time-billing-v9-rc10-20261004/migration-blanc/D-G4/backups/ecarte-20261006T005520Z-retour-20261006T005534Z/timebilling-avant-retour.db (sha cfe01216c789)
+2026-10-06T00:55:35Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-06T00:55:20) seraient écartées par le retour arrière : historical_invoices : 23 ligne(s) ajoutée(s). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/D-G4/backups/ecarte-20261006T005520Z-retour-20261006T005534Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    retour arrière refusé (registre chargé depuis la sauvegarde : à exporter d'abord)
+OK    service rc19 toujours en marche après le refus
+
+=== 7. nettoyage
+images du bac à sable supprimées
+RÉPÉTITION D : GO

@@ -1,0 +1,32 @@
+FAIL [durée 25 h] formulaire envoyé et correction enregistrée — http://127.0.0.1:8471/entry/2248/edit 
+PASS [durée 25 h] aucun message « Avertissements non calculés »
+FAIL [durée 25 h] valeurs attendues en base (valeurs non modifiées conservées) — [["description","NAV gt24"]]
+FAIL [durée 25 h] une seule correction tracée — 
+FAIL [durée 0,005 h] formulaire envoyé et correction enregistrée — http://127.0.0.1:8471/entry/2249/edit 
+PASS [durée 0,005 h] aucun message « Avertissements non calculés »
+FAIL [durée 0,005 h] valeurs attendues en base (valeurs non modifiées conservées) — [["description","NAV lt001"]]
+FAIL [durée 0,005 h] une seule correction tracée — 
+FAIL [horaires avec secondes] formulaire envoyé et correction enregistrée — http://127.0.0.1:8471/entry/2250/edit Saisie non modifiée : heure invalide (format HH:MM attendu)
+PASS [horaires avec secondes] aucun message « Avertissements non calculés »
+FAIL [horaires avec secondes] valeurs attendues en base (valeurs non modifiées conservées) — [["description","NAV secondes"]]
+FAIL [horaires avec secondes] une seule correction tracée — 
+FAIL [début = fin] formulaire envoyé et correction enregistrée — http://127.0.0.1:8471/entry/2251/edit Saisie non modifiée : l'heure de fin ne peut pas être identique à l'heure de début (une prestation passant minuit s'écrit par exemple 22:00 → 02:00 : la fin est alors antérieure au début)
+PASS [début = fin] aucun message « Avertissements non calculés »
+FAIL [début = fin] valeurs attendues en base (valeurs non modifiées conservées) — [["description","NAV debut=fin"]]
+FAIL [début = fin] une seule correction tracée — 
+PASS [horaire seul] formulaire envoyé et correction enregistrée
+PASS [horaire seul] aucun message « Avertissements non calculés »
+FAIL [horaire seul] valeurs attendues en base (valeurs non modifiées conservées) — [["start_time",""]]
+PASS [horaire seul] une seule correction tracée
+PASS [description sur 2 lignes] formulaire envoyé et correction enregistrée
+PASS [description sur 2 lignes] aucun message « Avertissements non calculés »
+FAIL [description sur 2 lignes] valeurs attendues en base (valeurs non modifiées conservées) — [["description","NAV multi l1l2"]]
+PASS [description sur 2 lignes] une seule correction tracée
+FAIL [description de 1 109 caractères] formulaire envoyé et correction enregistrée — http://127.0.0.1:8471/entry/2254/edit Saisie non modifiée : description trop longue (1109 caractères ; 1000 au maximum)
+PASS [description de 1 109 caractères] aucun message « Avertissements non calculés »
+FAIL [description de 1 109 caractères] valeurs attendues en base (valeurs non modifiées conservées) — [["hours",2]]
+PASS [description de 1 109 caractères] description longue conservée
+FAIL [description de 1 109 caractères] une seule correction tracée — 
+PASS [nouvelle valeur hors limites] 26 h bloqué par le navigateur (max = valeur enregistrée), rien d'écrit
+PASS [page] aucune erreur JavaScript / CSP
+14/31

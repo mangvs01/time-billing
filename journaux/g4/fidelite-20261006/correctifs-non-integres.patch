@@ -1,0 +1,470 @@
+diff -ruN -x __pycache__ -x '*.pyc' a/app/app.py b/app/app.py
+--- a/app/app.py	2026-10-06 00:33:36.050723800 +0000
++++ b/app/app.py	2026-10-06 09:19:49.228501564 +0000
+@@ -1,4 +1,4 @@
+-import os, sqlite3, io, json, csv, secrets, re, hashlib, time, base64, math, zipfile
++import os, sqlite3, io, json, csv, secrets, re, hashlib, time, base64, math, zipfile, unicodedata
+ from urllib import parse as urllib_parse
+ from datetime import datetime, date, timedelta, timezone
+ from decimal import Decimal, ROUND_HALF_UP, ROUND_CEILING, ROUND_FLOOR
+@@ -568,12 +568,14 @@
+   if not start or not end: raise ValueError("renseigner l'heure de début et l'heure de fin")
+   ms,me=TIME_RE.match(start),TIME_RE.match(end)
+   if not ms or not me: raise ValueError("heure invalide (format HH:MM attendu)")
++  start,end=f"{int(ms.group(1)):02d}:{ms.group(2)}",f"{int(me.group(1)):02d}:{me.group(2)}"   # « 7:05 » is stored as 07:05 (same time, the format every calculation reads)
+   minutes=clock_minutes(start,end)
+   if minutes is None: raise ValueError("l'heure de fin ne peut pas être identique à l'heure de début (une prestation passant minuit s'écrit par exemple 22:00 → 02:00 : la fin est alors antérieure au début)")
+   h=minutes/60
+  elif mode=="duration":
+   raw=(form.get("manual_hours") or "").strip().replace(",",".")
+   if not raw: raise ValueError("renseigner la durée travaillée")
++  if not re.fullmatch(r"[0-9]+(\.[0-9]*)?|\.[0-9]+",raw): raise ValueError("durée invalide (nombre d'heures attendu, ex. 4,25 pour 4 h 15)")   # no « 1_5 », « 1e1 », non-ASCII digits
+   try: h=float(raw)
+   except ValueError: raise ValueError("durée invalide (nombre d'heures attendu, ex. 4,25 pour 4 h 15)")
+   if not math.isfinite(h): raise ValueError("durée invalide (nombre d'heures attendu, ex. 4,25 pour 4 h 15)")
+@@ -659,7 +661,8 @@
+  (line breaks included) and bidirectional overrides are refused: they could make the history read differently from what it stores."""
+  v=(v or "").strip()
+  if len(v)>MAX_REASON: raise ValueError(f"motif trop long ({len(v)} caractères ; {MAX_REASON} au maximum)")
+- if any(ord(ch)<32 or 0x7f<=ord(ch)<0xa0 or ord(ch) in _BIDI for ch in v): raise ValueError("motif : caractères de contrôle ou d'inversion du sens d'écriture refusés (une seule ligne de texte)")
++ if any(ord(ch)<32 or 0x7f<=ord(ch)<0xa0 or ord(ch) in _BIDI or unicodedata.category(ch) in ("Zl","Zp","Cf") for ch in v):   # Cf: invisible format characters (U+200B, U+FEFF…)
++  raise ValueError("motif : caractères de contrôle, invisibles ou d'inversion du sens d'écriture refusés (une seule ligne de texte)")
+  return v
+ def target_project(c,pid,current_pid,allow_closed):
+  """Mandate of an existing entry after a correction (rc19). Its own mandate, even closed: old entries stay editable. Another active
+diff -ruN -x __pycache__ -x '*.pyc' a/app/billing_rules.py b/app/billing_rules.py
+--- a/app/billing_rules.py	2026-10-05 23:17:33.054569674 +0000
++++ b/app/billing_rules.py	2026-10-06 09:07:57.782743782 +0000
+@@ -250,6 +250,10 @@
+     """YYYY-MM of the billed period's end month; later invoices of the same month get -2, -3…"""
+     base = period_to[:7]
+     taken = [r[0] for r in c.execute("SELECT number FROM invoices WHERE number=? OR number LIKE ?", (base, base + "-%"))]
++    # G4 (N1): a number printed on an invoice issued outside the application (historical registry, whatever its status) is taken too:
++    # CIRSE 2026 was really invoiced as « 2026-09 », so a Time Billing invoice ending in 2026-09 becomes « 2026-09-2 ».
++    if c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='historical_invoices'").fetchone():
++        taken += [r[0] for r in c.execute("SELECT invoice_ref FROM historical_invoices WHERE invoice_ref=? OR invoice_ref LIKE ?", (base, base + "-%"))]
+     if base not in taken: return base
+     suffixes = [int(n.rsplit("-", 1)[1]) for n in taken if re.fullmatch(re.escape(base) + r"-\d+", n)]
+     return f"{base}-{max(suffixes + [1]) + 1}"
+diff -ruN -x __pycache__ -x '*.pyc' a/app/historical_billing.py b/app/historical_billing.py
+--- a/app/historical_billing.py	2026-10-05 23:19:18.031625850 +0000
++++ b/app/historical_billing.py	2026-10-06 09:19:49.226501582 +0000
+@@ -54,7 +54,7 @@
+     cur = c.execute(f"INSERT INTO historical_invoices({','.join(row)}) VALUES({','.join('?' * len(row))})", tuple(row.values()))
+     c.execute("INSERT INTO audit(event,detail) VALUES(?,?)", ("historical_invoice_proposed", json.dumps(
+         {"id": cur.lastrowid, "project_id": row["project_id"], "cell": f"{row['source_sheet']}!{row['source_cell']}", "date": row["invoice_date"], "days": row["qty_days"],
+-         "amount_ht": row["amount_ht"]}, ensure_ascii=False)))
++         "amount_ht": row["amount_ht"], "note": row["note"]}, ensure_ascii=False)))
+     return cur.lastrowid
+ 
+ 
+@@ -69,8 +69,11 @@
+     if new == "validated" and r["invoice_date"] is None and r["qty_days"] is not None:
+         raise ValueError("date de facture inconnue : une facture historique sans date ne peut pas être validée (le cumul ne saurait pas où la placer)")
+     now = rules.utc_now_iso()
++    # The note only grows: a rejection is appended after the provenance note (D4 notes are never lost), a re-validation keeps the whole story.
++    kept = r["note"] or ""
++    if new == "rejected": kept = (kept + " · " if kept else "") + f"Rejet du {now[:10]} : {note}"
+     c.execute("UPDATE historical_invoices SET status=?,note=?,validated_at=?,validated_by=? WHERE id=?",
+-              (new, note if new == "rejected" else r["note"], now if new == "validated" else r["validated_at"], actor if new == "validated" else r["validated_by"], hid))
++              (new, kept, now if new == "validated" else r["validated_at"], actor if new == "validated" else r["validated_by"], hid))
+     c.execute("INSERT INTO audit(event,detail) VALUES(?,?)", (f"historical_invoice_{new}", json.dumps(
+         {"id": hid, "project": r["project"], "cell": f"{r['source_sheet']}!{r['source_cell']}", "from": r["status"], "date": r["invoice_date"], "days": r["qty_days"],
+          "amount_ht": r["amount_ht"], "by": actor, "reason": note}, ensure_ascii=False)))
+diff -ruN -x __pycache__ -x '*.pyc' a/app/historical_import.py b/app/historical_import.py
+--- a/app/historical_import.py	2026-10-05 08:12:01.165985215 +0000
++++ b/app/historical_import.py	2026-10-06 09:09:47.672794583 +0000
+@@ -41,7 +41,9 @@
+     'date_suspect': ('warning', 'Date suspecte (future ou hors plage)'),
+     'hours_suspect': ('warning', 'Durée supérieure à 24 h'),
+     'possible_existing_entry': ('warning', 'Prestation identique déjà présente en base'),
+-    'already_imported': ('error', 'Ligne déjà importée depuis ce même fichier (lot non annulé) : aucun doublon possible'),   # rc16 : bloquant, une décision « importer » ne peut pas créer de doublon
++    'already_imported': ('error', 'Ligne déjà importée (lot non annulé), depuis ce fichier ou une copie du classeur : aucun doublon possible'),   # rc16 : bloquant, une décision « importer » ne peut pas créer de doublon
++    'source_row_changed': ('warning', 'Cette ligne du classeur a déjà été importée avec un autre contenu (modifiée depuis ?) : corriger plutôt la saisie existante'),
++    'previously_excluded': ('warning', "Ligne écartée volontairement lors d'un import précédent"),
+     'year_differs_from_sheet': ('warning', "Année différente de celle de l'onglet (non corrigée)"),
+     'duplicate_other_sheet': ('warning', "Copie exacte d'une saisie d'un autre onglet (jamais supprimée automatiquement)"),
+     'time_overlap': ('warning', 'Plage horaire chevauchant une autre saisie du même jour'),
+@@ -304,6 +306,26 @@
+     return {'sheets': values.sheetnames, 'rows': rows_out, 'skipped_sheets': skipped, 'ignored_blank_rows': ignored_blank}
+ 
+ 
++def _line_key(raw):
++    """Identity of a source line by its cell values (stored raw_json of the batch ledger, or the raw of a parsed row): a re-saved or
++    extended copy of the workbook yields the same key, whatever its sha256."""
++    if isinstance(raw, str): raw = json.loads(raw or '{}')
++    return (raw.get('date', ''), _norm(raw.get('project', '')), raw.get('start', ''), raw.get('end', ''), raw.get('hours', ''), _norm(raw.get('description', '')))
++
++
++def _imported_lines(conn):
++    """Lines of the COMMITTED batches (a rolled-back batch no longer counts): imported ones by position and by content, explicitly excluded ones by position."""
++    by_pos, by_content, excluded = {}, set(), {}
++    for x in conn.execute("""SELECT ir.source_sheet,ir.source_row,ir.raw_json,ir.decision,ir.entry_id FROM import_batch_rows ir
++                             JOIN import_batches b ON b.id=ir.batch_id WHERE b.status='COMMITTED'"""):
++        k = _line_key(x[2])
++        if x[4] is not None:
++            by_pos.setdefault((x[0], x[1]), set()).add(k); by_content.add(k)
++        elif x[3] == 'exclude':
++            excluded.setdefault((x[0], x[1]), set()).add(k)
++    return by_pos, by_content, excluded
++
++
+ def validate(conn, payload, mapping, decisions):
+     """Combine static issues with DB-dependent checks. Pure read; returns rows + summary.
+ 
+@@ -314,6 +336,7 @@
+     issued = {r['project_id']: r['last'] for r in conn.execute(
+         "SELECT project_id, MAX(period_to) last FROM invoices WHERE status='issued' GROUP BY project_id")}
+     out, counts = [], {}
++    imported_pos, imported_content, excluded_pos = _imported_lines(conn)
+     for r in payload['rows']:
+         issues = list(r['issues'])
+         target = mapping.get(r['project_name'], '') if r['project_name'] else ''
+@@ -323,13 +346,24 @@
+         if pid is not None and r['work_date']:
+             if pid in issued and r['work_date'] <= issued[pid]: issues.append('before_issued_invoice')
+             if r['hours']:
+-                if conn.execute('SELECT 1 FROM entries WHERE project_id=? AND work_date=? AND ABS(hours-?)<1e-9 AND start_time=? AND end_time=? LIMIT 1',
+-                                (pid, r['work_date'], float(r['hours']), r['start_time'], r['end_time'])).fetchone():
++                # same date, clock and duration: on the chosen mandate, or on ANY mandate when the line has a clock (one person cannot work twice in the same slot)
++                clocked = bool(r['start_time'] and r['end_time'])
++                if conn.execute('SELECT 1 FROM entries WHERE work_date=? AND ABS(hours-?)<1e-9 AND start_time=? AND end_time=?' + ('' if clocked else ' AND project_id=?') + ' LIMIT 1',
++                                (r['work_date'], float(r['hours']), r['start_time'], r['end_time']) + (() if clocked else (pid,))).fetchone():
+                     issues.append('possible_existing_entry')
+-        if conn.execute("""SELECT 1 FROM import_batch_rows ir JOIN import_batches b ON b.id=ir.batch_id
+-                           WHERE b.status='COMMITTED' AND b.file_sha256=? AND ir.source_sheet=? AND ir.source_row=? AND ir.entry_id IS NOT NULL LIMIT 1""",
+-                        (payload['file_sha256'], r['source_sheet'], r['source_row'])).fetchone():
+-            issues.append('already_imported')
++        # rc16 + G4: a line already imported is recognised by its source line (sheet, row, cell values), not only by the sha256 of the file: a re-saved or
++        # completed copy of the workbook cannot import it again, and a line corrected in the application since its import does not come back with its old value.
++        pos, key = (r['source_sheet'], r['source_row']), _line_key(r['raw'])
++        if 'total_row' not in issues:
++            if (key in imported_pos.get(pos, ()) or (key in imported_content and r['start_time'] and r['end_time'])
++                    or conn.execute("""SELECT 1 FROM import_batch_rows ir JOIN import_batches b ON b.id=ir.batch_id
++                                       WHERE b.status='COMMITTED' AND b.file_sha256=? AND ir.source_sheet=? AND ir.source_row=? AND ir.entry_id IS NOT NULL LIMIT 1""",
++                                    (payload['file_sha256'], r['source_sheet'], r['source_row'])).fetchone()):
++                issues.append('already_imported')
++            elif pos in imported_pos:
++                issues.append('source_row_changed')
++            elif key in excluded_pos.get(pos, ()):
++                issues.append('previously_excluded')
+         sev = {severity(i) for i in issues}
+         decision = decisions.get(str(r['idx']), '')
+         if target == 'skip': status = 'excluded_project'
+@@ -370,7 +404,8 @@
+     return out, summary
+ 
+ 
+-CATEGORY_ORDER = [('year_differs_from_sheet', "A1 Année différente de l'onglet"), ('date_suspect', 'A2 Date future ou hors plage'),
++CATEGORY_ORDER = [('source_row_changed', 'A10 Ligne déjà importée, modifiée depuis dans le classeur'), ('previously_excluded', "A11 Écartée lors d'un import précédent"),
++                  ('year_differs_from_sheet', "A1 Année différente de l'onglet"), ('date_suspect', 'A2 Date future ou hors plage'),
+                   ('duplicate_other_sheet', "A3 Copie d'une saisie d'un autre onglet"), ('declared_vs_clock_mismatch', 'A4 Durée déclarée ≠ calculée'),
+                   ('clock_unreadable', 'A5 Heure illisible'), ('date_outside_sheet_month', "A6 Date hors du mois de l'onglet"),
+                   ('time_overlap', 'A7 Chevauchement horaire'), ('time_order_ambiguous', 'A8 Fin ≤ début'), ('incomplete_time_pair', 'A9 Horaires incomplets')]
+diff -ruN -x __pycache__ -x '*.pyc' a/app/invoice_checks.py b/app/invoice_checks.py
+--- a/app/invoice_checks.py	2026-10-06 00:33:55.609509626 +0000
++++ b/app/invoice_checks.py	2026-10-06 09:18:51.024018341 +0000
+@@ -80,7 +80,8 @@
+     # 1 — detail of the period: exactly the entries of the mandate dated within it
+     sql_ids = {r[0] for r in conn.execute("SELECT id FROM entries WHERE project_id=? AND work_date BETWEEN ? AND ?", (pid, pf, pt))}
+     detail_ids = {r["id"] for r in rows if pf <= r["work_date"] <= pt}
+-    hrs = round(sum(r["hours"] for r in rows if pf <= r["work_date"] <= pt), 4)
++    hrs_exact = sum(r["hours"] for r in rows if pf <= r["work_date"] <= pt)   # compared unrounded: 7 h 20 = 7.3333… must not fail check 12 on a rounding gap
++    hrs = round(hrs_exact, 4)
+     add(1, "Les feuilles détaillées de la période sont celles de la période", sql_ids == detail_ids,
+         (f"{len(detail_ids)} saisie(s), {hrs} h dans la période du {fr(pf)} au {fr(pt)}" if detail_ids else f"aucune saisie dans la période du {fr(pf)} au {fr(pt)} (les feuilles jointes sont du cumul antérieur)")
+         if sql_ids == detail_ids else f"écart entre la base ({len(sql_ids)} saisies) et le détail ({len(detail_ids)})")
+@@ -96,6 +97,7 @@
+     want = float(p["rate"] or 0) / (dh if h["unit"] == "hour" else 1)       # the draft stores the mandate's day rate, or its hourly equivalent
+     if abs(float(h["unit_rate"]) - want) > 1e-9: bad3.append(f"tarif de la facture {h['unit_rate']} ≠ tarif du mandat {round(want, 6)} par {'heure' if h['unit'] == 'hour' else 'jour'}")
+     if not float(h["qty"]) > 0: bad3.append("quantité nulle ou négative")
++    if not float(h["unit_rate"]) > 0: bad3.append("tarif nul : renseigner le tarif journalier du mandat")      # D8 sheet: a rate of 0 fails check 3 itself
+     add(3, "Le montant est quantité × tarif", not bad3, "; ".join(bad3) or f"{h['qty']} × {h['unit_rate']} = {ht} CHF HT")
+     # 4 — VAT
+     base = ht + (a["other"] if h.get("other_vat_mode") == "soumis" else Decimal(0))
+@@ -152,13 +154,13 @@
+     # 12 — the same story: arithmetic invariants (blocking, never derogable) + narrative gaps (blocking, derogable with a written reason: D8)
+     bad12 = []
+     if abs(sum(r["hours"] for r in rows) / dh - pos["realized"]) > EPS: bad12.append("somme des heures de l'annexe ≠ jours réalisés cumulés imprimés")
+-    if abs(hrs - h["period_hours"]) > EPS: bad12.append("heures de la période ≠ total de la section période")
++    if abs(hrs_exact - h["period_hours"]) > EPS: bad12.append("heures de la période ≠ total de la section période")
+     if abs(rules.days(h["qty"], h["unit"], dh) - pos["current"]) > EPS: bad12.append("quantité de la page 1 ≠ jours « cette facture » de la position")
+     if abs(pos["invoiced"] - (pos["historical"] + pos["previous"] + pos["current"])) > EPS: bad12.append("jours facturés totaux ≠ historiques + antérieurs + cette facture")
+     if bad12: add(12, "La facture, l'annexe et la position racontent la même histoire", False, "; ".join(bad12))
+     else:
+         notes = []
+-        pdays = hrs / dh
++        pdays = hrs_exact / dh
+         if not detail_ids:
+             notes.append(f"aucune saisie datée de la période facturée du {fr(pf)} au {fr(pt)} : l'annexe ne montre que du cumul antérieur")
+         if abs(rules.days(h["qty"], h["unit"], dh) - pdays) > 0.5:
+diff -ruN -x __pycache__ -x '*.pyc' a/app/pdf_layout.py b/app/pdf_layout.py
+--- a/app/pdf_layout.py	2026-10-06 00:37:18.648522065 +0000
++++ b/app/pdf_layout.py	2026-10-06 09:18:51.023018350 +0000
+@@ -350,11 +350,10 @@
+ 
+ 
+ def other_label(h, amount, prefix="AUTRES"):
+-    """« AUTRES » line label; its VAT treatment is printed whenever the line carries an amount."""
++    """« AUTRES » line label; its own label and VAT treatment are printed only when the line carries an amount (G4 §6: an empty « AUTRES » reads as on the reference)."""
++    if Decimal(str(amount or 0)) == 0: return prefix
+     label = prefix + (f" — {h['other_label']}" if h.get("other_label") else "")
+-    if Decimal(str(amount or 0)) != 0:
+-        label += f" ({OTHER_VAT_SHORT.get(h.get('other_vat_mode') or 'hors_tva', 'hors TVA')})"
+-    return label
++    return label + f" ({OTHER_VAT_SHORT.get(h.get('other_vat_mode') or 'hors_tva', 'hors TVA')})"
+ 
+ 
+ def unit_heads(unit):
+@@ -507,7 +506,7 @@
+         bottom = _framed_table(d, top + 16, POSITION7_COLS, SUMMARY_RIGHT, heads, vals)
+         notes = [f"Jours réalisés cumulés : temps enregistré du début du mandat au {dmy(h['period_to'])} (date de coupure de cette facture).",
+                  "Jours facturés historiques : factures émises hors Time Billing, validées dans le registre, datées au plus tard de la date de cette facture. "
+-                 "Jours facturés Time Billing antérieurs : factures Time Billing émises avant celle-ci. Jours annulés : notes de crédit émises et non annulées, "
++                 f"Jours facturés Time Billing antérieurs : factures Time Billing émises dont la période se termine au plus tard le {dmy(h['period_to'])}. Jours annulés : notes de crédit émises et non annulées, "
+                  "créditées en jours (un crédit en montant seul ne modifie pas les jours).",
+                  "Solde contractuel = jours commandés − (historiques + antérieurs + cette facture − jours annulés par notes de crédit)."]
+         items = pos.get("historical_items") or []
+diff -ruN -x __pycache__ -x '*.pyc' a/app/templates/entry_edit.html b/app/templates/entry_edit.html
+--- a/app/templates/entry_edit.html	2026-10-05 13:10:14.730142000 +0000
++++ b/app/templates/entry_edit.html	2026-10-06 09:10:20.840506600 +0000
+@@ -13,7 +13,7 @@
+ <div class="field wide" id="allowClosedField" {% if v.allow_closed!='1' %}hidden{% endif %}><label for="allow_closed"><input type="checkbox" name="allow_closed" id="allow_closed" value="1" style="width:auto" {% if v.allow_closed=='1' %}checked{% endif %}> Rattacher à un mandat clôturé — correction d'historique : aucune nouvelle saisie n'y est acceptée par défaut ; motif obligatoire</label></div>
+ <div class="field wide"><label>Mode de saisie — choisir une seule méthode</label><div class="modebox row"><label><input type="radio" name="entry_mode" value="clock" {% if v.entry_mode!='duration' %}checked{% endif %}> Début / fin (calcul automatique)</label><label><input type="radio" name="entry_mode" value="duration" {% if v.entry_mode=='duration' %}checked{% endif %}> Durée saisie directement</label></div></div>
+ <div id="clockFields" class="wide"><div class="fields"><div class="field"><label for="start_time">Heure de début</label><input type="time" name="start_time" id="start_time" value="{{v.start_time}}"></div><div class="field"><label for="end_time">Heure de fin</label><input type="time" name="end_time" id="end_time" value="{{v.end_time}}"></div></div><div class="calc" style="margin-top:9px"><span class="hint">Durée calculée automatiquement</span><strong id="calcDuration">—</strong></div>{% if clock_hours is not none and ((clock_hours - e.hours)|abs) > 0.000001 %}<p class="hint" id="declaredHours">Durée enregistrée : {{e.hours|nbg}} h (durée déclarée{% if provenance %} dans le classeur{% endif %}), différente des horaires {{e.start_time}}–{{e.end_time}} = {{clock_hours|nbg}} h. Elle est conservée tant que l'heure de début et l'heure de fin ne changent pas ; pour la remplacer, modifier un horaire ou choisir « Durée saisie directement ».</p>{% endif %}</div>
+-<div id="manualFields" class="field wide" hidden><label for="manual_hours">Durée travaillée (heures)</label><input name="manual_hours" id="manual_hours" type="number" min="0.01" max="24" step="0.01" value="{% if v.entry_mode=='duration' %}{{v.manual_hours}}{% endif %}" placeholder="Ex. 4.25 pour 4 h 15"></div>
++<div id="manualFields" class="field wide" hidden><label for="manual_hours">Durée travaillée (heures)</label><input name="manual_hours" id="manual_hours" type="number" min="0.01" max="24" step="any" value="{% if v.entry_mode=='duration' %}{{v.manual_hours}}{% endif %}" placeholder="Ex. 4.25 pour 4 h 15"></div>
+ <div class="field wide"><label for="description">Description de la prestation</label><input name="description" id="description" maxlength="1000" value="{{v.description}}"></div>
+ <div class="field wide"><label for="reason">Motif de la correction{% if billed %} (obligatoire : saisie facturée){% else %} (facultatif){% endif %}</label><input name="reason" id="reason" maxlength="{{max_reason}}" value="{{v.reason}}" {% if billed %}required aria-describedby="billedWarning"{% endif %} placeholder="Ex. heure de fin mal saisie dans le classeur"></div>
+ {% if billed %}<div class="field wide"><label for="confirm_billed"><input type="checkbox" name="confirm_billed" id="confirm_billed" value="1" style="width:auto" required aria-describedby="billedWarning"> Je confirme : la facture émise {{billed_nums}} reste inchangée et un écart post-facturation sera affiché.</label></div>{% endif %}
+diff -ruN -x __pycache__ -x '*.pyc' a/app/templates/historical.html b/app/templates/historical.html
+--- a/app/templates/historical.html	2026-10-05 23:19:53.697304963 +0000
++++ b/app/templates/historical.html	2026-10-06 09:19:49.226501582 +0000
+@@ -1,18 +1,18 @@
+ {% extends "_page.html" %}{% block title %}Factures historiques{% endblock %}{% block backlink %}/?tab=dashboard{% endblock %}{% block body %}
+ <h1>Factures historiques — émises hors Time Billing</h1>
+-<section class="panel" id="historicalIntro"><p>Factures que le classeur de suivi (SUIVI 2025 / SUIVI 2026) montre comme déjà émises avant Time Billing. Chaque ligne garde <b>la cellule d'où elle vient</b>. Ce ne sont <b>pas</b> des factures Time Billing : aucun numéro, aucun PDF, aucune modification, aucune suppression, jamais recréées comme factures émises.</p>
++<section class="panel" id="historicalIntro"><p>Factures que le classeur de suivi (SUIVI 2025 / SUIVI 2026) montre comme déjà émises avant Time Billing. Chaque ligne garde <b>la cellule d'où elle vient</b>. Ce ne sont <b>pas</b> des factures Time Billing : aucun numéro attribué par Time Billing (un n° imprimé sur la facture réelle est affiché et réservé), aucun PDF, aucune modification, aucune suppression, jamais recréées comme factures émises.</p>
+ <p class="hint">Seules les lignes <b>validées</b> par vous sont comptées (jours facturés, solde du bon de commande, chiffre d'affaires de l'année, position de l'annexe). Une ligne « à valider » ou « rejetée » ne change aucun indicateur. Un rejet demande un motif ; chaque validation ou rejet est tracé (utilisateur, date).</p>
+ <p id="historicalCounts"><a href="/historique"{% if not flt %} class="active"{% endif %}>Toutes</a> · <a href="/historique?statut=proposed">À valider ({{counts.proposed}})</a> · <a href="/historique?statut=validated">Validées ({{counts.validated}})</a> · <a href="/historique?statut=rejected">Rejetées ({{counts.rejected}})</a></p></section>
+ {% for key,rows in groups %}{% set pid=key[0] %}{% set todo=rows|selectattr('status','equalto','proposed')|list|length %}
+ <section class="panel historical-mandate" data-mandate="{{pid}}"><h2>{{key[1]}}{% if not key[2] %} <small>(clôturé)</small>{% endif %}</h2>
+ {% set t=totals.get(pid) %}<p class="hint">{% if t %}Validées : {{t.n}} facture(s), {{t.days|nb(4)}} j, {{t.amount|chf}} HT (comptées dans les indicateurs).{% else %}Aucune facture historique validée pour ce mandat.{% endif %}</p>
+ <div class="tablewrap"><table class="cards"><tr><th>Date de facture</th><th>Source dans le classeur</th><th>Jours</th><th>Montant HT</th><th>Origine des chiffres</th><th>Statut</th><th>Action</th></tr>
+-{% for r in rows %}<tr data-hid="{{r.id}}"><td class="nw" data-label="Date">{% if r.invoice_date %}{{r.invoice_date|d}}{% else %}<small>inconnue</small>{% endif %}</td>
++{% for r in rows %}<tr data-hid="{{r.id}}"><td class="nw" data-label="Date">{% if r.invoice_date %}{{r.invoice_date|d}}{% else %}<small>inconnue</small>{% endif %}{% if r.invoice_ref %}<br><small>n° {{r.invoice_ref}} (facture réelle)</small>{% endif %}</td>
+ <td data-label="Source"><small>{{r.source_sheet}} · cellule {{r.source_cell}}{% if r.source_column %} · « {{r.source_column}} »{% endif %}<br>{{r.source_file}}</small></td>
+ <td class="nw" data-label="Jours">{% if r.qty_days is not none %}{{r.qty_days|nb(4)}} j{% if r.qty_derived %} <small>(déduit)</small>{% endif %}{% else %}—{% endif %}</td>
+ <td class="nw" data-label="Montant HT">{% if r.amount_ht is not none %}{{r.amount_ht|chf}}{% else %}—{% endif %}{% if r.unit_rate %}<br><small>à {{r.unit_rate|chf}}/j</small>{% endif %}</td>
+ <td data-label="Origine"><small>{{basis.get(r.basis,r.basis)}}{% if r.note and r.status!='rejected' %}<br>{{r.note}}{% endif %}</small></td>
+-<td data-label="Statut"><b class="hstatus hstatus-{{r.status}}">{{labels.get(r.status,r.status)}}</b>{% if r.status=='validated' %}<br><small>par {{r.validated_by}} le {{r.validated_at|ts}}</small>{% elif r.status=='rejected' %}<br><small>motif : {{r.note}}</small>{% endif %}</td>
++<td data-label="Statut"><b class="hstatus hstatus-{{r.status}}">{{labels.get(r.status,r.status)}}</b>{% if r.status=='validated' %}<br><small>par {{r.validated_by}} le {{r.validated_at|ts}}</small>{% elif r.status=='rejected' %}<br><small>{{r.note}}</small>{% endif %}</td>
+ <td data-label="Action">{% if r.status!='validated' %}<form method="post" action="/historique/{{r.id}}/statut" class="inline"><input type="hidden" name="statut" value="validated"><button>Valider</button></form>{% endif %}
+ {% if r.status!='rejected' %}<form method="post" action="/historique/{{r.id}}/statut" class="inline"><input type="hidden" name="statut" value="rejected"><input name="motif" maxlength="{{max_reason}}" required placeholder="Motif du rejet" aria-label="Motif du rejet de la ligne {{r.source_cell}}"><button class="secondary">{% if r.status=='validated' %}Retirer{% else %}Rejeter{% endif %}</button></form>{% endif %}</td></tr>{% endfor %}</table></div>
+ {% if todo %}<form method="post" action="/historique/mandat/{{pid}}/valider" class="inline" data-confirm="Valider les {{todo}} facture(s) historique(s) proposée(s) pour « {{key[1]}} » ? Elles seront comptées dans les jours facturés de ce mandat."><button>Valider les {{todo}} ligne(s) à valider de ce mandat</button></form>{% endif %}
+diff -ruN -x __pycache__ -x '*.pyc' a/app/templates/index.html b/app/templates/index.html
+--- a/app/templates/index.html	2026-10-05 23:26:42.918617327 +0000
++++ b/app/templates/index.html	2026-10-06 09:12:29.186386746 +0000
+@@ -15,7 +15,7 @@
+ <div class="field"><label>Date de prestation</label><input type="date" name="work_date" required></div><div class="field"><label>Projet</label><select name="project_id" required>{% for p in active %}<option value="{{p.id}}">{{p.name}}</option>{% else %}<option value="">— créer d'abord un mandat —</option>{% endfor %}</select></div>
+ <div class="field wide"><label>Mode de saisie — choisir une seule méthode</label><div class="modebox row"><label><input type="radio" name="entry_mode" value="clock" checked> Début / fin (calcul automatique)</label><label><input type="radio" name="entry_mode" value="duration"> Durée saisie directement</label></div></div>
+ <div id="clockFields" class="wide"><div class="fields"><div class="field"><label>Heure de début</label><input type="time" name="start_time" id="startTime"></div><div class="field"><label>Heure de fin</label><input type="time" name="end_time" id="endTime"></div></div><div class="calc" style="margin-top:9px"><span class="hint">Durée calculée automatiquement</span><strong id="durationDisplay">—</strong></div></div>
+-<div id="manualFields" class="field wide" hidden><label>Durée travaillée (heures)</label><input name="manual_hours" id="manualHours" type="number" min="0.01" step="0.01" placeholder="Ex. 4.25 pour 4 h 15"></div>
++<div id="manualFields" class="field wide" hidden><label>Durée travaillée (heures)</label><input name="manual_hours" id="manualHours" type="number" min="0.01" step="any" placeholder="Ex. 4.25 pour 4 h 15"></div>
+ <div class="field wide"><label>Description de la prestation</label><input name="description" placeholder="Ex. Réunion de coordination, visite de chantier, rédaction"></div><button class="wide">Enregistrer le temps</button></form></section>
+ {% if open_variances %}<section class="panel wide warnbox" data-panel="dashboard" id="variancesAlert"><strong>Écarts post-facturation :</strong> {{open_variances|length}} facture(s) émise(s) dont des saisies facturées ont été corrigées depuis l'émission, sans décision enregistrée ({% for v in open_variances %}{{v.number}} : {{v.variance_hours|nb}} h{% if not loop.last %}, {% endif %}{% endfor %}). Les factures émises restent inchangées. <a href="/?tab=archive">Historique des factures</a> : décider d'une note de crédit, d'une compensation ou d'aucune action.</section>{% endif %}{% if has_docs and backup_stale %}<section class="panel wide warnbox" data-panel="dashboard"><strong>Sauvegarde conseillée :</strong> {% if last_backup %}la dernière sauvegarde JSON téléchargée date du {{last_backup|ts}} (plus de 30 jours){% else %}aucune sauvegarde JSON n'a été téléchargée{% endif %}. <a href="/?tab=settings">Télécharger une sauvegarde</a>.</section>{% endif %}{% if no_mandate or settings_missing %}<section class="panel wide first" data-panel="dashboard"><h2>Pour commencer</h2><ol>{% if settings_missing %}<li>Renseigner l'émetteur (raison sociale, adresse, titulaire du compte, IBAN, conditions de paiement) dans <a href="/?tab=settings">Paramètres &amp; sauvegardes</a> : requis avant d'émettre une facture.</li>{% endif %}{% if no_mandate %}<li>Créer un mandat (client, adresse de facturation, tarif journalier, jours commandés, TVA) dans <a href="/?tab=mandates">Mandats &amp; prévisionnel</a>.</li><li>Saisir les heures dans <a href="/?tab=time">Saisie des heures</a> : soit début et fin, soit une durée directe.</li><li>Préparer puis émettre la facture dans <a href="/?tab=billing">Édition des factures</a> ; les factures émises, leurs PDF et les notes de crédit se retrouvent dans <a href="/?tab=archive">Factures émises</a>.</li>{% endif %}</ol><p class="hint">Un mandat existant d'un classeur Excel peut être repris par <a href="/?tab=migration">Import historique</a> (prévisualisation, arbitrage des anomalies, annulation possible du lot). Pensez à télécharger régulièrement une sauvegarde dans Paramètres &amp; sauvegardes.</p></section>
+ {% endif %}{% set cy=namespace(y=none,unb=0,drafts=0,cn=0,cnsum=0) %}{% for y in fc.years %}{% if y.year|string==current_year|string %}{% set cy.y=y %}{% endif %}{% endfor %}{% for p in projects %}{% if p.active %}{% set cy.unb=cy.unb+positions[p.id].unbilled_days %}{% endif %}{% endfor %}{% for i in invoices %}{% if i.status=='draft' %}{% set cy.drafts=cy.drafts+1 %}{% endif %}{% endfor %}{% for n in cnotes %}{% if n.balance>0 %}{% set cy.cn=cy.cn+1 %}{% set cy.cnsum=cy.cnsum+n.balance %}{% endif %}{% endfor %}
+@@ -33,8 +33,8 @@
+ {% else %}<div class="ringinfo"><b>{{p.name}}</b><small>{{p.client}}</small><small>Sans bon de commande · réalisé {{real|nb}} j · facturé net {{bill|nb}} j</small></div>{% endif %}</div>
+ {% endif %}{% endfor %}</div>{% endif %}
+ <section class="panel wide" data-panel="dashboard"><h2>Situation synthétique des mandats</h2><div class="tablewrap"><table class="cards"><tr><th>Projet / client</th><th>PO</th><th>Tarif/j</th><th>Heures cumulées</th><th>Jours réalisés cumulés</th><th>Jours facturés</th><th>Jours annulés par notes de crédit</th><th>Solde contractuel (j)</th><th>Réalisé non facturé (j)</th></tr>{% for p in projects %}{% set k=positions[p.id] %}<tr><td>{{p.name}}{% if not p.active %} <small>(clôturé)</small>{% endif %}<br><small>{{p.client}}</small></td><td>{{p.po}}</td><td>{{(p.rate)|chf}}</td><td>{{(p.hours)|nb}}</td><td>{{(p.hours/(p.day_hours or 8))|nb(4)}}</td><td>{{(k.gross_billed_days+k.historical_days)|nb}}{% if k.historical_days %}<br><small>dont {{(k.historical_days)|nbg}} j historique</small>{% endif %}</td><td>{{(k.credited_days)|nb}}</td><td>{% if k.ordered_days %}{{(k.po_balance_days)|nb}}{% else %}<small>sans PO</small>{% endif %}</td><td>{{(k.unbilled_days)|nb}}</td></tr>{% endfor %}</table></div><p class="hint">Jours facturés = factures émises dans Time Billing + <a href="/historique">factures historiques validées</a> (émises hors Time Billing, avec leur cellule source). Jours annulés = notes de crédit émises et non annulées, créditées en jours (un crédit en montant seul ne change pas les jours). Solde contractuel = jours commandés − (jours facturés − jours annulés). Données historiques inchangées : ces colonnes sont recalculées à l'affichage.</p></section>
+-<section class="panel wide p-forecast" data-panel="mandates"><h2>Prévisions par année civile — solde réel des bons de commande</h2><p class="hint">Solde PO = (jours commandés − jours facturés nets des notes de crédit) × tarif journalier, HT, réparti à parts égales sur les mois restants du mandat (à partir du mois courant). Mandats clôturés exclus. « Facturé » = factures émises moins notes de crédit, HT, par date d'émission.</p>{% for y in fc.years %}<div class="year"><h3>{{y.year}}</h3>{% if y.months %}{% set mx=namespace(v=1) %}{% for m in y.months %}{% if m.amount|float>mx.v %}{% set mx.v=m.amount|float %}{% endif %}{% endfor %}{% set yi=loop.index %}{% set nbm=y.months|length %}{% set slot=600/nbm %}{% set bw=[slot*0.5,40]|min %}
+-<svg class="fchart" viewBox="0 0 640 156" role="img" aria-label="Prévision mensuelle {{y.year}}"><defs><linearGradient id="fgrad{{yi}}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4b8dff"/><stop offset="1" stop-color="#0f62fe"/></linearGradient></defs><line class="gl" x1="10" x2="630" y1="120" y2="120"/><line class="gl" x1="10" x2="630" y1="68" y2="68" stroke-dasharray="3 5"/>{% for m in y.months %}{% set h=(m.amount|float/mx.v*84)|round(1) %}<rect class="bar" fill="url(#fgrad{{yi}})" x="{{(20+loop.index0*slot+(slot-bw)/2)|round(1)}}" y="{{(120-h)|round(1)}}" width="{{bw|round(1)}}" height="{{h}}" rx="6"><title>{{m.month}} : {{m.amount|chf}}</title></rect><text class="val" x="{{(20+loop.index0*slot+slot/2)|round(1)}}" y="{{(114-h)|round(1)}}" text-anchor="middle">{{(m.amount|float/1000)|round(1)|string|replace('.',',')}} k</text><text x="{{(20+loop.index0*slot+slot/2)|round(1)}}" y="138" text-anchor="middle">{{m.month[5:]}}/{{m.month[2:4]}}</text>{% endfor %}</svg>{% endif %}<table><tr><th>Mois</th><th>Prévision HT</th><th>Détail</th></tr>{% for m in y.months %}<tr><td>{{m.month}}</td><td>{{(m.amount)|chf}}</td><td><small>{% for n,a in m.detail %}{{n}} : {{(a)|nb}}{% if not loop.last %} · {% endif %}{% endfor %}</small></td></tr>{% else %}<tr><td colspan="3">Aucune prévision restante.</td></tr>{% endfor %}<tr><td>Facturé {{y.year}} (émis)</td><td>{{(y.actual)|chf}}</td><td></td></tr><tr><td>Prévision restante {{y.year}}</td><td>{{(y.planned)|chf}}</td><td></td></tr><tr><td><b>Total estimé {{y.year}}</b></td><td><b>{{(y.total)|chf}}</b></td><td></td></tr></table></div>{% endfor %}{% if fc.expired %}<p class="warnbox">Mandats échus avec solde PO non planifié : {% for e in fc.expired %}{{e.project}} (fin {{e.end|d}}, {{(e.balance)|chf}}){% if not loop.last %}, {% endif %}{% endfor %}. À clôturer ou à prolonger.</p>{% endif %}{% if fc.undated %}<p class="hint">Mandats sans date de début, projetés à partir du mois courant : {{fc.undated|join(', ')}}.</p>{% endif %}</section>
++<section class="panel wide p-forecast" data-panel="mandates"><h2>Prévisions par année civile — solde réel des bons de commande</h2><p class="hint">Solde PO = (jours commandés − jours facturés nets des notes de crédit) × tarif journalier, HT, réparti à parts égales sur les mois restants du mandat (à partir du mois courant). Mandats clôturés exclus. « Facturé » = factures émises moins notes de crédit, HT, par date d'émission, plus les factures historiques validées (émises hors Time Billing), à leur date de facture.</p>{% for y in fc.years %}<div class="year"><h3>{{y.year}}</h3>{% if y.months %}{% set mx=namespace(v=1) %}{% for m in y.months %}{% if m.amount|float>mx.v %}{% set mx.v=m.amount|float %}{% endif %}{% endfor %}{% set yi=loop.index %}{% set nbm=y.months|length %}{% set slot=600/nbm %}{% set bw=[slot*0.5,40]|min %}
++<svg class="fchart" viewBox="0 0 640 156" role="img" aria-label="Prévision mensuelle {{y.year}}"><defs><linearGradient id="fgrad{{yi}}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4b8dff"/><stop offset="1" stop-color="#0f62fe"/></linearGradient></defs><line class="gl" x1="10" x2="630" y1="120" y2="120"/><line class="gl" x1="10" x2="630" y1="68" y2="68" stroke-dasharray="3 5"/>{% for m in y.months %}{% set h=(m.amount|float/mx.v*84)|round(1) %}<rect class="bar" fill="url(#fgrad{{yi}})" x="{{(20+loop.index0*slot+(slot-bw)/2)|round(1)}}" y="{{(120-h)|round(1)}}" width="{{bw|round(1)}}" height="{{h}}" rx="6"><title>{{m.month}} : {{m.amount|chf}}</title></rect><text class="val" x="{{(20+loop.index0*slot+slot/2)|round(1)}}" y="{{(114-h)|round(1)}}" text-anchor="middle">{{(m.amount|float/1000)|round(1)|string|replace('.',',')}} k</text><text x="{{(20+loop.index0*slot+slot/2)|round(1)}}" y="138" text-anchor="middle">{{m.month[5:]}}/{{m.month[2:4]}}</text>{% endfor %}</svg>{% endif %}<table><tr><th>Mois</th><th>Prévision HT</th><th>Détail</th></tr>{% for m in y.months %}<tr><td>{{m.month}}</td><td>{{(m.amount)|chf}}</td><td><small>{% for n,a in m.detail %}{{n}} : {{(a)|nb}}{% if not loop.last %} · {% endif %}{% endfor %}</small></td></tr>{% else %}<tr><td colspan="3">Aucune prévision restante.</td></tr>{% endfor %}<tr><td>Facturé {{y.year}} (émis et historique validé)</td><td>{{(y.actual)|chf}}</td><td></td></tr><tr><td>Prévision restante {{y.year}}</td><td>{{(y.planned)|chf}}</td><td></td></tr><tr><td><b>Total estimé {{y.year}}</b></td><td><b>{{(y.total)|chf}}</b></td><td></td></tr></table></div>{% endfor %}{% if fc.expired %}<p class="warnbox">Mandats échus avec solde PO non planifié : {% for e in fc.expired %}{{e.project}} (fin {{e.end|d}}, {{(e.balance)|chf}}){% if not loop.last %}, {% endif %}{% endfor %}. À clôturer ou à prolonger.</p>{% endif %}{% if fc.undated %}<p class="hint">Mandats sans date de début, projetés à partir du mois courant : {{fc.undated|join(', ')}}.</p>{% endif %}</section>
+ <section class="panel wide p-detail" data-panel="mandates"><h2>Détail des mandats</h2><p class="scrollhint">← Faire défiler le tableau horizontalement pour voir toutes les colonnes →</p><table class="cards tcards"><tr><th>Mandat / client</th><th>Début</th><th>Durée</th><th>Valeur commandée</th><th>Heures saisies</th><th>Jours réalisés cumulés</th><th>Jours commandés</th><th>Jours facturés (émis)</th><th>Jours annulés par notes de crédit</th><th>Solde contractuel (j)</th><th>Réalisé non facturé (j)</th><th>Actions</th></tr>{% for p in projects %}{% set k=positions[p.id] %}<tr><td>{{p.name}}<br><small>{{p.client}} · {{p.po}}</small></td><td>{{(p.start_date|d) or 'À définir'}}</td><td>{{p.duration_months or 12}} mois</td><td>{{(p.rate*p.ordered_days)|chf}}</td><td>{{(p.hours)|nb}}</td><td>{{(p.hours/(p.day_hours or 8))|nb(3)}}</td><td>{{(k.ordered_days)|nb}}</td><td>{{(k.gross_billed_days+k.historical_days)|nb}}{% if k.historical_days %}<br><small>dont {{(k.historical_days)|nbg}} j historique</small>{% endif %}</td><td>{{(k.credited_days)|nb}}</td><td>{{(k.po_balance_days)|nb}}</td><td>{{(k.unbilled_days)|nb}}</td><td><div class="actions"><a class="btn" href="/entries?project={{p.id}}">Saisies</a>{% if p.active %}<a class="btn" href="/project/{{p.id}}/edit">Modifier</a><form class="closeform" method="post" action="/project/{{p.id}}/close" data-confirm="Clôturer ce mandat ? Il ne sera plus proposé en saisie ni en facturation ; son historique est conservé."><input name="reason" placeholder="Motif de clôture" aria-label="Motif de clôture" required><button class="secondary">Clôturer</button></form>{% else %}<small>Clôturé le {{p.closed_at|localdate|d}} — {{p.closed_reason}}</small><form method="post" action="/project/{{p.id}}/reopen"><button class="secondary">Rouvrir</button></form>{% endif %}</div></td></tr>{% endfor %}</table><p class="hint">Solde contractuel = jours commandés − (jours facturés − jours annulés par notes de crédit). Réalisé non facturé = jours réalisés cumulés − (jours facturés − jours annulés) − jours offerts à l'émission (positif : reliquat à facturer ; négatif : facturé d'avance).</p></section>
+ <section class="panel" data-panel="billing"><h2>Édition des factures</h2><form class="fields" method="post" action="/invoice" id="invoiceForm"><div class="field wide"><label>Projet à facturer</label><select name="project_id" id="invoiceProject" required>{% for p in active %}<option value="{{p.id}}">{{p.name}}</option>{% endfor %}</select></div>
+ <div class="field"><label>Début de la période</label><input type="date" name="period_from" id="periodFrom" required></div><div class="field"><label>Date d'arrêté / fin de période</label><input type="date" name="period_to" id="periodTo" required></div>
+diff -ruN -x __pycache__ -x '*.pyc' a/outils/charger_factures_historiques.py b/outils/charger_factures_historiques.py
+--- a/outils/charger_factures_historiques.py	2026-10-06 00:48:21.229621643 +0000
++++ b/outils/charger_factures_historiques.py	2026-10-06 09:12:29.190386711 +0000
+@@ -13,7 +13,7 @@
+   ERA 2026        aucune facture, aucun mandat ; ECIO 2025 : jamais facturé (décision C3)
+ Note de provenance D4 (doublons A1 exclus du réalisé) sur SUIVI 2026!J3, SUIVI 2025!K7, M14, N10, N8. Aucune valeur source n'est corrigée.
+ 
+-Usage (conteneur jetable SANS réseau, image de l'application ; le classeur et la base montés en lecture seule pour la simulation) :
++Usage (conteneur jetable SANS réseau, image de l'application, -w /app -e PYTHONPATH=/app ; le classeur et la base montés en lecture seule pour la simulation) :
+   python outils/charger_factures_historiques.py --classeur "/src/Time sheet CP.xlsx" --base /data/timebilling.db --sortie /out
+   python outils/charger_factures_historiques.py ... --appliquer --confirmer CHARGER-23-A-VALIDER
+ """
+diff -ruN -x __pycache__ -x '*.pyc' a/tests/test_g4_fidelite.py b/tests/test_g4_fidelite.py
+--- a/tests/test_g4_fidelite.py	1970-01-01 00:00:00.000000000 +0000
++++ b/tests/test_g4_fidelite.py	2026-10-06 09:19:49.228501564 +0000
+@@ -0,0 +1,167 @@
++"""G4 — fidelity review of 2026-10-06 (corrections, entries, Excel imports, historical registry). Synthetic data only, on a COPY of the
++staging database (see test_import.py for the run command).
++
++B1/B2  a line already imported is recognised by its source line (sheet, row, cell values), not only by the sha256 of the file: a re-saved or
++       completed copy of the workbook cannot import it again, even mapped to another mandate, and a line corrected since its import does not
++       come back with its old value. B3: a line excluded on purpose by an earlier import is said again.
++C1     a period holding 7 h 20 (or 20 min) passes check 12: the period hours are compared unrounded.
++N1     the number printed on a real historical invoice (CIRSE 2026 = « 2026-09 ») is never given to a Time Billing invoice.
++D-02   rejecting a historical invoice keeps its provenance note (D4): the reason is appended, never written over it.
++C2/C3/C5  entry form: « 7:05 » is read as 07:05, « 1_5 » / « 1e1 » / non-ASCII digits are refused, invisible characters are refused in a reason.
++"""
++import hashlib, json, sqlite3
++from datetime import datetime, time
++
++import app.app as m
++from tests import test_g4, test_rc19          # base classes only: importing a class that holds tests would run its tests again here
++from tests.test_g4 import text
++from tests.test_import import workbook
++
++
++def resaved(sheets, title):
++    """Same cell values, other bytes: what Excel produces when the workbook is saved again (or completed with new months)."""
++    from openpyxl import load_workbook
++    import io
++    wb = load_workbook(io.BytesIO(workbook(sheets)))
++    wb.properties.title = title
++    b = io.BytesIO(); wb.save(b); return b.getvalue()
++
++
++MAR = [(datetime(2025, 3, 3), 'réunion client', 'Alpha', time(8, 0), time(10, 0), 2),
++       (datetime(2025, 3, 4), 'rédaction', 'Alpha', None, None, 1.5)]
++
++
++class ImportIdentity(test_rc19.RC19):
++    def statuses(self, token):
++        return {r['description']: (r['status'], r['issues']) for r in self.summary(token)[0]}
++
++    def test_B1_a_resaved_copy_cannot_import_the_same_lines_again_even_on_another_mandate(self):
++        first = workbook({'MAR': MAR}); self.import_batch(None, data=first)
++        self.assertEqual(self.scalar('SELECT COUNT(*) FROM entries'), 2)
++        copy = resaved({'MAR': MAR, 'AVR': [(datetime(2025, 4, 2), 'nouveau mois', 'Alpha', time(9, 0), time(10, 0), 1)]}, 'copie complétée')
++        self.assertNotEqual(hashlib.sha256(copy).hexdigest(), hashlib.sha256(first).hexdigest())
++        for target in (self.p1, self.p2):                       # mapped to the same project, then to another one: never a duplicate
++            t = self.upload(copy); self.save(t, {'Alpha': target})
++            st = self.statuses(t)
++            self.assertEqual(st['réunion client'][0], 'error'); self.assertIn('already_imported', st['réunion client'][1])
++            self.assertEqual(st['rédaction'][0], 'error'); self.assertIn('already_imported', st['rédaction'][1])
++            self.assertEqual(st['nouveau mois'][0], 'ok')
++        form = self.save(t, {'Alpha': self.p1}, {'0': 'include', '1': 'include'})          # an explicit « import » cannot force them either
++        r, fl = self.commit(t, form); self.assertIn('Import validé : 1', ' '.join(fl))
++        self.assertEqual(self.scalar('SELECT COUNT(*) FROM entries'), 3)
++        self.assertEqual(self.scalar("SELECT COUNT(*) FROM entries WHERE description='réunion client'"), 1)
++
++    def test_B2_a_line_corrected_since_its_import_does_not_come_back_with_its_old_value(self):
++        self.import_batch(None, data=workbook({'MAR': MAR}))
++        r, fl = self.edit(self.eid('réunion client'), end_time='10:30'); self.assertIn('modifiée', fl)
++        t = self.upload(resaved({'MAR': MAR}, 'réenregistré')); self.save(t, {'Alpha': self.p1})
++        st = self.statuses(t)
++        self.assertEqual(st['réunion client'][0], 'error'); self.assertIn('already_imported', st['réunion client'][1])
++        self.assertEqual([(x['start_time'], x['end_time'], x['hours']) for x in self.sql("SELECT * FROM entries WHERE description='réunion client'")],
++                         [('08:00', '10:30', 2.5)])
++
++    def test_B1_a_line_changed_in_the_workbook_since_its_import_needs_a_decision(self):
++        self.import_batch(None, data=workbook({'MAR': MAR}))
++        changed = [MAR[0], (datetime(2025, 3, 4), 'rédaction', 'Alpha', None, None, 2.5)]      # same sheet and row, other duration
++        t = self.upload(resaved({'MAR': changed}, 'modifié')); self.save(t, {'Alpha': self.p1})
++        st = self.statuses(t)
++        self.assertEqual(st['rédaction'][0], 'needs_decision'); self.assertIn('source_row_changed', st['rédaction'][1])
++        self.assertIn('déjà été importée avec un autre contenu', text(self.c.get(f'/import/review/{t}')))
++
++    def test_B3_a_line_excluded_on_purpose_is_said_again(self):
++        rows = MAR + [(datetime(2025, 4, 20), 'hors mois', 'Alpha', time(14, 0), time(15, 0), 1)]   # April date on the March sheet: warning
++        t = self.upload(workbook({'MAR': rows})); form = self.save(t, {'Alpha': self.p1})
++        idx = next(r['idx'] for r in self.summary(t)[0] if r['description'] == 'hors mois')
++        form = self.save(t, {'Alpha': self.p1}, {str(idx): 'exclude'})
++        r, fl = self.commit(t, form); self.assertIn('Import validé : 2', ' '.join(fl))
++        t2 = self.upload(resaved({'MAR': rows}, 'copie')); self.save(t2, {'Alpha': self.p1})
++        st = self.statuses(t2)
++        self.assertEqual(st['hors mois'][0], 'needs_decision'); self.assertIn('previously_excluded', st['hors mois'][1])
++
++    def test_a_rolled_back_batch_no_longer_counts(self):
++        b = self.import_batch(None, data=workbook({'MAR': MAR}))
++        self.flashes(); self.c.post(f'/imports/rollback/{b}'); self.assertIn('Lot annulé', ' '.join(self.flashes()))
++        t = self.upload(resaved({'MAR': MAR}, 'après annulation')); self.save(t, {'Alpha': self.p1})
++        self.assertEqual({v[0] for v in self.statuses(t).values()}, {'ok'})
++
++
++class PeriodHours(test_g4.G4):
++    checks = test_g4.Checks.checks
++    neutral_identity = test_g4.Checks.neutral_identity
++
++    def test_C1_seven_hours_twenty_and_twenty_minutes_pass_check_12(self):
++        self.neutral_identity()
++        for s, e in (('08:00', '15:20'), ('16:00', '16:20')):
++            self.c.post('/entry', data={'work_date': '2026-09-11', 'project_id': str(self.pid), 'entry_mode': 'clock', 'start_time': s, 'end_time': e, 'description': 'rédaction'})
++        iid = self.draft(self.pid, '2026-09-01', '2026-09-30', 3)[0]           # 16 + 7.3333 + 0.3333 = 23.6667 h = 2.958 j
++        ck = self.checks(iid)
++        self.assertEqual({n: x['status'] for n, x in ck.items() if x['status'] != 'ok'}, {}, ck)
++        self.flashes(); self.issue(iid, derogate=False)
++        self.assertEqual(self.scalar('SELECT status FROM invoices WHERE id=?', (iid,)), 'issued', self.flashes())
++
++
++class HistoricalNumbers(test_g4.G4):
++    def test_N1_the_number_of_a_real_historical_invoice_is_reserved(self):
++        other = self.mandate(name='Mandat CIRSE fictif', rate='650', vat='0', ordered='8', legal_id='CHE-000.000.009')
++        self.hist(pid=other, date='2026-10-01', days=8.0, amount=5200.0, cell='Q12', invoice_ref='2026-09')   # proposed is enough: the number exists
++        self.assertIn('n° 2026-09 (facture réelle)', text(self.c.get('/historique')))
++        iid = self.draft(self.pid, '2026-09-01', '2026-09-30', 2)[0]
++        self.assertIn('2026-09-2', text(self.c.get(f'/issue/{iid}')))
++        self.flashes(); self.issue(iid)
++        self.assertEqual(self.scalar('SELECT number FROM invoices WHERE id=?', (iid,)), '2026-09-2', self.flashes())
++
++    def test_D02_a_rejection_keeps_the_provenance_note(self):
++        hid = self.hist(note='Provenance (D4) : 1,75 h de doublons A1 ; effet possible 0,169 j')
++        self.assertIn('Provenance (D4)', json.loads(self.scalar("SELECT detail FROM audit WHERE event='historical_invoice_proposed' ORDER BY id DESC LIMIT 1"))['note'])
++        self.set_status(hid, 'validated')
++        r, fl = self.set_status(hid, 'rejected', 'pièce comptable introuvable'); self.assertIn('rejetée', fl)
++        note = self.scalar('SELECT note FROM historical_invoices WHERE id=?', (hid,))
++        self.assertTrue(note.startswith('Provenance (D4) : 1,75 h de doublons A1'), note); self.assertIn('Rejet du ', note); self.assertIn(': pièce comptable introuvable', note)
++        self.set_status(hid, 'validated')
++        self.assertEqual(self.scalar('SELECT note FROM historical_invoices WHERE id=?', (hid,)), note)    # re-validation keeps the whole story
++
++
++class EntryForm(test_rc19.RC19):
++    def test_C5_a_one_digit_hour_is_read_as_HH_MM(self):
++        self.clock(self.pid, '2026-09-01', '7:05', '9:35', 'heure courte'); e = self.row(self.eid('heure courte'))
++        self.assertEqual((e['start_time'], e['end_time'], e['hours']), ('07:05', '09:35', 2.5))
++
++    def test_C2_only_plain_decimal_durations(self):
++        for bad in ('1_5', '1e1', '٣', 'inf', '0x2'):
++            self.c.post('/entry', data={'work_date': '2026-09-01', 'project_id': str(self.pid), 'entry_mode': 'duration', 'manual_hours': bad, 'description': f'durée {bad}'})
++            self.assertEqual(self.scalar('SELECT COUNT(*) FROM entries WHERE description=?', (f'durée {bad}',)), 0, bad)
++        for good, h in (('7,3333', 7.3333), ('.5', 0.5), ('4.', 4.0)):
++            self.c.post('/entry', data={'work_date': '2026-09-01', 'project_id': str(self.pid), 'entry_mode': 'duration', 'manual_hours': good, 'description': f'durée {good}'})
++            self.assertEqual(self.row(self.eid(f'durée {good}'))['hours'], h)
++
++    def test_C3_invisible_characters_refused_in_a_reason(self):
++        for bad in ('a b', 'a​b', '﻿motif'):
++            with self.assertRaises(ValueError): m.change_reason(bad)
++        self.assertEqual(m.change_reason('  motif accentué — ok  '), 'motif accentué — ok')
++
++
++class LayoutD6(test_g4.G4):
++    checks = test_g4.Checks.checks
++
++    def test_E3_an_empty_others_line_prints_AUTRES_alone(self):
++        from tests.test_functional import pdf_text
++        iid = self.draft(self.pid, '2026-09-01', '2026-09-30', 2, other_label='Frais divers', other_amount='0')[0]
++        t = pdf_text(self.c.get(f'/invoice/{iid}.pdf').data)
++        self.assertIn('AUTRES', t); self.assertNotIn('Frais divers', t)
++        self.c.post(f'/invoice/{iid}/edit', data={'period_from': '2026-09-01', 'period_to': '2026-09-30', 'qty': '2', 'unit': 'day', 'rounding': 'exact',
++                                                   'rounding_step': '0.25', 'vat': '0', 'other_amount': '12.5', 'other_label': 'Frais divers'})
++        self.assertIn('AUTRES — Frais divers (hors TVA)', pdf_text(self.c.get(f'/invoice/{iid}.pdf').data))
++
++    def test_E6_a_rate_of_zero_fails_check_3(self):
++        pid = self.mandate(name='Mandat sans tarif', rate='0', vat='0', ordered='15', legal_id='CHE-000.000.008')
++        self.entry(pid, '2026-09-10', 8, 'septembre')
++        iid = self.draft(pid, '2026-09-01', '2026-09-30', 1)[0]
++        ck = self.checks(iid)
++        self.assertEqual(ck[3]['status'], 'fail'); self.assertFalse(ck[3]['derogable']); self.assertIn('tarif nul', ck[3]['detail'])
++
++    def test_E7_the_summary_says_which_earlier_invoices_are_counted(self):
++        import re
++        from tests.test_functional import pdf_text
++        iid = self.draft(self.pid, '2026-09-01', '2026-09-30', 2)[0]
++        t = re.sub(r'\s+', ' ', pdf_text(self.c.get(f'/invoice/{iid}.pdf').data))
++        self.assertIn('factures Time Billing émises dont la période se termine au plus tard le 30.09.2026', t)

@@ -1,0 +1,12 @@
+cible :8472 /entries Content-Length 100000
+avant : 161 ms
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+pendant (24 connexions lentes) : 9 ms
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+après : 12 ms
+cible :8472 /logout Content-Length 100000
+avant : 224 ms
+pendant (24 connexions lentes) : 11 ms
+pendant (24 connexions lentes) : 6 ms
+pendant (24 connexions lentes) : 2 ms
+après : 7 ms

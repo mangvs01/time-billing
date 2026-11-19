@@ -1,0 +1,26 @@
+feuille,projet,colonne,cellule,date,brut,formule,jours,montant_chf,tarif,base
+SUIVI 2025,Endovascular Summit,Facture 09.04,SUIVI 2025!I4,2025-04-09,5.2,,5.2,3380.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,Endovascular Summit,Facture 16.06,SUIVI 2025!K4,2025-06-16,7.7,,7.7,5005.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,EUROPCR 2025,Facture 09.04,SUIVI 2025!I5,2025-04-09,6.6,,6.6,4290.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,EUROPCR 2025,Facture 12.05,SUIVI 2025!J5,2025-05-12,5.3,,5.3,3445.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,EUROPCR 2025,Facture 16.06,SUIVI 2025!K5,2025-06-16,7.5,,7.5,4875.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,NC STC June,Facture 16.06,SUIVI 2025!K7,2025-06-16,10.5,,10.5,6825.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,CIRSE 2025,Facture 03.10,SUIVI 2025!N8,2025-10-03,9.5,,9.5,6175.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,ERA 2025,Facture 12.05,SUIVI 2025!J9,2025-05-12,5.6,,5.6,3640.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,ERA 2025,Facture 14.07,SUIVI 2025!L9,2025-07-14,8.4,,8.4,5460.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,Rising stars Q3,Facture 03.10,SUIVI 2025!N10,2025-10-03,6,,6.0,3900.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,PCR LV 2025,Facture 15/12,SUIVI 2025!P11,2025-12-15,6.34,,6.34,4121.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,SMART Y90,Facture 27.11,SUIVI 2025!O12,2025-11-27,10,,10.0,6500.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,EAHAD,Facture 16.06,SUIVI 2025!K13,2025-06-16,1,,1.0,650.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2025,NC STC Sept,Facture 30.09,SUIVI 2025!M14,2025-09-30,13.8,,13.8,8970.0,650.0,jours lus dans la cellule ; montant = jours × tarif de la ligne
+SUIVI 2026,ASN 2025,Facture 16/02,SUIVI 2026!J3,2026-02-16,6389.5,"=Tableau7[[#This Row],[TOTAL]]",9.83,6389.5,650.0,montant CHF lu dans la cellule ; jours = montant ÷ tarif de la ligne
+SUIVI 2026,ERA 2025 (cloture),Facture 16/02,SUIVI 2026!J4,2026-02-16,364.00000000000006,"=Tableau7[[#This Row],[TOTAL]]",0.56,364.0,650.0,montant CHF lu dans la cellule ; jours = montant ÷ tarif de la ligne
+SUIVI 2026,SMM 2026,Facture 03/04,SUIVI 2026!L5,2026-04-03,9750,,15.0,9750.0,650.0,montant CHF lu dans la cellule ; jours = montant ÷ tarif de la ligne
+SUIVI 2026,EHRA 2026,Facture 11/05,SUIVI 2026!N6,2026-05-11,11700,,18.0,11700.0,650.0,montant CHF lu dans la cellule ; jours = montant ÷ tarif de la ligne
+SUIVI 2026,EAU 2026,Facture 31/03,SUIVI 2026!K7,2026-03-31,9100,,14.0,9100.0,650.0,montant CHF lu dans la cellule ; jours = montant ÷ tarif de la ligne
+SUIVI 2026,STC GEM Avril,Facture 27/04,SUIVI 2026!M8,2026-04-27,4550,,7.0,4550.0,650.0,montant CHF lu dans la cellule ; jours = montant ÷ tarif de la ligne
+SUIVI 2026,EUROPCR 2026,Facture 16/06,SUIVI 2026!O9,2026-06-16,11245,,17.3,11245.0,650.0,montant CHF lu dans la cellule ; jours = montant ÷ tarif de la ligne
+SUIVI 2026,EULAR 2026,Facture 16/07,SUIVI 2026!P10,2026-07-16,8125,"=Tableau7[[#This Row],[TOTAL]]",12.5,8125.0,650.0,montant CHF lu dans la cellule ; jours = montant ÷ tarif de la ligne
+SUIVI 2026,CIRSE 2026,Facture 01/10,SUIVI 2026!Q12,2026-10-01,5200,"=Tableau7[[#This Row],[TOTAL]]",8.0,5200.0,650.0,montant CHF lu dans la cellule ; jours = montant ÷ tarif de la ligne
+SUIVI 2026,STC GEM Oct - DM job,Facture 27/04,SUIVI 2026!M15,2026-04-27,4550,,7.58333,4550.0,600.0,montant CHF lu dans la cellule ; jours = montant ÷ tarif de la ligne
+SUIVI 2025,AL Jan-Mar,"(TOTAL de la ligne, sans colonne de facture)",SUIVI 2025!ligne 3,,19400.0,=6900+12500,,19400.0,,"montant seul : aucune quantité, aucun tarif, aucune date de facture dans le classeur"

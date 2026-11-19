@@ -1,0 +1,18 @@
+{
+ "formulaires": 0,
+ "refus": [],
+ "n_refus": 0,
+ "valeurs_modifiees": {
+  "settings": {
+   "avant": [],
+   "après": [
+    "{\"key\": \"other_vat_default\", \"value\": \"hors_tva\"}",
+    "{\"key\": \"refund_delay_days\", \"value\": \"\"}"
+   ],
+   "n": 2
+  }
+ },
+ "horodatages_seuls_modifies": {
+  "settings": 9
+ }
+}

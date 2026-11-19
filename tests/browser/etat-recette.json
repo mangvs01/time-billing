@@ -1,0 +1,36 @@
+{
+ "pdf": {},
+ "ids": {
+  "pid": "1"
+ },
+ "a4": {
+  "realises": "0,00",
+  "factures": "0,00",
+  "annules": "0,00",
+  "solde": "30,00",
+  "non_factures": "0,00"
+ },
+ "counts": {
+  "audit": 3,
+  "billing_addresses": 0,
+  "credit_note_cancellations": 0,
+  "credit_note_snapshots": 0,
+  "credit_notes": 0,
+  "credit_operations": 0,
+  "entries": 0,
+  "entry_changes": 0,
+  "historical_invoices": 0,
+  "import_batch_rows": 0,
+  "import_batches": 0,
+  "invoice_annex_entries": 0,
+  "invoice_date_changes": 0,
+  "invoice_lines": 0,
+  "invoice_number_changes": 0,
+  "invoice_snapshots": 0,
+  "invoice_variance_decisions": 0,
+  "invoices": 0,
+  "projects": 1,
+  "settings": 0
+ },
+ "mobileOverflow": false
+}

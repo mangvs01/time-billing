@@ -1,0 +1,42 @@
+== 2026-10-08T06:13:59Z départ ; HEAD 6610dc8 + arbre de travail ; source 958c76ed0fc6ec0426e530c068c7fcf960fc73dc6b79626057121df7166703b4 (copie du staging, aucune lecture sous /opt) ; image sha256:2462741ffc576acdf60e92bc4ca0be8628093b3ef05557d95c279b84159a605a
+== 2026-10-08T06:13:59Z lot R (copie fraîche de la source)
+lot R rc=0 RÉSULTAT R : 49/49 OK, 0 KO
+== 2026-10-08T06:14:36Z lots A–K + prévision + Q (journaux : journaux/fonc/reprise-2025-p13b-rc23/)
+A–K/Q rc=0
+ab rc=0 RÉSULTAT A+B : 57/57 OK, 0 KO
+cg rc=0 RÉSULTAT C-G : 96/96 OK, 0 KO
+dg rc=0 RÉSULTAT D-E-G : 53/53 OK, 0 KO
+extra rc=0 RÉSULTAT extra : 23/23 OK, 0 KO
+hij rc=0 RÉSULTAT H-I-J : 37/37 OK, 0 KO
+forecast rc=0 RÉSULTAT K : 21/21 OK, 0 KO
+entites_vides rc=0 RÉSULTAT Q : 18/18 OK, 0 KO
+version testée: {"status":"ok","version":"9.2-rc23"}
+base staging réelle inchangée
+rc=0
+== 2026-10-08T06:16:01Z lots M, N, L (mandats préparés, première facture)
+M/N/L rc=0
+RÉSULTAT M : 10/10 OK, 0 KO
+RÉSULTAT N : 3/3 OK, 0 KO
+RÉSULTAT L : 19/19 OK, 0 KO
+base staging réelle inchangée
+== 2026-10-08T06:16:16Z navigateur complet + e2e 2 phases + concurrence + rc13 + lot rc19 navigateur (sorties : recette/fonc/reprise-2025-p13b-rc23-nav/)
+navigateur rc=0
+base staging inchangée
+recette-metier-phase1.log: RESULT phase1: 107/107 — erreurs console : 0  FAIL=0
+recette-metier-phase2.log: RESULT phase2: 15/15 — erreurs console : 0  FAIL=0
+recette-saisies-phase1.log: RESULT phase1: 36/36 — erreurs console : 0  FAIL=0
+recette-saisies-phase2.log: RESULT phase2: 8/8 — erreurs console : 0  FAIL=0
+recette-responsive.log: RESULT: 33/33 pages sans défaut — erreurs console : 0  FAIL=0
+recette-rc12.log: RC12 navigateur : 22/22 réussis, 0 échec(s)  FAIL=0
+recette-rc14.log: RC14 navigateur : 56/56 réussis, 0 échec(s)  FAIL=0
+recette-nuit.log: NUIT navigateur : 34/34 réussis, 0 échec(s)  FAIL=0
+recette-minuit.log: RÉSULTAT minuit : 15/15 OK, 0 KO  FAIL=0
+recette-rc19.log: RÉSULTAT rc19 navigateur : 37/37 OK, 0 KO  FAIL=0
+e2e_rc13.log: RESULT rc13: 5/5 passed  FAIL=0
+e2e_phase1.log: RESULT phase1: 30/30 passed  FAIL=0
+e2e_phase2.log: RESULT phase2: 18/18 passed  FAIL=0
+concurrence.log: RESULT: 11/11  FAIL=0
+rc=0
+FIN : copie source inchangée (958c76ed0fc6ec0426e530c068c7fcf960fc73dc6b79626057121df7166703b4)
+conteneurs de recette restants : tb-fonc-m 
+== 2026-10-08T06:25:37Z FIN

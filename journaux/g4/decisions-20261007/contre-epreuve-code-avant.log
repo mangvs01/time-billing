@@ -1,0 +1,73 @@
+FE.EFEE
+======================================================================
+ERROR: test_an_invoice_dated_after_this_one_is_not_counted_even_for_an_earlier_period (tests.test_g4_decisions.Cutoff.test_an_invoice_dated_after_this_one_is_not_counted_even_for_an_earlier_period)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_decisions.py", line 30, in test_an_invoice_dated_after_this_one_is_not_counted_even_for_an_earlier_period
+    self.assertEqual((pos['previous'], pos['current'], pos['later'], pos['balance'], pos['cutoff']), (0, 2.0, 1.0, 10.0, '2026-10-01'))
+                                                                                     ~~~^^^^^^^^^^
+KeyError: 'cutoff'
+
+======================================================================
+ERROR: test_the_year_of_a_document_is_the_year_of_its_date (tests.test_g4_decisions.Cutoff.test_the_year_of_a_document_is_the_year_of_its_date)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_decisions.py", line 63, in test_the_year_of_a_document_is_the_year_of_its_date
+    self.assertEqual(rules.doc_date(_Row(invoice_date='2027-01-04', issued_at='2026-12-20T08:00:00')), '2027-01-04')     # the printed date wins
+                     ^^^^^^^^^^^^^^
+AttributeError: module 'app.billing_rules' has no attribute 'doc_date'. Did you mean: 'fr_date'?
+
+======================================================================
+ERROR: test_a_note_longer_than_one_line_is_refused_at_creation_and_edition (tests.test_g4_decisions.NoteZone.test_a_note_longer_than_one_line_is_refused_at_creation_and_edition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_decisions.py", line 87, in test_a_note_longer_than_one_line_is_refused_at_creation_and_edition
+    self.assertFalse(pdf_layout.note_fits(self.LONG))
+                     ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'app.pdf_layout' has no attribute 'note_fits'
+
+======================================================================
+ERROR: test_a_one_line_note_moves_nothing_on_the_page (tests.test_g4_decisions.NoteZone.test_a_one_line_note_moves_nothing_on_the_page)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_decisions.py", line 104, in test_a_one_line_note_moves_nothing_on_the_page
+    self.assertTrue(pdf_layout.note_fits(note))
+                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'app.pdf_layout' has no attribute 'note_fits'
+
+======================================================================
+FAIL: test_a_credit_note_counts_from_its_own_date (tests.test_g4_decisions.Cutoff.test_a_credit_note_counts_from_its_own_date)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_decisions.py", line 49, in test_a_credit_note_counts_from_its_own_date
+    pos = self.header(b)[0]['position']; self.assertEqual((pos['previous'], pos['credited'], pos['balance']), (1.0, 0, 9.0))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1.0, 0.5, 9.5) != (1.0, 0, 9.0)
+
+First differing element 1:
+0.5
+0
+
+- (1.0, 0.5, 9.5)
+?        --    ^
+
++ (1.0, 0, 9.0)
+?            ^
+
+
+======================================================================
+FAIL: test_a_draft_saved_before_the_limit_fails_check_11_and_still_prints_its_whole_note (tests.test_g4_decisions.NoteZone.test_a_draft_saved_before_the_limit_fails_check_11_and_still_prints_its_whole_note)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_decisions.py", line 118, in test_a_draft_saved_before_the_limit_fails_check_11_and_still_prints_its_whole_note
+    self.assertEqual(ck[11]['status'], 'fail'); self.assertFalse(ck[11]['derogable'])
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'ok' != 'fail'
+- ok
++ fail
+
+
+----------------------------------------------------------------------
+Ran 7 tests in 1.630s
+
+FAILED (failures=2, errors=4)

@@ -1,0 +1,21 @@
+2026-10-04T12:18:34Z  cible /opt/time-billing-v9-staging (projet time-billing-v9-staging, conteneur time-billing-v9-staging) — santé : {"status":"ok","version":"9.2-rc12"}
+2026-10-04T12:18:34Z  Dockerfile identique : oui
+2026-10-04T12:18:34Z  requirements identiques : oui
+2026-10-04T12:18:34Z  propriétaire du dossier de données : 10001 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-04T12:18:34Z  préparation conforme
+ Container time-billing-v9-staging Stopping 
+ Container time-billing-v9-staging Stopped 
+2026-10-04T12:18:36Z  sauvegarde /root/backups/time-billing-v9-staging/pre-rc13-20261004T121834Z conforme (service arrêté ; relancer l'ancienne version : docker compose -p time-billing-v9-staging start)
+OK   integrity_check
+OK   foreign_key_check vide
+OK   projects : 0 ligne(s), colonnes d origine inchangées
+OK   entries : 0 ligne(s), colonnes d origine inchangées
+OK   invoices : 0 ligne(s), colonnes d origine inchangées
+OK   credit_notes : 0 ligne(s), colonnes d origine inchangées
+OK   audit : 3 ligne(s), colonnes d origine inchangées
+OK   aucune facture émise sans copie figée
+OK   empreintes des PDF figés valides
+OK   PDF figés servis
+OK   35 déclencheurs d immuabilité présents
+OK   migration idempotente (2e passage sans erreur)
+GO

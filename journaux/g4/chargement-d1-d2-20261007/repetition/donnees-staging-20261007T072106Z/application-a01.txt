@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/app/outils/reporter_notes_a01.py", line 164, in <module>
+    main()
+  File "/app/outils/reporter_notes_a01.py", line 137, in main
+    m, post_billing = load_app(target)      # simulation : migre la COPIE ; application : la base est déjà au schéma rc19 (déployé)
+                      ^^^^^^^^^^^^^^^^
+  File "/app/outils/reporter_notes_a01.py", line 115, in load_app
+    import app.app as m
+  File "/app/app/app.py", line 272, in <module>
+    init()
+  File "/app/app/app.py", line 262, in init
+    migrate_rc19(path)
+  File "/app/app/app.py", line 93, in migrate_rc19
+    for name in RC19_TRIGGER_NAMES: c.execute(f"DROP TRIGGER IF EXISTS {name}")
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: attempt to write a readonly database

@@ -1,0 +1,3 @@
+options reverse_proxy : request_buffers 64KB
+direct : sauvegarde 11.64 Mo, envoi → 200 8474/restore/qJDxgUEo53nVxFqmGr8zmk-Q5Q5YH7FS ; empreinte reçue = envoyée : True
+via Caddy : sauvegarde 11.65 Mo, envoi → 200 8475/restore/5zYKF2XrxVesyMDW-Ks2BlNcA9f1ENr1 ; empreinte reçue = envoyée : True

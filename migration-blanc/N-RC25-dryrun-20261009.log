@@ -1,0 +1,76 @@
+
+=== 0. bac à sable : ancienne version rc24 (copie figée), base synthétique, secrets de test
+ Container tbsbx25 Starting 
+ Container tbsbx25 Started 
+OK    ancienne version rc24 en marche (base créée par l'application)
+base synthétique : 3 saisies
+
+=== A. 40 sans marqueur GO de 30
+OK    10-preflight : code 0, « préparation conforme »
+OK    A-20-backup : code 0, « conforme »
+OK    copie de l'image de retour dans la sauvegarde (SHA256SUMS)
+OK    A-40-sans-GO : code 1, « aucun marqueur GO »
+OK    ancienne version relancée par le piège
+OK    contenu de la base inchangé
+OK    aucun déploiement enregistré
+
+=== B. 30 en échec : pas de marqueur GO, ancienne version relancée
+OK    B-20-backup : code 0, « conforme »
+OK    service arrêté par 20
+OK    B-30-echec : code 125
+OK    reprise exécutée par le piège
+OK    aucun marqueur GO
+OK    ancienne version relancée
+OK    B-40-apres-echec : code 1, « aucun marqueur GO »
+
+=== C. port de .env.rc25p2 ≠ port de URL
+OK    C-20-backup : code 0, « conforme »
+OK    C-30-GO : code 0, « marqueur GO écrit »
+OK    C-40-port : code 1, « port publié 8091 »
+OK    ancienne version relancée, rien déployé
+
+=== D. marqueur GO périmé par une écriture dans la base vivante
+OK    D-20-backup : code 0, « conforme »
+OK    D-30-GO : code 0, « marqueur GO écrit »
+OK    D-40-en-marche : code 1, « est en marche »
+OK    D-40-base-changee : code 1, « base vivante a changé »
+OK    ancienne version relancée
+
+=== E. chaîne complète 10 → 20 → 30 (GO) → 40 → 50
+OK    E-10 : code 0
+OK    E-20 : code 0, « conforme »
+OK    E-30 : code 0, « marqueur GO écrit »
+OK    marqueur GO lié à la sauvegarde 20261008T232446Z
+OK    E-40 : code 0, « déployé »
+OK    nouvelle version en marche
+OK    E-50 : code 0, « VÉRIFICATIONS CONFORMES »
+
+=== F. donnée postérieure au déploiement dans une table inconnue : retour refusé
+OK    F-90-refus : code 1, « zz_future : 1 ligne »
+OK    service inchangé (nouvelle version en marche)
+OK    F-90-OUI-non-lie : code 1, « attendue est OUI-20261008T232446Z »
+OK    service inchangé
+
+=== G. image de retour supprimée (prune), retour confirmé OUI-20261008T232446Z
+OK    étiquettes pre-* supprimées
+OK    ancienne image supprimée du moteur docker
+OK    G-90 : code 0, « rechargée depuis la copie »
+OK    écart annoncé (non silencieux)
+      (aucune ligne d'audit postérieure)
+OK    ancienne version rc24 en marche
+OK    90 : base restaurée = sauvegarde 20261008T232446Z (SHA-256, avant redémarrage)
+OK    contenu de la base = sauvegarde 20261008T232446Z (après redémarrage)
+OK    donnée postérieure conservée dans la copie /tmp/rc25p2/N/backups/ecarte-20261008T232446Z-retour-20261008T232503Z/timebilling-avant-retour.db
+
+=== H. échec pendant l'installation : retour arrière automatique
+OK    H-20 : code 0, « conforme »
+OK    H-30 : code 0, « marqueur GO écrit »
+OK    H-40 : code 1, « retour arrière automatique »
+OK    90 exécuté par le piège de 40
+OK    ancienne version rc24 en marche
+OK    90 : base restaurée = sauvegarde 20261008T232509Z (SHA-256)
+OK    contenu de la base = sauvegarde 20261008T232509Z
+
+=== nettoyage
+
+RÉPÉTITION N : TOUT CONFORME

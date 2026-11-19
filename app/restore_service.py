@@ -19,7 +19,7 @@ ORDER = ["settings", "projects", "billing_addresses", "historical_invoices", "im
 
 
 # Operational state, never part of a backup: a restore must neither log the owner out nor bring a revoked session back to life.
-TRANSIENT = ("web_sessions", "login_failures", "kept_forms")
+TRANSIENT = ("web_sessions", "login_failures", "kept_forms", "auth_credentials")   # BMDP1: the password changed in the application is neither saved nor restored
 
 
 class RestoreRefused(ValueError):

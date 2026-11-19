@@ -1,0 +1,4 @@
+image tb-g4-cand:50492d4 ; version {"status":"ok","version":"9.2-rc23"}
+2115 requêtes en 20 s (106/s) : {200: 5, 429: 2110}
+audit : [('login_throttled', 2110), ('login_failed', 5)]
+base + wal : 0.34 Mo ; lignes login/s : 106 ; extrapolation 24 h : 9.1 M lignes

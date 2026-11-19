@@ -1,0 +1,17 @@
+test_C2_only_plain_decimal_durations (tests.test_g4_fidelite.EntryForm.test_C2_only_plain_decimal_durations) ... ok
+test_C3_invisible_characters_refused_in_a_reason (tests.test_g4_fidelite.EntryForm.test_C3_invisible_characters_refused_in_a_reason) ... ok
+test_C5_a_one_digit_hour_is_read_as_HH_MM (tests.test_g4_fidelite.EntryForm.test_C5_a_one_digit_hour_is_read_as_HH_MM) ... ok
+test_D02_a_rejection_keeps_the_provenance_note_and_needs_a_real_reason (tests.test_g4_fidelite.HistoricalNumbers.test_D02_a_rejection_keeps_the_provenance_note_and_needs_a_real_reason) ... ok
+test_N1_the_number_of_a_real_historical_invoice_is_reserved (tests.test_g4_fidelite.HistoricalNumbers.test_N1_the_number_of_a_real_historical_invoice_is_reserved) ... ok
+test_B1_a_line_changed_in_the_workbook_since_its_import_needs_a_decision (tests.test_g4_fidelite.ImportIdentity.test_B1_a_line_changed_in_the_workbook_since_its_import_needs_a_decision) ... ok
+test_B1_a_resaved_copy_cannot_import_the_same_lines_again_even_on_another_mandate (tests.test_g4_fidelite.ImportIdentity.test_B1_a_resaved_copy_cannot_import_the_same_lines_again_even_on_another_mandate) ... ok
+test_B2_a_line_corrected_since_its_import_does_not_come_back_with_its_old_value (tests.test_g4_fidelite.ImportIdentity.test_B2_a_line_corrected_since_its_import_does_not_come_back_with_its_old_value) ... ok
+test_B3_a_line_excluded_on_purpose_is_said_again (tests.test_g4_fidelite.ImportIdentity.test_B3_a_line_excluded_on_purpose_is_said_again) ... ok
+test_a_rolled_back_batch_no_longer_counts (tests.test_g4_fidelite.ImportIdentity.test_a_rolled_back_batch_no_longer_counts) ... ok
+test_C1_seven_hours_twenty_and_twenty_minutes_pass_check_12 (tests.test_g4_fidelite.PeriodHours.test_C1_seven_hours_twenty_and_twenty_minutes_pass_check_12) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 3.431s
+
+OK
+rc=0

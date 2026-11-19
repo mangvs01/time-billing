@@ -1,0 +1,9 @@
+R-E5-1 (session 412386, 2026-10-06 ~20:40 UTC) : positions page 1 mesurées par pdftotext -bbox (hôte), PDF rendus par tests/mesure_e5.py (image rc19, base synthétique).
+avant = arbre intégré 20:24 ; après = + option (b) (pdf_layout._first_page : une ligne de facture n'avance que de 2 lignes).
+avant  1l Période=y320.1 SOUS-TOTAL=y342.4 AUTRES=y408.7 TOTAL=y430.7 Paiement=y541.1 | colonne description xMax 174.804
+avant  2l Période=y330.4 SOUS-TOTAL=y342.4 AUTRES=y408.7 TOTAL=y430.7 Paiement=y541.1 | colonne description xMax 199.508
+avant  3l Période=y340.7 SOUS-TOTAL=y352.7 AUTRES=y419.0 TOTAL=y441.0 Paiement=y541.1 | colonne description xMax 190.852
+apres  1l Période=y320.1 SOUS-TOTAL=y342.4 AUTRES=y408.7 TOTAL=y430.7 Paiement=y541.1 | colonne description xMax 174.804
+apres  2l Période=y330.4 SOUS-TOTAL=y342.4 AUTRES=y408.7 TOTAL=y430.7 Paiement=y541.1 | colonne description xMax 199.508
+apres  3l Période=y340.7 SOUS-TOTAL=y342.4 AUTRES=y408.7 TOTAL=y430.7 Paiement=y541.1 | colonne description xMax 190.852
+Référence Facture-reelle-reference-2026-09.pdf (même mesure) : SOUS-TOTAL=y343.0 AUTRES=y409.3 TOTAL=y431.3 Paiement=y541.7

@@ -1,0 +1,12 @@
+# EXEMPLE — NE PAS INSTALLER tant que la décision billing-g5-sauvegarde-quotidienne n'est pas prise ET que les empreintes ne sont pas enregistrées :
+#   1. relire procedure/backup-quotidien.sh, procedure/verifier-sauvegarde.sh et procedure/tb-common.sh ;
+#   2. en root : CONFIRM_SAUVEGARDE=OUI-<AAAAMMJJ> procedure/approuver-sauvegarde.sh --ecrire   (fichier /etc/time-billing/approved-scripts.sha256) ;
+#   3. installer ce fichier sous /etc/cron.d/time-billing-sauvegarde (root:root, 0644) ;
+#   4. vérifier qu'une exécution manuelle réussit sans CONFIRM_PROD, puis que la même exécution est REFUSÉE après une modification d'un des trois fichiers.
+# « env -i … bash -p » : environnement vide (ni BASH_ENV, ni fonctions exportées, ni PATH hérité) ; sans « -p » la garde REFUSE l'exception « sauvegarde ».
+# Le chemin à utiliser est celui où se trouvent réellement les scripts approuvés (le dépôt de travail ci-dessous). Les anciennes lignes d'OPERATIONS-RC11.md
+# (/opt/time-billing-v9/procedure/…) pointaient un dossier qui n'existe pas : elles ne doivent pas être reprises. Ces tâches ne préviennent personne en cas
+# d'échec et les sauvegardes restent sur le même serveur : alerte et copie hors serveur chiffrée restent à mettre en place (voir RAPPORT-GARDE-PRODUCTION-RC25.md).
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+17 2 * * *  root  /usr/bin/env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin /bin/bash -p /root/time-billing-v9-rc10-20261004/procedure/backup-quotidien.sh /root/time-billing-v9-rc10-20261004/procedure/prod.conf >> /var/log/time-billing-backup.log 2>&1
+43 3 * * 0  root  /usr/bin/env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin /bin/bash -p /root/time-billing-v9-rc10-20261004/procedure/verifier-sauvegarde.sh /root/time-billing-v9-rc10-20261004/procedure/prod.conf "$(ls -1t /root/backups/time-billing-v9-prod/quotidiennes/timebilling-*.db | head -1)" >> /var/log/time-billing-backup.log 2>&1

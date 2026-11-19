@@ -1,0 +1,23 @@
+{
+ "formulaires": {
+  "saisie": 2247,
+  "mandat": 24,
+  "brouillon": 1,
+  "paramètres": 1
+ },
+ "refus": [],
+ "n_refus": 0,
+ "valeurs_modifiees": {
+  "settings": {
+   "avant": [],
+   "après": [
+    "{\"key\": \"other_vat_default\", \"value\": \"hors_tva\"}",
+    "{\"key\": \"refund_delay_days\", \"value\": \"\"}"
+   ],
+   "n": 2
+  }
+ },
+ "horodatages_seuls_modifies": {
+  "settings": 9
+ }
+}

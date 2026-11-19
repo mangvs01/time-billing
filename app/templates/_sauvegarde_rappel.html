@@ -1,0 +1,20 @@
+{% if backup_popup %}<style>
+dialog.sv-rappel{max-width:min(520px,calc(100vw - 32px));width:100%;border:1px solid var(--line-strong);border-radius:24px;padding:22px 22px 18px;background:var(--raised,#fff);color:var(--ink);box-shadow:0 24px 60px rgba(14,22,33,.28)}
+dialog.sv-rappel::backdrop{background:rgba(14,22,33,.45)}
+dialog.sv-rappel h2{margin:0 0 6px;font-size:19px}
+dialog.sv-rappel p{margin:8px 0;color:var(--ink-2);line-height:1.45}
+dialog.sv-rappel .sv-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;justify-content:flex-end}
+dialog.sv-rappel .sv-actions>*{flex:1 1 150px;justify-content:center;text-align:center}
+dialog.sv-rappel:not([open]){display:none}
+</style>
+<dialog id="sv-rappel" class="sv-rappel" aria-labelledby="sv-rappel-t" aria-describedby="sv-rappel-d">
+<form method="dialog">
+<h2 id="sv-rappel-t">Pensez à faire une sauvegarde</h2>
+<p id="sv-rappel-d">{% if last_backup %}Votre dernière sauvegarde téléchargée date du {{last_backup|ts}} (plus de 30 jours).{% else %}Vous n'avez pas encore téléchargé de sauvegarde.{% endif %}</p>
+<p>Le fichier de sauvegarde est une copie de toutes vos factures, de vos clients et de vos PDF. Gardez-le hors du serveur (clé USB, disque externe) : si le serveur tombe en panne, vous pourrez tout récupérer.</p>
+<p>Cette fenêtre revient au plus une fois par mois, à la connexion, tant que la sauvegarde date de plus de 30 jours.</p>
+<div class="sv-actions"><button type="submit" class="secondary" value="plus-tard">Plus tard</button><a class="btn primary" href="/?tab=settings#sauvegarde">Télécharger la sauvegarde maintenant</a></div>
+</form>
+</dialog>
+<script nonce="{{csp_nonce}}">(function(){var d=document.getElementById('sv-rappel');if(!d)return;try{if(d.showModal){d.showModal();}else{d.setAttribute('open','');}}catch(e){d.setAttribute('open','');}})();</script>
+{% endif %}

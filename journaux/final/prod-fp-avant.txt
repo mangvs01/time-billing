@@ -1,0 +1,18 @@
+date: 2026-10-04T02:47:44Z
+container_id=0b25a3430633017ad07aea017655aa0300e39abf7890065a57003117ecc0df3d image=sha256:2e19479df57e03dc056bee9f0c9f20c965aedd47d5f4ba27fd98907cfd07c9fa started=2026-10-02T12:50:00.886505111Z restarts=0
+image_created=2026-10-02T12:49:28.786602825Z id=sha256:2e19479df57e03dc056bee9f0c9f20c965aedd47d5f4ba27fd98907cfd07c9fa
+bd31f410305d6623dbf2237158ad8820cd3cbbfba20a37df0f17c54af7b0f6d6  /opt/time-billing-v9/data/timebilling.db
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /opt/time-billing-v9/data/.gitkeep
+db_mtime=2026-10-02 12:49:30.397473779 +0000
+2c1836bd8529fc5d4591cdc9f105c379aa2828c2e22a0946079e449b55a93f48  /opt/time-billing-v9/Dockerfile
+c3e6dc6f8003e05beef9a39cbd733ba5b768115beeb28bedd08a4b4c66b74b33  /opt/time-billing-v9/Facture-modele-reference.ods
+40b896a8888daa2faee2208bf8a30b14597466a1a9463219b7addd84bd0bbdb0  /opt/time-billing-v9/Facture-reelle-reference-2026-09.pdf
+8abb48cb10ff3c0e375c19e248702cab3b9306cd21538c796c305f63b390c4b8  /opt/time-billing-v9/README.md
+d42b9f37257a072133fae752bc048721a2556635def520a71c927d1388b52943  /opt/time-billing-v9/app/__pycache__/app.cpython-313.pyc
+0cf3a160a720f15c582cfde45c8b025732a4c50ffbfb471f19bc877f5154d94e  /opt/time-billing-v9/app/app.py
+c77c1a2b15717d3eb0c449d1822bda4c9679f57655bb39ad87593340a69065b8  /opt/time-billing-v9/app/templates/index.html
+80acd96df71ef3a14aff2d2476406f4765bfbf52d3f571364fd98e7b3be6b6fc  /opt/time-billing-v9/app/templates/login.html
+4ec5adadde9e22a90ec420731f7c939aeb5b70f3c48f558fbd75ab04705aaa2a  /opt/time-billing-v9/docker-compose.yml
+1b443a112b633ccf1576d16f11efa2f2f0ab379570d4f9fc11a2783a62dce7a8  /opt/time-billing-v9/requirements.txt
+56ad57b16914636458fcd9fb13b99c113e72c99af850315e756104a77e604784  /opt/time-billing-v9/time-billing-v6-migration-audit.xlsx
+health=200

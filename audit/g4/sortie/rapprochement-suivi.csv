@@ -1,0 +1,27 @@
+projet_source,client_source,statut_source,nb_j_po_source,jours_factures_source,montant_facture_source_chf,reference_date_facture,mandat_application,jours_realises_application,jours_factures_application,notes_de_credit,realise_non_facture_application,ecart_facture_moins_realise_jours,realise_non_facture_si_historique_compte,jours_realises_classeur,heures_exclues_import,solde_po_application,solde_po_si_historique_compte,heures_apres_derniere_facture,controle_total_ligne,categories
+AL Jan-Mar,,TERMINE,,0,19400.0,"(TOTAL de la ligne, sans colonne de facture) (SUIVI 2025!ligne 3: 19400.0 CHF)",,0.0,0,0,,,,,0.0,,,,,AF
+ERA 2026,CSL,TERMINE,4.0,0,0,,,0.0,0,0,,,,,0.0,,,,,F
+ASN 2025,CSL,TERMINE,10.0,9.83,6389.5,Facture 16/02 (SUIVI 2026!J3: 6389.5 CHF),ASN 2025,9.3,0,0,9.3,0.53,-0.53,9.83125,4.25,10.0,0.17,0,ASN 2025: somme des factures = TOTAL de la ligne,AB
+CIRSE 2025,BSCI,TERMINE,10.0,9.5,6175.0,Facture 03.10 (SUIVI 2025!N8: 9.5 j),CIRSE 2025,9.33125,0,0,9.33125,0.16875,-0.16875,9.64375,1.75,10.0,0.5,0,CIRSE 2025: somme des factures = TOTAL de la ligne,AB
+CIRSE 2026,BSCI,TERMINE,12.0,8.0,5200.0,Facture 01/10 (SUIVI 2026!Q12: 5200 CHF),CIRSE 2026,8.24375,0,0,8.24375,-0.24375,0.24375,8.025,0.0,12.0,4.0,0,CIRSE 2026: somme des factures = TOTAL de la ligne,ABC
+EAHAD,,TERMINE,1.0,1.0,650.0,Facture 16.06 (SUIVI 2025!K13: 1 j),EAHAD,1.0625,0,0,1.0625,-0.0625,0.0625,1.0625,0.0,1.0,0.0,0,EAHAD: somme des factures = TOTAL de la ligne,ABC
+EAU 2026,BSCI,TERMINE,10.0,14.0,9100.0,Facture 31/03 (SUIVI 2026!K7: 9100 CHF),EAU 2026,14.55,0,0,14.55,-0.55,0.55,14.55,0.0,10.0,-4.0,4.0,EAU 2026: somme des factures = TOTAL de la ligne,ABC
+ECIO 2025,BSCI,TERMINE,,0,0,,ECIO 2025,2.6625,0,0,2.6625,-2.6625,2.6625,2.69375,0.25,0,,,,-
+EHRA 2026,BSCI,TERMINE,10.0,18.0,11700.0,Facture 11/05 (SUIVI 2026!N6: 11700 CHF),EHRA 2026,19.53125,0,0,19.53125,-1.53125,1.53125,19.53125,0.0,10.0,-8.0,2.5,EHRA 2026: somme des factures = TOTAL de la ligne,ABC
+Endovascular Summit,BSCI,TERMINE,6.0,12.9,8385.0,Facture 09.04 (SUIVI 2025!I4: 5.2 j) ; Facture 16.06 (SUIVI 2025!K4: 7.7 j),Endovascular Summit,12.875,0,0,12.875,0.025,-0.025,12.875,0.0,6.0,-6.9,0,Endovascular Summit: somme des factures = TOTAL de la ligne,ABD
+ERA 2025 + ERA 2025 (cloture),CSL Vifor,TERMINE,5.0,14.56,9464.0,Facture 12.05 (SUIVI 2025!J9: 5.6 j) ; Facture 14.07 (SUIVI 2025!L9: 8.4 j) ; Facture 16/02 (SUIVI 2026!J4: 364.00000000000006 CHF),ERA 2025,16.40625,0,0,16.40625,-1.84625,1.84625,16.53125,0.0,5.0,-9.56,0,ERA 2025: somme des factures = TOTAL de la ligne ; ERA 2025 (cloture): somme des factures = TOTAL de la ligne,ABCD
+EULAR 2026,CSL,TERMINE,10.0,12.5,8125.0,Facture 16/07 (SUIVI 2026!P10: 8125 CHF),EULAR 2026,13.625,0,0,13.625,-1.125,1.125,13.625,0.0,10.0,-2.5,0,EULAR 2026: somme des factures = TOTAL de la ligne,ABC
+EUROPCR 2025,BSCI,TERMINE,10.0,19.4,12610.0,Facture 09.04 (SUIVI 2025!I5: 6.6 j) ; Facture 12.05 (SUIVI 2025!J5: 5.3 j) ; Facture 16.06 (SUIVI 2025!K5: 7.5 j),EUROPCR 2025,21.2375,0,0,21.2375,-1.8375,1.8375,21.2375,0.0,10.0,-9.4,7.75,EUROPCR 2025: somme des factures = TOTAL de la ligne,ABCD
+EUROPCR 2026,BSCI,TERMINE,15.0,17.3,11245.0,Facture 16/06 (SUIVI 2026!O9: 11245 CHF),EUROPCR 2026,17.46875,0,0,17.46875,-0.16875,0.16875,17.46875,0.0,15.0,-2.3,1.0,EUROPCR 2026: somme des factures = TOTAL de la ligne,ABC
+(absent du SUIVI),,,,0,0,,EUROPCR 2027,0.28125,0,0,0.28125,-0.28125,0.28125,0.28125,0.0,0,,,,-
+(absent du SUIVI),,,,0,0,,MSD,0.875,0,0,0.875,-0.875,0.875,0.875,0.0,0,,,,-
+NC STC June,BSCI,TERMINE,8.0,10.5,6825.0,Facture 16.06 (SUIVI 2025!K7: 10.5 j),NC STC June,10.69375,0,0,10.69375,-0.19375,0.19375,,0.75,8.0,-2.5,0,NC STC June: somme des factures = TOTAL de la ligne,ABC
+NC STC Sept,BSCI,TERMINE,14.0,13.8,8970.0,Facture 30.09 (SUIVI 2025!M14: 13.8 j),NC STC Sept,12.34375,0,0,12.34375,1.45625,-1.45625,,9.75,14.0,0.2,0,NC STC Sept: somme des factures = TOTAL de la ligne,AB
+NHAF 2026,BSCI,,16.0,0,0,,NHAF 2026,9.52484,0,0,9.52484,-9.52484,9.52484,9.55,-0.05,16.0,16.0,,,-
+PCR LV 2025,BSCI,TERMINE,6.34,6.34,4121.0,Facture 15/12 (SUIVI 2025!P11: 6.34 j),PCR LV 2025,6.34375,0,0,6.34375,-0.00375,0.00375,6.34375,0.0,6.34,0.0,0,PCR LV 2025: somme des factures = TOTAL de la ligne,AB
+PCR LV 2026,BSCI,,9.0,0,0,,PCR LV 2026,0.65625,0,0,0.65625,-0.65625,0.65625,0.65625,0.0,9.0,9.0,,,-
+Rising stars Q3,BSCI,TERMINE,6.0,6.0,3900.0,Facture 03.10 (SUIVI 2025!N10: 6 j),Rising stars Q3,5.46875,0,0,5.46875,0.53125,-0.53125,5.9375,3.75,6.0,0.0,0,Rising stars Q3: somme des factures = TOTAL de la ligne,AB
+SMART Y90,BSCI,TERMINE,10.0,10.0,6500.0,Facture 27.11 (SUIVI 2025!O12: 10 j),SMART Y90,10.4,0,0,10.4,-0.4,0.4,10.55625,1.25,10.0,0.0,0,SMART Y90: somme des factures = TOTAL de la ligne,ABC
+SMM 2026,BSCI,TERMINE,15.0,15.0,9750.0,Facture 03/04 (SUIVI 2026!L5: 9750 CHF),SMM 2026,15.03125,0,0,15.03125,-0.03125,0.03125,15.3125,2.25,15.0,0.0,1.0,SMM 2026: somme des factures = TOTAL de la ligne,AB
+STC GEM Avril,BSCI,TERMINE,7.0,7.0,4550.0,Facture 27/04 (SUIVI 2026!M8: 4550 CHF),STC GEM Avril,7.45625,0,0,7.45625,-0.45625,0.45625,,0.0,7.0,0.0,0,STC GEM Avril: somme des factures = TOTAL de la ligne,ABC
+STC GEM Oct - DM job,BSCI,,18.0,7.58333,4550.0,Facture 27/04 (SUIVI 2026!M15: 4550 CHF),STC GEM Oct - DM job,16.44375,0,0,16.44375,-8.86042,8.86042,,0.0,18.0,10.41667,131.55,STC GEM Oct - DM job: somme des factures 4550.00 ≠ TOTAL de la ligne 10800.00,AC

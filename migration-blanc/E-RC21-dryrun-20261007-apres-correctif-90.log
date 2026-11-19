@@ -1,0 +1,197 @@
+
+=== 0. faux staging rc19 : code 8afd867, base = pre-donnees-d1d2a01-20261007T072306Z (SHA vérifié), secrets de test
+OK    sauvegarde pre-donnees intacte
+ Container tbmb-erc21 Started 
+santé : {"status":"ok","version":"9.2-rc19"}
+OK    faux staging en rc19
+
+=== 1. procedure/60-donnees-d1-d2-a01.sh sur le faux staging (D1 + D2 : 24 « à valider » ; A-01 : 15 descriptions)
+2026-10-07T13:25:56Z  arrêt du staging (écritures D1/D2/A-01)
+ Container tbmb-erc21 Stopping 
+ Container tbmb-erc21 Stopped 
+2026-10-07T13:25:58Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/E-RC21/backups/pre-donnees-d1d2a01-20261007T132556Z (sha 30025db0aea7)
+2026-10-07T13:26:04Z  simulations conformes
+2026-10-07T13:26:08Z  application conforme
+ Container tbmb-erc21 Starting 
+ Container tbmb-erc21 Started 
+2026-10-07T13:26:10Z  staging redémarré : {"status":"ok","version":"9.2-rc19"}
+2026-10-07T13:26:10Z  TERMINÉ : CHARGÉ : 24 ligne(s) « à valider » (ids [1]…[24]), 0 déjà présente(s) à l'identique. Aucune validée.
+2026-10-07T13:26:10Z  A-01 : 15 description(s) corrigée(s), 0 déjà faite(s) ; chiffres inchangés : True. Journal : /root/time-billing-v9-rc10-20261004/journaux/donnees-staging-20261007T132556Z
+OK    procedure/60 conforme
+OK    24 factures historiques « à valider » (133 659,50 + 4 550 CHF) : [('proposed', 24, 138209.5)]
+INFO  corrections A-01 tracées : 15
+INFO  état : 2247 saisies ; historiques [('proposed', 24)] ; brouillon n°1 en échec : ['3', '10', '12', '13']
+
+=== 2. déploiement rc21 : 10 → 20 → 30 → 40 → 50 (comme le staging : .env conservé)
+2026-10-07T13:26:11Z  cible /root/time-billing-v9-rc10-20261004/migration-blanc/E-RC21/opt/time-billing-v9-staging (projet tbmb-erc21, conteneur tbmb-erc21) — santé : {"status":"ok","version":"9.2-rc19"}
+2026-10-07T13:26:11Z  Dockerfile identique : oui
+2026-10-07T13:26:11Z  requirements identiques : oui
+2026-10-07T13:26:11Z  propriétaire du dossier de données : 10001 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-07T13:26:11Z  préparation conforme
+ Container tbmb-erc21 Stopping 
+ Container tbmb-erc21 Stopped 
+2026-10-07T13:26:13Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/E-RC21/backups/pre-rc21-20261007T132611Z conforme (service arrêté ; relancer l'ancienne version : docker compose -p tbmb-erc21 start)
+OK   integrity_check
+OK   foreign_key_check vide
+OK   projects : 24 ligne(s), colonnes d origine inchangées
+OK   entries : 2247 ligne(s), colonnes d origine inchangées
+OK   invoices : 1 ligne(s), colonnes d origine inchangées
+OK   credit_notes : 0 ligne(s), colonnes d origine inchangées
+OK   audit : 187 ligne(s), colonnes d origine inchangées
+OK   aucune facture émise sans copie figée
+OK   empreintes des PDF figés valides
+OK   PDF figés servis
+OK   42 déclencheurs d immuabilité présents
+OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (0)
+OK   rc19 : 15 ligne(s) d historique des corrections identiques
+OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+OK   migration idempotente (2e passage sans erreur)
+OK   rc19 : schéma toujours conforme après le 2e passage
+GO
+ Image tbmb-erc21-time-billing-v9-staging Building 
+ Image tbmb-erc21-time-billing-v9-staging Built 
+ Container tbmb-erc21 Recreate 
+ Container tbmb-erc21 Recreated 
+ Container tbmb-erc21 Starting 
+ Container tbmb-erc21 Started 
+2026-10-07T13:26:20Z  déployé — santé : {"status":"ok","version":"9.2-rc21"}
+2026-10-07T13:26:20Z  OK    santé 9.2-rc21
+2026-10-07T13:26:20Z  OK    page de connexion 200
+2026-10-07T13:26:20Z  OK    en-têtes de sécurité
+2026-10-07T13:26:20Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-07T13:26:20Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-07T13:26:20Z  OK    archive ZIP protégée
+2026-10-07T13:26:20Z  OK    service non privilégié (uid 10001)
+2026-10-07T13:26:20Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-07T13:26:21Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-07T13:26:21Z  OK    écoute locale uniquement
+2026-10-07T13:26:21Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-07T13:26:21Z  OK    secrets absents des journaux du conteneur
+2026-10-07T13:26:24Z  après redémarrage :
+2026-10-07T13:26:24Z  OK    santé 9.2-rc21
+2026-10-07T13:26:24Z  OK    page de connexion 200
+2026-10-07T13:26:24Z  OK    en-têtes de sécurité
+2026-10-07T13:26:24Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-07T13:26:24Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-07T13:26:24Z  OK    archive ZIP protégée
+2026-10-07T13:26:24Z  OK    service non privilégié (uid 10001)
+2026-10-07T13:26:25Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-07T13:26:25Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-07T13:26:25Z  OK    écoute locale uniquement
+2026-10-07T13:26:25Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-07T13:26:25Z  OK    secrets absents des journaux du conteneur
+2026-10-07T13:26:25Z  VÉRIFICATIONS CONFORMES
+
+=== 3. contrôles rc21 (HTTP) : mêmes données que rc19, brouillon n°1, bouton et export .xlsx
+INFO  état : 2247 saisies ; historiques [('proposed', 24)] ; brouillon n°1 en échec : ['3', '10', '12', '13']
+OK    rc21 : saisies, corrections, historiques, factures/brouillons, mandats, paramètres et contrôles du brouillon n°1 identiques à rc19
+OK    onglet Migration (page d accueil) : bouton « Télécharger le classeur (.xlsx) »
+OK    export .xlsx téléchargé (200, 144009 octets)
+INFO  journal : {"sheets": 22, "entries": 2247, "hours": 1934.4987, "suivi": {"2026": "0"}}
+INFO  22 onglets : JAN, FEV, MAR, AVR, MAY, JUN, JULY, AUG, SEPT, OCT, NOV, DEC, JAN 26, FEB 26, MAR 26, APR 26, MAY 26, JUN 26, JUL 26, AUG 26, SEPT 26, SUIVI 2026
+OK    avant validation : seul SUIVI 2026 (mandats ouverts, aucun document) — ['SUIVI 2026']
+
+=== 4. retour arrière (aucune donnée métier écrite depuis la sauvegarde ; le téléchargement n'écrit que l'audit) : accepté → rc19
+2026-10-07T13:26:28Z  base vivante copiée avant retour : /root/time-billing-v9-rc10-20261004/migration-blanc/E-RC21/backups/ecarte-20261007T132611Z-retour-20261007T132628Z/timebilling-avant-retour.db (sha f6bd6796f7dd)
+2026-10-07T13:26:31Z  sauvegarde migrée par l'image déployée (610389120434) : référence des tables et colonnes ajoutées
+ Container tbmb-erc21 Stopping 
+ Container tbmb-erc21 Stopped 
+2026-10-07T13:26:34Z  .env d'origine restauré
+2026-10-07T13:26:34Z  requirements.lock d'origine restauré
+2026-10-07T13:26:34Z  .dockerignore d'origine restauré
+ Container tbmb-erc21 Creating 
+ Container tbmb-erc21 Created 
+ Container tbmb-erc21 Starting 
+ Container tbmb-erc21 Started 
+2026-10-07T13:26:37Z  retour arrière effectué — santé : {"status":"ok","version":"9.2-rc19"} ; base = sauvegarde 20261007T132611Z (SHA-256 identique)
+OK    90-rollback accepté
+OK    base restaurée = sauvegarde d'avant déploiement (SHA-256 vérifié par 90-rollback, service arrêté)
+OK    après redémarrage rc19 : contenu de toutes les tables = sauvegarde (le fichier peut différer : écritures de démarrage sans effet sur les données)
+OK    version rc19 de retour
+INFO  état : 2247 saisies ; historiques [('proposed', 24)] ; brouillon n°1 en échec : ['3', '10', '12', '13']
+OK    après retour : état rc19 identique (dont brouillon n°1 et 24 historiques)
+
+=== 5. redéploiement rc21 : 10 → 50
+2026-10-07T13:26:38Z  cible /root/time-billing-v9-rc10-20261004/migration-blanc/E-RC21/opt/time-billing-v9-staging (projet tbmb-erc21, conteneur tbmb-erc21) — santé : {"status":"ok","version":"9.2-rc19"}
+2026-10-07T13:26:39Z  Dockerfile identique : oui
+2026-10-07T13:26:39Z  requirements identiques : oui
+2026-10-07T13:26:39Z  propriétaire du dossier de données : 10001 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-07T13:26:39Z  préparation conforme
+ Container tbmb-erc21 Stopping 
+ Container tbmb-erc21 Stopped 
+2026-10-07T13:26:42Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/E-RC21/backups/pre-rc21-20261007T132639Z conforme (service arrêté ; relancer l'ancienne version : docker compose -p tbmb-erc21 start)
+OK   integrity_check
+OK   foreign_key_check vide
+OK   projects : 24 ligne(s), colonnes d origine inchangées
+OK   entries : 2247 ligne(s), colonnes d origine inchangées
+OK   invoices : 1 ligne(s), colonnes d origine inchangées
+OK   credit_notes : 0 ligne(s), colonnes d origine inchangées
+OK   audit : 188 ligne(s), colonnes d origine inchangées
+OK   aucune facture émise sans copie figée
+OK   empreintes des PDF figés valides
+OK   PDF figés servis
+OK   42 déclencheurs d immuabilité présents
+OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (0)
+OK   rc19 : 15 ligne(s) d historique des corrections identiques
+OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+OK   migration idempotente (2e passage sans erreur)
+OK   rc19 : schéma toujours conforme après le 2e passage
+GO
+ Image tbmb-erc21-time-billing-v9-staging Building 
+ Image tbmb-erc21-time-billing-v9-staging Built 
+ Container tbmb-erc21 Recreate 
+ Container tbmb-erc21 Recreated 
+ Container tbmb-erc21 Starting 
+ Container tbmb-erc21 Started 
+2026-10-07T13:26:46Z  déployé — santé : {"status":"ok","version":"9.2-rc21"}
+2026-10-07T13:26:47Z  OK    santé 9.2-rc21
+2026-10-07T13:26:47Z  OK    page de connexion 200
+2026-10-07T13:26:47Z  OK    en-têtes de sécurité
+2026-10-07T13:26:47Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-07T13:26:47Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-07T13:26:47Z  OK    archive ZIP protégée
+2026-10-07T13:26:47Z  OK    service non privilégié (uid 10001)
+2026-10-07T13:26:47Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-07T13:26:47Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-07T13:26:47Z  OK    écoute locale uniquement
+2026-10-07T13:26:48Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-07T13:26:48Z  OK    secrets absents des journaux du conteneur
+2026-10-07T13:26:51Z  après redémarrage :
+2026-10-07T13:26:51Z  OK    santé 9.2-rc21
+2026-10-07T13:26:51Z  OK    page de connexion 200
+2026-10-07T13:26:51Z  OK    en-têtes de sécurité
+2026-10-07T13:26:51Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-07T13:26:51Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-07T13:26:51Z  OK    archive ZIP protégée
+2026-10-07T13:26:52Z  OK    service non privilégié (uid 10001)
+2026-10-07T13:26:52Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-07T13:26:52Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-07T13:26:52Z  OK    écoute locale uniquement
+2026-10-07T13:26:52Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-07T13:26:52Z  OK    secrets absents des journaux du conteneur
+2026-10-07T13:26:52Z  VÉRIFICATIONS CONFORMES
+INFO  état : 2247 saisies ; historiques [('proposed', 24)] ; brouillon n°1 en échec : ['3', '10', '12', '13']
+OK    après redéploiement : données identiques à rc19
+
+=== 6. parcours utilisateur sur rc21 : validation des 24 historiques (page Factures historiques), puis export
+OK    24 historiques validées par la page : [('validated', 24)]
+INFO  validations tracées : 24
+OK    export .xlsx téléchargé (200, 147578 octets)
+INFO  journal : {"sheets": 23, "entries": 2247, "hours": 1934.4987, "suivi": {"2025": "67236.00", "2026": "70973.50"}}
+INFO  23 onglets : JAN, FEV, MAR, AVR, MAY, JUN, JULY, AUG, SEPT, OCT, NOV, DEC, SUIVI 2025, JAN 26, FEB 26, MAR 26, APR 26, MAY 26, JUN 26, JUL 26, AUG 26, SEPT 26, SUIVI 2026
+OK    23 onglets, SUIVI 2025 après DEC, SUIVI 2026 en dernier (ordre du classeur)
+INFO  lignes SUIVI 2025 : 11 ; SUIVI 2026 : 15 (mesure du 07.10 : 10 + 14, lignes TOTAL comprises si présentes)
+OK    CA des onglets SUIVI = « Facturé » de Billing (2025 67 236,00 ; 2026 70 973,50) : {'2025': '67236.00', '2026': '70973.50'} ; saisies 2247 / 1934.4987 h
+
+=== 7. retour arrière après validation des historiques : doit être REFUSÉ (les 24 validations seraient écartées sans avertissement)
+2026-10-07T13:26:56Z  base vivante copiée avant retour : /root/time-billing-v9-rc10-20261004/migration-blanc/E-RC21/backups/ecarte-20261007T132639Z-retour-20261007T132656Z/timebilling-avant-retour.db (sha de53bde97d7f)
+2026-10-07T13:27:00Z  sauvegarde migrée par l'image déployée (4b3e505eb958) : référence des tables et colonnes ajoutées
+2026-10-07T13:27:01Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-07T13:26:39) seraient écartées par le retour arrière : historical_invoices : 24 ligne(s) modifiée(s). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/E-RC21/backups/ecarte-20261007T132639Z-retour-20261007T132656Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    retour arrière refusé (validations écrites depuis la sauvegarde)
+OK    service rc21 toujours en marche
+OK    base inchangée par la tentative (contenu de toutes les tables hors audit/sessions)
+OK    motif du refus : historical_invoices : 24 ligne(s) modifiée(s)
+
+=== 8. nettoyage
+images du bac à sable supprimées
+RÉPÉTITION E : GO

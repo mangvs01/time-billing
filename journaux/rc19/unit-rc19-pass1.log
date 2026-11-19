@@ -1,0 +1,45 @@
+...........................................F...................................................E.........................[2026-10-05 12:38:15,575] ERROR in app: erreur interne
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/app.py", line 241, in inner
+    return fn(*a,**k)
+           ^^^^^^^^^^
+  File "/app/app/app.py", line 390, in index
+    fc=forecast_mod.build(c,rules.local_today())
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/tests/test_rc10_security.py", line 181, in boom
+    def boom(*a, **k): raise RuntimeError('SELECT secret FROM hidden_table')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: SELECT secret FROM hidden_table
+...............................................................................................................................................................................................................................................................
+======================================================================
+ERROR: test_closed_mandate_keeps_its_entries_editable (tests.test_rc10.Locks.test_closed_mandate_keeps_its_entries_editable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_rc10.py", line 209, in test_closed_mandate_keeps_its_entries_editable
+    self.assertIn('clôturé', ' '.join(self.flashes())); self.assertIsNone(self.scalar("SELECT id FROM entries WHERE description='nouvelle'"))
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/tests/test_import.py", line 53, in scalar
+    return self.sql(q, a)[0][0]
+           ~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+======================================================================
+FAIL: test_rollback_refused_when_batch_used_by_issued_invoice (tests.test_import.InvoiceAndRollback.test_rollback_refused_when_batch_used_by_issued_invoice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_import.py", line 444, in test_rollback_refused_when_batch_used_by_issued_invoice
+    with self.assertRaises(sqlite3.DatabaseError): c.execute('DELETE FROM entries WHERE import_batch_id=?', (batch,))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: DatabaseError not raised
+
+----------------------------------------------------------------------
+Ran 376 tests in 133.911s
+
+FAILED (failures=1, errors=1)
+exit=1

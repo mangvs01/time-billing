@@ -1,0 +1,167 @@
+
+=== 0. bac à sable : ancienne version rc24 (copie figée), base synthétique, secrets de test
+ Container tbsbx25 Starting 
+ Container tbsbx25 Started 
+OK    ancienne version rc24 en marche (base créée par l'application)
+base synthétique : 3 saisies
+
+=== A. 40 sans marqueur GO de 30
+OK    10-preflight : code 0, « préparation conforme »
+OK    A-20-backup : code 0, « conforme »
+ÉCHEC image.tar.gz absente
+ÉCHEC A-40-sans-GO : code 0 (attendu ≠ 0)
+       Image tbsbx25-tbsbx Building 
+       Image tbsbx25-tbsbx Built 
+       Container tbsbx25 Recreate 
+       Container tbsbx25 Recreated 
+       Container tbsbx25 Starting 
+       Container tbsbx25 Started 
+      2026-10-08T23:25:36Z  déployé — santé : {"status":"ok","version":"9.2-rc25p2"}
+ÉCHEC service non relancé : {"status":"ok","version":"9.2-rc25p2"}
+OK    contenu de la base inchangé
+ÉCHEC « deployed » écrit
+
+=== B. 30 en échec : pas de marqueur GO, ancienne version relancée
+ÉCHEC B-20-backup : code 1 (attendu 0)
+      2026-10-08T23:26:07Z  ARRÊT : 9.2-rc25p2 est déjà en marche : une sauvegarde maintenant remplacerait celle d'avant déploiement (retour arrière vers 9.2-rc25p2)
+ÉCHEC service en marche après 20
+OK    B-30-echec : code 125
+ÉCHEC reprise absente
+OK    aucun marqueur GO
+ÉCHEC service non relancé : {"status":"ok","version":"9.2-rc25p2"}
+ÉCHEC B-40-apres-echec : motif « aucun marqueur GO » absent
+      2026-10-08T23:26:38Z  ARRÊT : .env.rc25p2 absent : exécuter rotate-secrets.sh (nouveau mot de passe + secret de session)
+
+=== C. port de .env.rc25p2 ≠ port de URL
+ÉCHEC C-20-backup : code 1 (attendu 0)
+      2026-10-08T23:26:38Z  ARRÊT : 9.2-rc25p2 est déjà en marche : une sauvegarde maintenant remplacerait celle d'avant déploiement (retour arrière vers 9.2-rc25p2)
+ÉCHEC C-30-GO : motif « marqueur GO écrit » absent
+      OK   PDF figés servis
+      OK   42 déclencheurs d immuabilité présents
+      OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (0)
+      OK   rc19 : 0 ligne(s) d historique des corrections identiques
+      OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+      OK   migration idempotente (2e passage sans erreur)
+      OK   rc19 : schéma toujours conforme après le 2e passage
+      GO
+ÉCHEC C-40-port : motif « port publié 8091 » absent
+       Image tbsbx25-tbsbx Building 
+       Image tbsbx25-tbsbx Built 
+       Container tbsbx25 Recreate 
+       Container tbsbx25 Recreated 
+       Container tbsbx25 Starting 
+      Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint tbsbx25 (ed245a476b7def1b3d73695f60ffa7d0dce598749dc09cd453700b0cce737be5): Bind for 127.0.0.1:8091 failed: port is already allocated
+ÉCHEC état après refus du port
+
+=== D. marqueur GO périmé par une écriture dans la base vivante
+OK    D-20-backup : code 0, « conforme »
+ÉCHEC D-30-GO : motif « marqueur GO écrit » absent
+      OK   PDF figés servis
+      OK   42 déclencheurs d immuabilité présents
+      OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (0)
+      OK   rc19 : 0 ligne(s) d historique des corrections identiques
+      OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+      OK   migration idempotente (2e passage sans erreur)
+      OK   rc19 : schéma toujours conforme après le 2e passage
+      GO
+ÉCHEC D-40-en-marche : code 0 (attendu ≠ 0)
+       Image tbsbx25-tbsbx Building 
+       Image tbsbx25-tbsbx Built 
+       Container tbsbx25 Recreate 
+       Container tbsbx25 Recreated 
+       Container tbsbx25 Starting 
+       Container tbsbx25 Started 
+      2026-10-08T23:27:48Z  déployé — santé : {"status":"ok","version":"9.2-rc25p2"}
+ÉCHEC D-40-base-changee : motif « base vivante a changé » absent
+      2026-10-08T23:27:49Z  ARRÊT : .env.rc25p2 absent : exécuter rotate-secrets.sh (nouveau mot de passe + secret de session)
+ÉCHEC service non relancé
+
+=== E. chaîne complète 10 → 20 → 30 (GO) → 40 → 50
+OK    E-10 : code 0
+OK    E-20 : code 0, « conforme »
+ÉCHEC E-30 : motif « marqueur GO écrit » absent
+      OK   PDF figés servis
+      OK   42 déclencheurs d immuabilité présents
+      OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (0)
+      OK   rc19 : 0 ligne(s) d historique des corrections identiques
+      OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+      OK   migration idempotente (2e passage sans erreur)
+      OK   rc19 : schéma toujours conforme après le 2e passage
+      GO
+grep: /tmp/rc25p2/Nbase/backups/pre-rc25p2-20261008T232819Z/rehearsal-GO: No such file or directory
+ÉCHEC contenu du marqueur
+ÉCHEC E-40 : code 1 (attendu 0)
+      2026-10-08T23:28:21Z  ARRÊT : .env.rc25p2 absent : exécuter rotate-secrets.sh (nouveau mot de passe + secret de session)
+ÉCHEC version : 
+ÉCHEC E-50 : code 1 (attendu 0)
+      2026-10-08T23:28:53Z  OK    archive ZIP protégée
+      2026-10-08T23:28:53Z  OK    service non privilégié (uid 10001)
+      2026-10-08T23:28:53Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+      2026-10-08T23:28:53Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+      2026-10-08T23:28:53Z  OK    écoute locale uniquement
+      2026-10-08T23:28:53Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+      2026-10-08T23:28:53Z  OK    secrets absents des journaux du conteneur
+      2026-10-08T23:28:53Z  ARRÊT : au moins un contrôle en échec : exécuter 90-rollback.sh
+
+=== F. donnée postérieure au déploiement dans une table inconnue : retour refusé
+ÉCHEC F-90-refus : motif « zz_future : 1 ligne » absent
+      2026-10-08T23:28:53Z  base vivante copiée avant retour : /tmp/rc25p2/Nbase/backups/ecarte-20261008T232712Z-retour-20261008T232853Z/timebilling-avant-retour.db (sha a2b1d4d72c29)
+      2026-10-08T23:28:56Z  sauvegarde migrée par l'image déployée (d7159df39457) : référence des tables et colonnes ajoutées
+      2026-10-08T23:28:56Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-08T23:27:12) seraient écartées par le retour arrière : entries : 1 ligne(s) ajoutée(s). Copie conservée : /tmp/rc25p2/Nbase/backups/ecarte-20261008T232712Z-retour-20261008T232853Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    service inchangé (nouvelle version en marche)
+ÉCHEC F-90-OUI-non-lie : motif « attendue est OUI-20261008T232819Z » absent
+       Container tbsbx25 Stopped 
+      2026-10-08T23:29:00Z  .env d'origine restauré
+      2026-10-08T23:29:00Z  requirements.lock d'origine restauré
+      2026-10-08T23:29:00Z  .dockerignore d'origine restauré
+       Container tbsbx25 Creating 
+       Container tbsbx25 Created 
+       Container tbsbx25 Starting 
+      Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint tbsbx25 (a614ed2868edf8320d6e2b8fe9b5b23d9994bf42a237fb9fe624159a10c77317): Bind for 127.0.0.1:8091 failed: port is already allocated
+ÉCHEC service après refus OUI
+
+=== G. image de retour supprimée (prune), retour confirmé OUI-20261008T232819Z
+OK    étiquettes pre-* supprimées
+OK    ancienne image supprimée du moteur docker
+ÉCHEC G-90 : code 1 (attendu 0)
+      2026-10-08T23:29:32Z  base vivante copiée avant retour : /tmp/rc25p2/Nbase/backups/ecarte-20261008T232712Z-retour-20261008T232932Z/timebilling-avant-retour.db (sha bbaa3abbee31)
+      2026-10-08T23:29:34Z  sauvegarde migrée par l'image déployée (8c5ef9ec9216) : référence des tables et colonnes ajoutées
+       Container tbsbx25 Stopping 
+       Container tbsbx25 Stopped 
+      2026-10-08T23:29:35Z  .env d'origine restauré
+      2026-10-08T23:29:35Z  requirements.lock d'origine restauré
+      2026-10-08T23:29:35Z  .dockerignore d'origine restauré
+      Error response from daemon: No such image: tbsbx25-tbsbx:pre-rc25p2-20261008T232712Z
+ÉCHEC écart non annoncé
+      (aucune ligne d'audit postérieure)
+ÉCHEC version après retour : 
+ÉCHEC SHA de la base restaurée
+ÉCHEC contenu différent de la sauvegarde
+ls: cannot access '/tmp/rc25p2/Nbase/backups/ecarte-20261008T232819Z-retour-*': No such file or directory
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+sqlite3.OperationalError: no such table: zz_future
+ÉCHEC copie de la base vivante
+
+=== H. échec pendant l'installation : retour arrière automatique
+OK    H-20 : code 0, « conforme »
+ÉCHEC H-30 : motif « marqueur GO écrit » absent
+      OK   PDF figés servis
+      OK   42 déclencheurs d immuabilité présents
+      OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (0)
+      OK   rc19 : 0 ligne(s) d historique des corrections identiques
+      OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+      OK   migration idempotente (2e passage sans erreur)
+      OK   rc19 : schéma toujours conforme après le 2e passage
+      GO
+ÉCHEC H-40 : motif « retour arrière automatique » absent
+      error while interpolating services.tbsbx.environment.SECRET_KEY: required variable SECRET_KEY is missing a value: SECRET_KEY manquant dans .env
+      2026-10-08T23:30:07Z  ARRÊT : compose invalide (variable manquante dans .env ?)
+ÉCHEC 90 non exécuté
+ÉCHEC version : 
+ÉCHEC SHA de la base restaurée
+OK    contenu de la base = sauvegarde 20261008T233005Z
+
+=== nettoyage
+
+RÉPÉTITION N : ÉCHECS (voir ci-dessus, journaux /tmp/rc25p2/Nbase/journal)

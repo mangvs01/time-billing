@@ -1,0 +1,33 @@
+.............F...Fs...........................................................s...F.....................
+======================================================================
+FAIL: test_the_year_of_a_document_is_the_year_of_its_date (tests.test_g4_decisions.Cutoff.test_the_year_of_a_document_is_the_year_of_its_date)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_decisions.py", line 60, in test_the_year_of_a_document_is_the_year_of_its_date
+    self.assertEqual(rules.doc_date(_Row(invoice_date=None, issued_at='2026-12-31T23:30:00+00:00')), '2027-01-01')   # legacy row: the Zurich day of issuance
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '2026-12-31' != '2027-01-01'
+- 2026-12-31
++ 2027-01-01
+
+
+======================================================================
+FAIL: test_a_note_longer_than_one_line_is_refused_at_creation_and_edition (tests.test_g4_decisions.NoteZone.test_a_note_longer_than_one_line_is_refused_at_creation_and_edition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_decisions.py", line 83, in test_a_note_longer_than_one_line_is_refused_at_creation_and_edition
+    self.assertIn('note de facture trop longue', ' '.join(self.flashes()))
+AssertionError: 'note de facture trop longue' not found in ''
+
+======================================================================
+FAIL: test_R_E7_1_a_credit_note_on_a_later_invoice_is_not_cancelled_at_this_cutoff (tests.test_g4_fidelite.LayoutD6.test_R_E7_1_a_credit_note_on_a_later_invoice_is_not_cancelled_at_this_cutoff)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_fidelite.py", line 315, in test_R_E7_1_a_credit_note_on_a_later_invoice_is_not_cancelled_at_this_cutoff
+    self.assertIn('12.0 j commandés − (0 + 1.0 + 2.0 − 0) = 9.0 j', ck[8]['detail'])
+AssertionError: '12.0 j commandés − (0 + 1.0 + 2.0 − 0) = 9.0 j' not found in '12.0 j commandés − (0 + 1.0 + 2.0 − 0.0) = 9.0 j'
+
+----------------------------------------------------------------------
+Ran 104 tests in 23.953s
+
+FAILED (failures=3, skipped=2)

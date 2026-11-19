@@ -1,0 +1,116 @@
+test_q1_q2_full_quantity (sonde.Sonde.test_q1_q2_full_quantity) ... 
+===== Q1/Q2 variante B : F09 = toutes les heures de septembre (1,5 j, S comprise) =====
+/root/time-billing-v9-rc10-20261004/app/invoice_checks.py:63: ResourceWarning: unclosed file <_io.TextIOWrapper name='/root/time-billing-v9-rc10-20261004/app/golden_layout.json' mode='r' encoding='UTF-8'>
+  try: return json.load(open(GOLDEN_FILE)).get("layout_sha256")
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+F08 émise : 2026-08 qty=1.0 j ; annexe S : ([('2026-08', 'billed', '2026-08-20')], '2026-08', False, None)
+Édition S sans confirmation -> HTTP 200 ; flash=[] ; date=2026-08-20
+Édition S avec confirmation -> HTTP 302 ; date=2026-09-15
+   flash: Saisie n° 1 modifiée (l'ancienne valeur reste dans l'historique des corrections).
+   flash: Attention : saisie facturée — la facture 2026-08 reste inchangée (document émis, jamais modifié). Écart post-facturation de 2026-08 : 0,00 h (0,0000 j, aucun) entre les saisies facturées et leur valeur actuelle. À décider ensuite : note de crédit (avoir), compensation, ou aucune action — Factures émises, « Écart post-facturation
+   flash: Attention : cette saisie reste facturée par 2026-08 ; datée du 15.09.2026 (période non encore facturée), elle serait comptée une seconde fois par le prochain brouillon de « Mandat M » : en tenir compte dans sa quantité, ou émettre une note de crédit sur 2026-08.
+   rôles S après déplacement : ([('2026-08', 'billed', '2026-08-20')], '2026-08', True, None)
+Brouillon F09 qty=1.5 ; flash=['Brouillon créé.', "Il figure dans « Factures émises » (statut brouillon) : le modifier ou l'émettre depuis cette page."]
+   contrôle  1 [ok] 2 saisie(s), 12.0 h dans la période du 01.09.2026 au 30.09.2026
+   contrôle  6 [ok] réalisé jusqu'au 30.09.2026 : 1.5 j ; facturé jusqu'à la date de facture 08.10.2026
+   contrôle  8 [ok] 20.0 j commandés − (0 + 1.0 + 1.5 − 0) = 17.5 j
+   contrôle 12 [ok] mêmes période, quantité, tarif et totaux sur les trois documents
+   page d'émission : Saisies déjà facturées corrigées depuis leur facture. 2026-08 : écart 0,00 h (0,0000 j).
+   page d'émission : Reliquat après cette facture −1 j facturé(s) d'avance 
+   page d'émission : Traitement du reliquat de −1 j 
+   émission F09 SANS dérogation -> statut=issued ; flash=['Facture 2026-09 émise le 08.10.2026 à 08:20:24.']
+F09 = 2026-09 qty=1.5 j ; montant F08+F09 = 2000.0 CHF HT pour 12 h = 1,5 j réalisés (1200 CHF)
+   rôles S (entries_invoices / annotate billed_by, billed_changed, annex_of) : ([('2026-08', 'billed', '2026-08-20'), ('2026-09', 'billed', '2026-09-15')], '2026-08, 2026-09', True, None)
+   /entries (ligne S) : …eures ÷ heures par jour de chaque mandat) · Exporter ces saisies (CSV) Date Mandat Début – fin Durée Jours équiv. Description Origine Actions 15.09.2026 Mandat M durée saisie 8,00 h 8 h 00 min 1,0000 S travail août manuelle Modifier Supprim…
+   écart 2026-08: frozen=8.0 h current=8.0 h variance=0.0 h needs_decision=False remaining_units=0.0
+     changed=[(1, 'date reclassée', {'invoice': '2026-09', 'draft': False})] late=[] reclassified=[] earlier_changed=[]
+     page /invoice/1/ecart : aucune note de crédit proposée
+   écart 2026-09: frozen=12.0 h current=12.0 h variance=0.0 h needs_decision=False remaining_units=0.0
+     changed=[] late=[] reclassified=[] earlier_changed=[]
+     page /invoice/2/ecart : aucune note de crédit proposée
+Ensuite S 8 h -> 6 h (HTTP 302) ; flash :
+   flash: Saisie n° 1 modifiée (l'ancienne valeur reste dans l'historique des corrections).
+   flash: Attention : saisie facturée — la facture 2026-08 reste inchangée (document émis, jamais modifié). Écart post-facturation de 2026-08 : −2,00 h (−0,2500 j, facturé en trop) entre les saisies facturées et leur valeur actuelle. À décider ensuite : note de crédit (
+   flash: Attention : saisie facturée — la facture 2026-09 reste inchangée (document émis, jamais modifié). Écart post-facturation de 2026-09 : −2,00 h (−0,2500 j, facturé en trop) entre les saisies facturées et leur valeur actuelle. À décider ensuite : note de crédit (
+   flash: Attention : date déplacée dans la période de la facture émise 2026-09, qui ne l'a pas facturée : la saisie reste facturée par 2026-08 (aucune double facturation).
+   écart 2026-08: frozen=8.0 h current=6.0 h variance=-2.0 h needs_decision=True remaining_units=-0.25
+     changed=[(1, 'date reclassée', {'invoice': '2026-09', 'draft': False})] late=[] reclassified=[] earlier_changed=[]
+     page /invoice/1/ecart : créer une note de crédit de 0,25 j sur 2026-08
+   écart 2026-09: frozen=12.0 h current=10.0 h variance=-2.0 h needs_decision=True remaining_units=-0.25
+     changed=[(1, 'modifiée', None)] late=[] reclassified=[] earlier_changed=[]
+     page /invoice/2/ecart : créer une note de crédit de 0,25 j sur 2026-09
+ok
+test_q1_q2_suggested_quantity (sonde.Sonde.test_q1_q2_suggested_quantity) ... 
+===== Q1/Q2 variante A : F09 à la quantité SUGGÉRÉE =====
+F08 émise : 2026-08 qty=1.0 j ; annexe S : ([('2026-08', 'billed', '2026-08-20')], '2026-08', False, None)
+Édition S sans confirmation -> HTTP 200 ; flash=[] ; date=2026-08-20
+Édition S avec confirmation -> HTTP 302 ; date=2026-09-15
+   flash: Saisie n° 1 modifiée (l'ancienne valeur reste dans l'historique des corrections).
+   flash: Attention : saisie facturée — la facture 2026-08 reste inchangée (document émis, jamais modifié). Écart post-facturation de 2026-08 : 0,00 h (0,0000 j, aucun) entre les saisies facturées et leur valeur actuelle. À décider ensuite : note de crédit (avoir), compensation, ou aucune action — Factures émises, « Écart post-facturation
+   flash: Attention : cette saisie reste facturée par 2026-08 ; datée du 15.09.2026 (période non encore facturée), elle serait comptée une seconde fois par le prochain brouillon de « Mandat M » : en tenir compte dans sa quantité, ou émettre une note de crédit sur 2026-08.
+   rôles S après déplacement : ([('2026-08', 'billed', '2026-08-20')], '2026-08', True, None)
+   /suggest sept : hours=12.0 already_billed_hours=8.0 suggested_qty=0.5 j unbilled_days_to_date=0.5
+Brouillon F09 qty=0.5 ; flash=['Brouillon créé.', "Il figure dans « Factures émises » (statut brouillon) : le modifier ou l'émettre depuis cette page."]
+   contrôle  1 [ok] 2 saisie(s), 12.0 h dans la période du 01.09.2026 au 30.09.2026
+   contrôle  6 [ok] réalisé jusqu'au 30.09.2026 : 1.5 j ; facturé jusqu'à la date de facture 08.10.2026
+   contrôle  8 [ok] 20.0 j commandés − (0 + 1.0 + 0.5 − 0) = 18.5 j
+   contrôle 12 [fail dérogeable] quantité facturée 0.5 j pour 1.5 j réalisé(s) dans la période
+   page d'émission : Saisies déjà facturées corrigées depuis leur facture. 2026-08 : écart 0,00 h (0,0000 j).
+   page d'émission : Reliquat après cette facture 0 j — aucun 
+   émission F09 SANS dérogation -> statut=draft ; flash=["Émission refusée : contrôles avant émission en échec — 12. La facture, l'annexe et la position racontent la même histoire — quantité facturée 0.5 j pour 1.5 j réalisé(s) dans la période (dérogation motivée possible) : émission pos"]
+   émission F09 AVEC motifs de dérogation 12/13 -> statut=issued ; flash=['Facture 2026-09 émise le 08.10.2026 à 08:20:27.']
+F09 = 2026-09 qty=0.5 j ; montant F08+F09 = 1200.0 CHF HT pour 12 h = 1,5 j réalisés (1200 CHF)
+   rôles S (entries_invoices / annotate billed_by, billed_changed, annex_of) : ([('2026-08', 'billed', '2026-08-20'), ('2026-09', 'billed', '2026-09-15')], '2026-08, 2026-09', True, None)
+   /entries (ligne S) : …eures ÷ heures par jour de chaque mandat) · Exporter ces saisies (CSV) Date Mandat Début – fin Durée Jours équiv. Description Origine Actions 15.09.2026 Mandat M durée saisie 8,00 h 8 h 00 min 1,0000 S travail août manuelle Modifier Supprim…
+   écart 2026-08: frozen=8.0 h current=8.0 h variance=0.0 h needs_decision=False remaining_units=0.0
+     changed=[(1, 'date reclassée', {'invoice': '2026-09', 'draft': False})] late=[] reclassified=[] earlier_changed=[]
+     page /invoice/1/ecart : aucune note de crédit proposée
+   écart 2026-09: frozen=12.0 h current=12.0 h variance=0.0 h needs_decision=False remaining_units=0.0
+     changed=[] late=[] reclassified=[] earlier_changed=[]
+     page /invoice/2/ecart : aucune note de crédit proposée
+Ensuite S 8 h -> 6 h (HTTP 302) ; flash :
+   flash: Saisie n° 1 modifiée (l'ancienne valeur reste dans l'historique des corrections).
+   flash: Attention : saisie facturée — la facture 2026-08 reste inchangée (document émis, jamais modifié). Écart post-facturation de 2026-08 : −2,00 h (−0,2500 j, facturé en trop) entre les saisies facturées et leur valeur actuelle. À décider ensuite : note de crédit (
+   flash: Attention : saisie facturée — la facture 2026-09 reste inchangée (document émis, jamais modifié). Écart post-facturation de 2026-09 : −2,00 h (−0,2500 j, facturé en trop) entre les saisies facturées et leur valeur actuelle. À décider ensuite : note de crédit (
+   flash: Attention : date déplacée dans la période de la facture émise 2026-09, qui ne l'a pas facturée : la saisie reste facturée par 2026-08 (aucune double facturation).
+   écart 2026-08: frozen=8.0 h current=6.0 h variance=-2.0 h needs_decision=True remaining_units=-0.25
+     changed=[(1, 'date reclassée', {'invoice': '2026-09', 'draft': False})] late=[] reclassified=[] earlier_changed=[]
+     page /invoice/1/ecart : créer une note de crédit de 0,25 j sur 2026-08
+   écart 2026-09: frozen=12.0 h current=10.0 h variance=-2.0 h needs_decision=True remaining_units=-0.25
+     changed=[(1, 'modifiée', None)] late=[] reclassified=[] earlier_changed=[]
+     page /invoice/2/ecart : créer une note de crédit de 0,25 j sur 2026-09
+ok
+test_q3_cumulative_annex (sonde.Sonde.test_q3_cumulative_annex) ... 
+===== Q3 : saisie tardive d'août reprise à la main dans F09 =====
+L (4 h, 25.08) saisie après F08 ; flash=['Temps enregistré : 4 h.', "Attention : période déjà facturée (facture émise jusqu'au 31.08.2026). Cette prestation n'apparaît pas dans la facture émise et doit être traitée comme un reliq"]
+   /suggest sept : hours=4.0 already_billed_hours=0.0 suggested_qty=0.5 j unbilled_days_to_date=1.0
+Brouillon F09 qty=1 j (T 4 h + L 4 h reprise à la main)
+   contrôle  1 [ok] 1 saisie(s), 4.0 h dans la période du 01.09.2026 au 30.09.2026
+   contrôle  6 [ok] réalisé jusqu'au 30.09.2026 : 2.0 j ; facturé jusqu'à la date de facture 08.10.2026
+   contrôle  8 [ok] 20.0 j commandés − (0 + 1.0 + 1.0 − 0) = 18.0 j
+   contrôle 12 [ok] mêmes période, quantité, tarif et totaux sur les trois documents
+   page d'émission : Reliquat après cette facture 0 j — aucun 
+   émission F09 SANS dérogation -> statut=issued ; flash=['Facture 2026-09 émise le 08.10.2026 à 08:20:29.']
+   rôles L : ([('2026-09', 'annex', '2026-08-25')], None, False, '2026-09')
+   écart 2026-08: frozen=8.0 h current=8.0 h variance=0.0 h needs_decision=False remaining_units=0.0
+     changed=[] late=[3] reclassified=[] earlier_changed=[]
+     page /invoice/1/ecart : aucune note de crédit proposée
+   écart 2026-09: frozen=4.0 h current=4.0 h variance=0.0 h needs_decision=False remaining_units=0.0
+     changed=[] late=[] reclassified=[] earlier_changed=[]
+     page /invoice/2/ecart : aucune note de crédit proposée
+Ensuite L 4 h -> 2 h (HTTP 302) ; flash :
+   flash: Saisie n° 3 modifiée (l'ancienne valeur reste dans l'historique des corrections).
+   flash: Saisie listée dans l'annexe cumulative de 2026-09 sans y être facturée (hors période) : ces factures restent inchangées et leur montant n'en dépend pas.
+   écart 2026-08: frozen=8.0 h current=8.0 h variance=0.0 h needs_decision=False remaining_units=0.0
+     changed=[] late=[3] reclassified=[] earlier_changed=[]
+     page /invoice/1/ecart : aucune note de crédit proposée
+   écart 2026-09: frozen=4.0 h current=4.0 h variance=0.0 h needs_decision=False remaining_units=0.0
+     changed=[] late=[] reclassified=[] earlier_changed=[3]
+     page /invoice/2/ecart : aucune note de crédit proposée
+   position mandat : consumed=1.75 j billed=2.0 j unbilled=-0.25 j
+ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 9.056s
+
+OK

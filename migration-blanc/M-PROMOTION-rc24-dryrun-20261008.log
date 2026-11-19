@@ -1,0 +1,86 @@
+OK    copie de publication rc24 intacte
+OK    sauvegarde du staging pre-rc24 intacte
+
+=== 0a. fausse production V9.0 (archive A19, base A vide), conf = prod.conf du bac à sable (copie de publication rc24)
+bac à sable M-PROD prêt (base : 425ccf48ff8c)
+ Container tbmb-m-prod Started 
+OK    fausse production en V9.0 : {"status":"ok","version":"9.0-rc1"}
+
+=== 0b. faux staging rc24 (sauvegarde pre-rc24 = tes données), recette simulée : 24 historiques validées
+ Container tbmb-m-stg Started 
+OK    faux staging en rc24
+OK    recette simulée sur le staging : 24 historiques validées [('validated', 24)]
+
+=== 1. promotion AVANT le déploiement de la production (V9.0 ≠ rc24) : doit être refusée, rien d'arrêté
+2026-10-08T09:38:56Z  ARRÊT : versions différentes (production 9.0-rc1, staging 9.2-rc24) : déployer d'abord la version du staging en production (10 → 50)
+OK    refus : versions différentes
+OK    production et staging toujours en marche
+
+=== 2. déploiement de la fausse production en rc24 : 10 → 20 → 30 → rotate-secrets → 40 → 50 (copie de publication)
+OK    production déployée en rc24, 50-verify conforme
+OK    production rc24 sans donnée métier (VIDE : aucune ligne dans les tables métier présentes)
+
+=== 3. sans PROMOUVOIR=OUI : refus
+OK    refus : confirmation PROMOUVOIR=OUI exigée
+OK    refus : configuration du staging incomplète (aucun héritage de la production)
+
+=== 4. échec simulé après l'installation : la base de production d'origine doit être remise, les deux services relancés
+2026-10-08T09:39:35Z  ARRÊT : échec simulé (répétition) après l'installation
+2026-10-08T09:39:35Z  ÉCHEC : remise en place de la base de production d'origine
+2026-10-08T09:39:35Z  base de production restaurée (identique à la sauvegarde)
+OK    production et staging relancés après l'échec
+OK    production : base d'origine (vide) remise
+OK    base installée avant l'échec conservée (production-echec.db)
+OK    staging intact après l'échec
+
+=== 5. promotion
+2026-10-08T09:39:43Z  contrôles : production et staging en 9.2-rc24, même code (4a2e4a66dbb2), production sans donnée métier
+2026-10-08T09:39:43Z  arrêt du staging (gel : plus aucune écriture)
+ Container tbmb-m-stg Stopping 
+ Container tbmb-m-stg Stopped 
+2026-10-08T09:39:45Z  base du staging copiée (sha f54ed6b3b316)
+2026-10-08T09:39:46Z  contenu promu : factures {'draft': 1} ; notes de crédit {} ; historiques {'validated': 24} ; saisies 2247 — toute facture ou note ÉMISE devient une pièce réelle et immuable en production
+2026-10-08T09:39:46Z  arrêt de la production
+ Container tbmb-m-prod Stopping 
+ Container tbmb-m-prod Stopped 
+2026-10-08T09:39:49Z  sauvegarde de la production : /root/time-billing-v9-rc10-20261004/migration-blanc/M-PROD/backups/promotion-20261008T093943Z/production-avant.db (sha 069475f4b3e6) — aucune donnée métier
+{"source": "staging", "source_sha256": "f54ed6b3b316281a8a8f9da9348007e92d0a99669f3126021419db9caccfc60a", "version": "9.2-rc24", "promotion": "20261008T093943Z", "purge": {"web_sessions": 2, "kept_forms": 0, "login_failures": 0}, "entries": 2247, "projects": 24, "invoices": 1, "historical_invoices": 24}
+ Container tbmb-m-prod Starting 
+ Container tbmb-m-prod Started 
+2026-10-08T09:39:55Z  TERMINÉ : production 9.2-rc24 = base du staging (IDENTIQUES : toutes les tables métier (mêmes colonnes, mêmes lignes)). Chiffres : /root/time-billing-v9-rc10-20261004/migration-blanc/M-PROD/backups/promotion-20261008T093943Z/production-empreinte.json
+2026-10-08T09:39:55Z  sauvegarde : /root/time-billing-v9-rc10-20261004/migration-blanc/M-PROD/backups/promotion-20261008T093943Z (production-avant.db = base d'origine, staging.db, promue.db ; SHA256SUMS). Le staging reste ARRÊTÉ.
+2026-10-08T09:39:55Z  retour arrière si nécessaire : /root/time-billing-v9-rc10-20261004/procedure/90-rollback.sh /root/time-billing-v9-rc10-20261004/migration-blanc/M-PROD/sandbox.conf (base V9.0 d'origine) — il refusera, liste à l'appui, tant que les données promues sont là ;
+2026-10-08T09:39:55Z    ABANDONNER_CORRECTIONS=OUI seulement après export de ce qui a été saisi EN PRODUCTION depuis (les données promues restent dans /root/time-billing-v9-rc10-20261004/migration-blanc/M-PROD/backups/promotion-20261008T093943Z/staging.db)
+OK    70-promouvoir-base-staging : TERMINÉ
+OK    production en marche : {"status":"ok","version":"9.2-rc24"}
+OK    staging laissé ARRÊTÉ (gel)
+IDENTIQUES : toutes les tables métier (mêmes colonnes, mêmes lignes)
+OK    production = staging (toutes les tables métier)
+OK    base du staging intacte (tables métier)
+OK    mot de passe du STAGING refusé par la production
+OK    connexion à la production avec SON mot de passe (secrets de la production conservés)
+OK    événement d'audit de la promotion : {"source": "staging", "source_sha256": "f54ed6b3b316281a8a8f9da9348007e92d0a99669f3126021419db9caccfc60a", "version": "9.2-rc24", "promotion": "20261008T093943Z
+OK    sessions web du staging purgées (1 session = cette connexion) : 1
+OK    24 historiques validées en production : [('validated', 24)]
+OK    saisie 1 corrigée en production après promotion, correction tracée (1) — ["Saisie n° 1 modifiée (l'ancienne valeur reste dans l'historique des corrections)."]
+
+=== 6. seconde promotion (staging relancé) : refusée, la production contient des données
+2026-10-08T09:40:03Z  ARRÊT : la production contient déjà des données (NON VIDE : entries 2247 ligne(s) ; entry_changes 16 ligne(s) ; projects 24 ligne(s) ; invoices 1 ligne(s) ; historical_invoices 24 ligne(s) ; invoice_date_changes 1 ligne(s) ; import_batches 11 ligne(s) ; settings 9 ligne(s) ; import_batch_rows 25267 ligne(s)) : promotion refusée, rien n'est fait (nouvelle décision nécessaire)
+OK    refus : production non vide
+OK    production inchangée par la tentative
+OK    staging toujours en marche (refus avant tout arrêt)
+
+=== 7. retour arrière de la production : refusé sans ABANDONNER_CORRECTIONS, puis accepté → V9.0, base d'origine
+2026-10-08T09:40:15Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-08T09:38:57) seraient écartées par le retour arrière : entries : 2247 ligne(s) ajoutée(s); entry_changes : 16 ligne(s) ajoutée(s); projects : 24 ligne(s) ajoutée(s); invoices : 1 ligne(s) ajouté
+OK    retour refusé (données promues et correction écrites depuis la sauvegarde)
+OK    retour arrière accepté avec ABANDONNER_CORRECTIONS=OUI
+OK    production de retour en V9.0
+OK    base de production = sauvegarde d'avant déploiement (SHA-256)
+OK    … = base V9.0 d'origine (SHA-256 de la copie A)
+OK    données promues intactes sur le staging après le retour arrière
+OK    sauvegarde promotion-<TS> présente et vérifiée (SHA256SUMS)
+
+=== 8. nettoyage
+images des bacs à sable supprimées
+RÉPÉTITION M : GO
+NB (09:58 UTC) : « pre-rc24 » ci-dessus = libellé seulement ; la sauvegarde utilisée est pre-rc23-20261008T091053Z (PRE fixe). Libellé corrigé dans le script.

@@ -6,7 +6,8 @@ echoed in an error message: every message below names the variable, never its va
 Environment:
   APP_USER            login name (default admin)
   APP_PASSWORD_HASH   preferred: werkzeug hash (scrypt:… or pbkdf2:…) of the password, so the clear password is
-                      stored nowhere on the server
+                      stored nowhere on the server. BMDP1: a password changed from the application (table auth_credentials,
+                      scrypt hash only) takes precedence over it; with no row there, nothing changes (see docs/MOT-DE-PASSE.md)
   APP_PASSWORD        legacy clear password, accepted only when no hash is given (12 characters minimum)
   SECRET_KEY          session signing key: random, 32 characters minimum, different from the password
   COOKIE_SECURE       1 (default): session cookie sent over HTTPS only; 0 only for plain-HTTP local access
@@ -16,7 +17,7 @@ Environment:
 import hmac, ipaddress
 from datetime import datetime, timedelta, timezone
 
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 WEAK = {"", "replace-with-long-random-secret", "change-me-now", "changeme", "change-me", "secret", "password", "admin"}
 MIN_SECRET, MIN_PASSWORD = 32, 12
@@ -55,11 +56,56 @@ def cookie_config(cfg):
             "SESSION_COOKIE_SECURE": cfg["cookie_secure"], "PERMANENT_SESSION_LIFETIME": timedelta(hours=cfg["session_hours"])}
 
 
-def credentials_ok(cfg, user, password):
+def credentials_ok(cfg, user, password, c=None):
+    """c: an open connection. When given, a password changed from the application (auth_credentials) is the only one that counts;
+    with no stored hash (or no connection) the environment decides, exactly as before BMDP1."""
     user_ok = hmac.compare_digest((user or "").encode(), cfg["user"].encode())
-    if cfg["pw_hash"]: pw_ok = check_password_hash(cfg["pw_hash"], password or "")
-    else: pw_ok = hmac.compare_digest((password or "").encode(), cfg["pw"].encode())
-    return user_ok and pw_ok
+    return user_ok and password_ok(cfg, password, c)
+
+
+def password_ok(cfg, password, c=None):
+    stored = stored_hash(c) if c is not None else None
+    if stored: return check_password_hash(stored, password or "")
+    if cfg["pw_hash"]: return check_password_hash(cfg["pw_hash"], password or "")
+    return hmac.compare_digest((password or "").encode(), cfg["pw"].encode())
+
+
+# --- BMDP1: password changed from the application ---------------------------------------------------
+# One row at most (id = 1): the scrypt hash and a counter. Operational state like web_sessions: never part of a backup, never restored,
+# never promoted from the staging (see restore_service.TRANSIENT). The clear password is never stored, logged or audited.
+CRED_SCHEMA = """CREATE TABLE IF NOT EXISTS auth_credentials(id INTEGER PRIMARY KEY CHECK(id=1), pw_hash TEXT NOT NULL CHECK(pw_hash LIKE 'scrypt:%'),
+                 version INTEGER NOT NULL DEFAULT 1, changed_at TEXT NOT NULL)"""
+NEW_PASSWORD_MIN, NEW_PASSWORD_MAX = 12, 200
+
+
+def stored_hash(c):
+    """The hash saved by « Changer mon mot de passe », or None (nothing saved, or table not created yet)."""
+    try: r = c.execute("SELECT pw_hash FROM auth_credentials WHERE id=1").fetchone()
+    except Exception: return None
+    return (r[0] or None) if r else None
+
+
+def password_problem(cfg, c, current, new, confirm):
+    """French plain-language refusal of a password change, or None when the new password is acceptable. The current password itself is checked apart."""
+    new, confirm = new or "", confirm or ""
+    if new != confirm: return "Mot de passe non modifié : les deux saisies du nouveau mot de passe ne sont pas identiques."
+    if len(new) < NEW_PASSWORD_MIN: return f"Mot de passe non modifié : le nouveau mot de passe est trop court ({NEW_PASSWORD_MIN} caractères au moins)."
+    if len(new) > NEW_PASSWORD_MAX: return f"Mot de passe non modifié : le nouveau mot de passe est trop long ({NEW_PASSWORD_MAX} caractères au plus)."
+    if not new.strip(): return "Mot de passe non modifié : le nouveau mot de passe ne peut pas être fait que d'espaces."
+    if hmac.compare_digest(new.encode(), (current or "").encode()) or password_ok(cfg, new, c):
+        return "Mot de passe non modifié : le nouveau mot de passe doit être différent de l'actuel."
+    if new.lower() in WEAK or hmac.compare_digest(new.encode(), cfg["key"].encode()):
+        return "Mot de passe non modifié : ce mot de passe est trop courant ou interdit, en choisir un autre."
+    return None
+
+
+def set_password(c, new, now_iso):
+    """Saves the scrypt hash of `new` (replaces the previous one). Returns the new version number. The caller commits and audits (without the password)."""
+    c.execute(CRED_SCHEMA)
+    h = generate_password_hash(new, method="scrypt")
+    c.execute("INSERT INTO auth_credentials(id,pw_hash,version,changed_at) VALUES(1,?,1,?) "
+              "ON CONFLICT(id) DO UPDATE SET pw_hash=excluded.pw_hash, version=auth_credentials.version+1, changed_at=excluded.changed_at", (h, now_iso))
+    return c.execute("SELECT version FROM auth_credentials WHERE id=1").fetchone()[0]
 
 
 # --- login throttling (shared by the gunicorn workers through SQLite) ------------------------------
@@ -92,13 +138,13 @@ def record_failure(c, ip):
     c.execute("INSERT INTO login_failures(ip,at) VALUES(?,?)", (ip, datetime.now(timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds")))
 
 
-def throttle_logged(c, ip, tail=2000):
+def throttle_logged(c, ip, tail=2000, event="login_throttled"):
     """True when a refused login of this client (same key as the lock) is already in the audit for the current window.
     A bot hammering a locked login otherwise added one audit row (and one write transaction) per request: ~100/s, 9 M rows a day.
     Only the most recent `tail` audit rows are read (bounded cost); beyond that many interleaved clients, a row may be written again."""
     key = client_key(ip)
     rows = c.execute("SELECT detail FROM (SELECT event, detail, created_at FROM audit ORDER BY id DESC LIMIT ?) "
-                     "WHERE event='login_throttled' AND created_at>=datetime('now',?)", (tail, f"-{WINDOW_MIN} minutes")).fetchall()
+                     "WHERE event=? AND created_at>=datetime('now',?)", (tail, event, f"-{WINDOW_MIN} minutes")).fetchall()
     return any(client_key(r[0][3:] if r[0].startswith("ip=") else r[0]) == key for r in rows)
 
 

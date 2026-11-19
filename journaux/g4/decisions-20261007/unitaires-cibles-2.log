@@ -1,0 +1,14 @@
+.F................s...........................................................s.........................
+======================================================================
+FAIL: test_a_credit_note_counts_from_its_own_date (tests.test_g4_decisions.Cutoff.test_a_credit_note_counts_from_its_own_date)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_decisions.py", line 46, in test_a_credit_note_counts_from_its_own_date
+    ck = self.checks(b); self.assertEqual({x['status'] for x in ck.values()}, {'ok'}, ck); self.assertIn('0.0 j annulés', ck[7]['detail'])
+                                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '0.0 j annulés' not found in '0 j annulés par notes de crédit'
+
+----------------------------------------------------------------------
+Ran 104 tests in 26.358s
+
+FAILED (failures=1, skipped=2)

@@ -1,0 +1,100 @@
+
+=== 0. version d'origine (V9.0, image construite depuis l'arborescence de prod copiée)
+ Container tbmb-a16 Started 
+santé V9.0 : {"status":"ok","version":"9.0-rc1"}
+
+=== 1. 10-preflight
+2026-10-05T08:50:45Z  cible /root/time-billing-v9-rc10-20261004/migration-blanc/A16/opt/time-billing-v9 (projet tbmb-a16, conteneur tbmb-a16) — santé : {"status":"ok","version":"9.0-rc1"}
+2026-10-05T08:50:45Z  Dockerfile identique : NON
+2026-10-05T08:50:45Z  requirements identiques : non (copiés au déploiement)
+2026-10-05T08:50:45Z  propriétaire du dossier de données : 0 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-05T08:50:45Z  préparation conforme
+
+=== 2. 20-backup
+ Container tbmb-a16 Stopping 
+ Container tbmb-a16 Stopped 
+2026-10-05T08:50:47Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/A16/backups/pre-rc16-20261005T085045Z conforme (service arrêté ; relancer l'ancienne version : docker compose -p tbmb-a16 start)
+
+=== 3. 30-rehearse
+OK   integrity_check
+OK   foreign_key_check vide
+OK   projects : 0 ligne(s), colonnes d origine inchangées
+OK   entries : 0 ligne(s), colonnes d origine inchangées
+OK   invoices : 0 ligne(s), colonnes d origine inchangées
+OK   credit_notes : 0 ligne(s), colonnes d origine inchangées
+OK   audit : 0 ligne(s), colonnes d origine inchangées
+OK   aucune facture émise sans copie figée
+OK   empreintes des PDF figés valides
+OK   PDF figés servis
+OK   35 déclencheurs d immuabilité présents
+OK   migration idempotente (2e passage sans erreur)
+GO
+
+=== 4. rotate-secrets (mot de passe de test aléatoire, non interactif)
+2026-10-05T08:50:50Z  .env.rc16 écrit (mode 600) : hachage scrypt du mot de passe + secret de session de 64 caractères
+OK .env.rc16 : hachage seulement, mot de passe en clair absent, mode 600
+
+=== 5. 40-deploy
+ Image tbmb-a16-time-billing-v9 Building 
+ Image tbmb-a16-time-billing-v9 Built 
+ Container tbmb-a16 Recreate 
+ Container tbmb-a16 Recreated 
+ Container tbmb-a16 Starting 
+ Container tbmb-a16 Started 
+2026-10-05T08:50:53Z  déployé — santé : {"status":"ok","version":"9.2-rc16"}
+
+=== 6. 50-verify (dont redémarrage)
+2026-10-05T08:50:53Z  OK    santé 9.2-rc16
+2026-10-05T08:50:53Z  OK    page de connexion 200
+2026-10-05T08:50:54Z  OK    en-têtes de sécurité
+2026-10-05T08:50:54Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-05T08:50:54Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-05T08:50:54Z  OK    archive ZIP protégée
+2026-10-05T08:50:54Z  OK    service non privilégié (uid 10001)
+2026-10-05T08:50:54Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-05T08:50:54Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-05T08:50:54Z  OK    écoute locale uniquement
+2026-10-05T08:50:54Z  OK    base : intégrité, effectifs, copies figées
+2026-10-05T08:50:54Z  OK    secrets absents des journaux du conteneur
+2026-10-05T08:50:57Z  après redémarrage :
+2026-10-05T08:50:57Z  OK    santé 9.2-rc16
+2026-10-05T08:50:57Z  OK    page de connexion 200
+2026-10-05T08:50:58Z  OK    en-têtes de sécurité
+2026-10-05T08:50:58Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-05T08:50:58Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-05T08:50:58Z  OK    archive ZIP protégée
+2026-10-05T08:50:58Z  OK    service non privilégié (uid 10001)
+2026-10-05T08:50:58Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-05T08:50:58Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-05T08:50:58Z  OK    écoute locale uniquement
+2026-10-05T08:50:58Z  OK    base : intégrité, effectifs, copies figées
+2026-10-05T08:50:58Z  OK    secrets absents des journaux du conteneur
+2026-10-05T08:50:58Z  VÉRIFICATIONS CONFORMES
+
+=== 7. contrôles complémentaires rc16
+OK compose : secrets uniquement par variables ${…}, aucune valeur
+OK hachage transmis intact au conteneur (comparaison d'empreintes, caractères $ préservés)
+ancien mot de passe refusé : 200 (200 = formulaire réaffiché)
+audit migration []
+
+=== 8. 90-rollback
+ Container tbmb-a16 Stopping 
+ Container tbmb-a16 Stopped 
+2026-10-05T08:51:01Z  .env d'origine restauré
+ Container tbmb-a16 Creating 
+ Container tbmb-a16 Created 
+ Container tbmb-a16 Starting 
+ Container tbmb-a16 Started 
+2026-10-05T08:51:04Z  retour arrière effectué — santé : {"status":"ok","version":"9.0-rc1"} ; base = sauvegarde 20261005T085045Z (SHA-256 identique)
+
+=== 9. contrôle du retour arrière
+santé : {"status":"ok","version":"9.0-rc1"}
+OK base = sauvegarde (SHA-256 identique)
+OK code = code V9.0 de production (identique)
+redémarrage V9.0 après retour : {"status":"ok","version":"9.0-rc1"}
+
+=== 10. nettoyage du bac à sable
+ Network tbmb-a16_default Removed 
+images du bac à sable supprimées
+FIN A16
+FIN A16 rc=0

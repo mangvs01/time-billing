@@ -1,0 +1,122 @@
+
+=== 0. version d'origine (V9.0, image construite depuis l'arborescence de prod copiée)
+ Container tbmb-b Started 
+santé V9.0 : {"status":"ok","version":"9.0-rc1"}
+PDF facture 1 (v90) : 200, sha b79d3f535ecf
+PDF facture 2 (v90) : 200, sha eac80d7564c3
+PDF facture 3 (v90) : 200, sha 41aea239fe17
+
+=== 1. 10-preflight
+2026-10-04T11:44:21Z  cible /root/time-billing-v9-rc10-20261004/migration-blanc/B/opt/time-billing-v9 (projet tbmb-b, conteneur tbmb-b) — santé : {"status":"ok","version":"9.0-rc1"}
+2026-10-04T11:44:21Z  Dockerfile identique : NON
+2026-10-04T11:44:21Z  requirements identiques : non (copiés au déploiement)
+2026-10-04T11:44:21Z  propriétaire du dossier de données : 0 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-04T11:44:21Z  préparation conforme
+
+=== 2. 20-backup
+ Container tbmb-b Stopping 
+ Container tbmb-b Stopped 
+2026-10-04T11:44:23Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/B/backups/pre-rc12-20261004T114421Z conforme (service arrêté ; relancer l'ancienne version : docker compose -p tbmb-b start)
+
+=== 3. 30-rehearse
+OK   integrity_check
+OK   foreign_key_check vide
+OK   projects : 1 ligne(s), colonnes d origine inchangées
+OK   entries : 5 ligne(s), colonnes d origine inchangées
+OK   invoices : 3 ligne(s), colonnes d origine inchangées
+OK   credit_notes : 1 ligne(s), colonnes d origine inchangées
+OK   audit : 2 ligne(s), colonnes d origine inchangées
+OK   aucune facture émise sans copie figée
+OK   empreintes des PDF figés valides
+OK   PDF figés servis
+OK   32 déclencheurs d immuabilité présents
+OK   migration idempotente (2e passage sans erreur)
+GO
+
+=== 4. rotate-secrets (mot de passe de test aléatoire, non interactif)
+2026-10-04T11:44:25Z  .env.rc12 écrit (mode 600) : hachage scrypt du mot de passe + secret de session de 64 caractères
+OK .env.rc12 : hachage seulement, mot de passe en clair absent, mode 600
+
+=== 5. 40-deploy
+ Image tbmb-b-time-billing-v9 Building 
+ Image tbmb-b-time-billing-v9 Built 
+ Container tbmb-b Recreate 
+ Container tbmb-b Recreated 
+ Container tbmb-b Starting 
+ Container tbmb-b Started 
+2026-10-04T11:44:29Z  déployé — santé : {"status":"ok","version":"9.2-rc12"}
+
+=== 6. 50-verify (dont redémarrage)
+2026-10-04T11:44:29Z  OK    santé 9.2-rc12
+2026-10-04T11:44:29Z  OK    page de connexion 200
+2026-10-04T11:44:29Z  OK    en-têtes de sécurité
+2026-10-04T11:44:29Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-04T11:44:29Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-04T11:44:29Z  OK    archive ZIP protégée
+2026-10-04T11:44:29Z  OK    service non privilégié (uid 10001)
+2026-10-04T11:44:29Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-04T11:44:29Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-04T11:44:29Z  OK    écoute locale uniquement
+2026-10-04T11:44:29Z  OK    base : intégrité, effectifs, copies figées
+2026-10-04T11:44:29Z  OK    secrets absents des journaux du conteneur
+2026-10-04T11:44:32Z  après redémarrage :
+2026-10-04T11:44:32Z  OK    santé 9.2-rc12
+2026-10-04T11:44:32Z  OK    page de connexion 200
+2026-10-04T11:44:32Z  OK    en-têtes de sécurité
+2026-10-04T11:44:32Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-04T11:44:33Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-04T11:44:33Z  OK    archive ZIP protégée
+2026-10-04T11:44:33Z  OK    service non privilégié (uid 10001)
+2026-10-04T11:44:33Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-04T11:44:33Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-04T11:44:33Z  OK    écoute locale uniquement
+2026-10-04T11:44:33Z  OK    base : intégrité, effectifs, copies figées
+2026-10-04T11:44:33Z  OK    secrets absents des journaux du conteneur
+2026-10-04T11:44:33Z  VÉRIFICATIONS CONFORMES
+
+=== 7. contrôles complémentaires rc12
+OK compose : secrets uniquement par variables ${…}, aucune valeur
+OK hachage transmis intact au conteneur (comparaison d'empreintes, caractères $ préservés)
+ancien mot de passe refusé : 200 (200 = formulaire réaffiché)
+PDF facture 1 (rc12) : 200, sha b0bbd4896b86
+PDF facture 2 (rc12) : 200, sha 0762213d2833
+PDF facture 3 (rc12) : 200, sha 4b9122a89db7
+OK facture 1 : texte du PDF servi après migration = texte du PDF V9.0
+OK facture 2 : texte du PDF servi après migration = texte du PDF V9.0
+ÉCART facture 3 (texte)
+facture {'id': 1, 'number': '2026-001', 'status': 'issued', 'issued_at': '2026-07-01T08:15:00', 'invoice_date': None}
+facture {'id': 2, 'number': '2026-002', 'status': 'issued', 'issued_at': '2026-08-01T09:30:00', 'invoice_date': None}
+facture {'id': 3, 'number': None, 'status': 'draft', 'issued_at': None, 'invoice_date': None}
+copie figée 1 2026-001 migration-v9.2 (rendu V9.0) b0bbd4896b86
+copie figée 2 2026-002 migration-v9.2 (rendu V9.0) 0762213d2833
+note (héritée V9.0) {'id': 1, 'reference': 'NC-2026-001', 'status': 'draft', 'treatment': None, 'amount': 100.0}
+audit migration [<sqlite3.Row object at 0x749f94362140>]
+OK facture 1 : PDF servi = copie figée (octet pour octet)
+OK facture 2 : PDF servi = copie figée (octet pour octet)
+
+=== 8. 90-rollback
+ Container tbmb-b Stopping 
+ Container tbmb-b Stopped 
+2026-10-04T11:44:36Z  .env d'origine restauré
+ Container tbmb-b Creating 
+ Container tbmb-b Created 
+ Container tbmb-b Starting 
+ Container tbmb-b Started 
+2026-10-04T11:44:38Z  retour arrière effectué — santé : {"status":"ok","version":"9.0-rc1"} ; base = sauvegarde 20261004T114421Z (SHA-256 identique)
+
+=== 9. contrôle du retour arrière
+santé : {"status":"ok","version":"9.0-rc1"}
+OK base = sauvegarde (SHA-256 identique)
+OK code = code V9.0 de production (identique)
+PDF facture 1 (retour) : 200, sha d33d5fe8fa7b
+PDF facture 2 (retour) : 200, sha 3ca2c485d303
+PDF facture 3 (retour) : 200, sha 76bb3589a3a5
+OK facture 1 : identique à l'origine après retour arrière
+OK facture 2 : identique à l'origine après retour arrière
+OK facture 3 : identique à l'origine après retour arrière
+redémarrage V9.0 après retour : {"status":"ok","version":"9.0-rc1"}
+
+=== 10. nettoyage du bac à sable
+ Network tbmb-b_default Removed 
+images du bac à sable supprimées
+FIN B

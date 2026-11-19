@@ -1,0 +1,14 @@
+# PROPOSITION — à ajouter à /etc/caddy/Caddyfile après accord (opération O5). Nom de domaine à confirmer :
+# un enregistrement DNS A (et AAAA si IPv6) vers le serveur est nécessaire AVANT le rechargement (certificat automatique).
+billing.hudd-l.com {
+    encode gzip
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        -Server
+    }
+    # Optionnel, défense en profondeur (comme amo.hudd-l.com) :
+    # basic_auth { <utilisateur> <hachage bcrypt produit par: caddy hash-password> }
+    reverse_proxy 127.0.0.1:8091
+}
+# Validation puis rechargement sans coupure des autres sites :
+#   caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy

@@ -1,0 +1,74 @@
+.......................Empreinte des données métier d'une base Time Billing — contrôles communs aux deux méthodes de la décision G4
+(Decision Center billing-g4-donnees-production : promotion de la base du staging OU rejeu des imports en production).
+
+LECTURE SEULE : chaque base est ouverte en « mode=ro » ; rien n'est jamais écrit. Bibliothèque standard seulement : s'exécute sur l'hôte
+(python3 -I outils/empreinte_metier.py …) sur une COPIE (sauvegarde 20-backup), jamais sur une base vivante sous /opt.
+
+  vide <base>                 code 0 si aucune table métier ne contient de ligne (la production doit être vide au moment de la bascule,
+                              quelle que soit la méthode) ; sinon code 1 et liste des tables non vides.
+  empreinte <base>            effectifs, empreinte SHA-256 de chaque table métier et chiffres de contrôle (JSON).
+  comparer <base A> <base B>  code 0 si toutes les tables métier sont identiques (mêmes colonnes, mêmes lignes) ; sinon code 1 et, par table,
+                              le nombre de lignes présentes seulement dans A / seulement dans B.
+
+Tables métier = celles que procedure/90-rollback.sh compare (même liste). Hors comparaison, effectifs seulement : audit (journal propre à
+chaque environnement), web_sessions, login_failures, kept_forms (transitoires), sqlite_sequence. Empreinte d'une table : toutes ses
+colonnes (triées par nom), lignes triées sur toutes les colonnes — indépendante de l'ordre physique et de l'ordre des colonnes.
+
+.......................................................................................s...............................................................................................................[2026-10-08 06:29:36,257] ERROR in app: erreur interne
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/app.py", line 295, in inner
+    return fn(*a,**k)
+           ^^^^^^^^^^
+  File "/app/app/app.py", line 450, in index
+    fc=forecast_mod.build(c,rules.local_today())
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/tests/test_rc10_security.py", line 182, in boom
+    def boom(*a, **k): raise RuntimeError('SELECT secret FROM hidden_table')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: SELECT secret FROM hidden_table
+...................................................................................................................................................................................................................................................................................[2026-10-08 06:31:23,858] ERROR in app: avertissements après correction de la saisie 1
+Traceback (most recent call last):
+  File "/app/app/app.py", line 859, in entry_edit
+    draft_warning(c2,p["id"],work_date)
+  File "/app/tests/test_revue_rc19_restes.py", line 100, in boom
+    def boom(*a_, **k): raise RuntimeError('panne simulée')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: panne simulée
+[2026-10-08 06:31:23,873] ERROR in app: avertissements après suppression de la saisie 2
+Traceback (most recent call last):
+  File "/app/app/app.py", line 924, in entry_delete
+    draft_warning(c2,e["project_id"],e["work_date"])
+  File "/app/tests/test_revue_rc19_restes.py", line 100, in boom
+    def boom(*a_, **k): raise RuntimeError('panne simulée')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: panne simulée
+...............................
+----------------------------------------------------------------------
+Ran 528 tests in 183.849s
+
+OK (skipped=1)
+IDENTIQUES : toutes les tables métier (mêmes colonnes, mêmes lignes)
+DIFFÉRENTES :
+  entries : 2 ligne(s) dans A, 2 dans B ; 1 ligne(s) seulement dans A, 1 seulement dans B
+DIFFÉRENTES :
+  entries : 2 ligne(s) dans A, 2 dans B ; 1 ligne(s) seulement dans A, 1 seulement dans B
+DIFFÉRENTES :
+  entries : 2 ligne(s) dans A, 1 dans B ; 1 ligne(s) seulement dans A, 0 seulement dans B
+DIFFÉRENTES :
+  historical_invoices : 1 ligne(s) dans A, 1 dans B ; 1 ligne(s) seulement dans A, 1 seulement dans B
+DIFFÉRENTES :
+  settings : 1 ligne(s) dans A, 1 dans B ; 1 ligne(s) seulement dans A, 1 seulement dans B
+DIFFÉRENTES :
+  invoice_snapshots : 1 ligne(s) dans A, 1 dans B ; 1 ligne(s) seulement dans A, 1 seulement dans B
+DIFFÉRENTES :
+  invoice_snapshots : 1 ligne(s) dans A, 2 dans B ; 0 ligne(s) seulement dans A, 1 seulement dans B
+NON VIDE : settings 1 ligne(s)
+DIFFÉRENTES :
+  entries : 2 ligne(s) dans A, 2 dans B ; 1 ligne(s) seulement dans A, 1 seulement dans B
+VIDE : aucune ligne dans les tables métier présentes

@@ -1,0 +1,13 @@
+Staging rc23 — 2026-10-08 (D13 = GO_STAGING, résolue 05:17 UTC)
+05:18 UTC  déploiement rc22 -> rc23 (10->50) fait hors session Claude2 tracée : sauvegarde pre-rc23-20261008T051822Z, aucun journal conservé.
+06:09 UTC  50-verify-controle.log : contrôle de ce déploiement, CONFORME (avant et après redémarrage, données identiques à la sauvegarde).
+06:10 UTC  90-rollback-test.log : retour arrière réel -> rc22, base = sauvegarde 051822Z (SHA identique).
+06:10 UTC  10/20/30-*-redeploiement.log : conformes (sauvegarde pre-rc23-20261008T061057Z, répétition GO).
+06:11 UTC  40-deploy-redeploiement.log : ARRÊT avant toute modification (.env.rc23 absent ; création refusée à l'agent).
+06:12 UTC  staging relancé en rc22 (docker compose -p time-billing-v9-staging start) : santé ok 9.2-rc22.
+Reste : cp -p /opt/time-billing-v9-staging/.env /opt/time-billing-v9-staging/.env.rc23 (utilisateur), puis 10->50 (fiche billing-d13-execution-rc23).
+08:35 UTC  .env.rc23 créé par l'utilisateur (ctime), identique au .env, mode 600.
+09:10 UTC  10-preflight-final.log : conforme (.env.rc23 présent).
+09:11 UTC  20/30/40/50-*-final.log : sauvegarde pre-rc23-20261008T091053Z, répétition GO, déployé 9.2-rc23, 50-verify CONFORME (arrêt ≈ 25 s).
+           Données : empreinte_metier comparer pre-rc23-20261008T061057Z / pre-rc23-20261008T091053Z = IDENTIQUES.
+09:11 UTC  00-prerequis-bascule-0912.log : PRÉREQUIS REMPLIS (G5).

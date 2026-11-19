@@ -1,0 +1,87 @@
+
+=== S0 juste après le déploiement (connexions seulement)
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+OK    S0 juste après le déploiement (connexions seulement) : retour accepté, V9.0 et base = sauvegarde
+
+=== S1 colonne ajoutée, mandat existant (adresse de facturation)
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+      2026-10-07T13:35:20Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-07T13:35:01) seraient écartées par le retour arrière : projects : 1 ligne(s) modifiée(s) (colonnes ajoutées par la migration). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/ecarte-20261007T133501Z-retour-20261007T133514Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    S1 colonne ajoutée, mandat existant (adresse de facturation) : retour refusé (« projects : 1 ligne(s) modifiée(s) (colonnes ajoutées par la migration) »), service rc toujours en marche
+OK    S1 colonne ajoutée, mandat existant (adresse de facturation) : retour forcé après export (ABANDONNER_CORRECTIONS=OUI) → V9.0
+
+=== S2 colonne ajoutée, brouillon existant (date de facture)
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+      2026-10-07T13:35:51Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-07T13:35:32) seraient écartées par le retour arrière : invoices : 1 ligne(s) modifiée(s) (colonnes ajoutées par la migration). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/ecarte-20261007T133532Z-retour-20261007T133544Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    S2 colonne ajoutée, brouillon existant (date de facture) : retour refusé (« invoices : 1 ligne(s) modifiée(s) (colonnes ajoutées par la migration) »), service rc toujours en marche
+OK    S2 colonne ajoutée, brouillon existant (date de facture) : retour forcé après export (ABANDONNER_CORRECTIONS=OUI) → V9.0
+
+=== S3 colonne ajoutée, note de crédit existante (description)
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+      2026-10-07T13:36:18Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-07T13:36:02) seraient écartées par le retour arrière : credit_notes : 1 ligne(s) modifiée(s) (colonnes ajoutées par la migration). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/ecarte-20261007T133602Z-retour-20261007T133613Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    S3 colonne ajoutée, note de crédit existante (description) : retour refusé (« credit_notes : 1 ligne(s) modifiée(s) (colonnes ajoutées par la migration) »), service rc toujours en marche
+OK    S3 colonne ajoutée, note de crédit existante (description) : retour forcé après export (ABANDONNER_CORRECTIONS=OUI) → V9.0
+
+=== S4 table ajoutée sans id (paramètre émetteur)
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+      2026-10-07T13:36:35Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-07T13:36:25) seraient écartées par le retour arrière : settings : 1 ligne(s) ajoutée(s) ou modifiée(s) (par rapport à la sauvegarde migrée). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/ecarte-20261007T133625Z-retour-20261007T133631Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    S4 table ajoutée sans id (paramètre émetteur) : retour refusé (« settings : 1 ligne(s) ajoutée(s) ou modifiée(s) (par rapport à la sauvegarde migrée) »), service rc toujours en marche
+OK    S4 table ajoutée sans id (paramètre émetteur) : retour forcé après export (ABANDONNER_CORRECTIONS=OUI) → V9.0
+
+=== S5 table ajoutée avec id (facture historique)
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+      2026-10-07T13:36:53Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-07T13:36:43) seraient écartées par le retour arrière : historical_invoices : 1 ligne(s) ajoutée(s). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/ecarte-20261007T133643Z-retour-20261007T133649Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    S5 table ajoutée avec id (facture historique) : retour refusé (« historical_invoices : 1 ligne(s) ajoutée(s) »), service rc toujours en marche
+OK    S5 table ajoutée avec id (facture historique) : retour forcé après export (ABANDONNER_CORRECTIONS=OUI) → V9.0
+
+=== S6 table ajoutée avec id (historique des corrections)
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+      2026-10-07T13:37:14Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-07T13:37:01) seraient écartées par le retour arrière : entry_changes : 1 ligne(s) ajoutée(s). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/ecarte-20261007T133701Z-retour-20261007T133709Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    S6 table ajoutée avec id (historique des corrections) : retour refusé (« entry_changes : 1 ligne(s) ajoutée(s) »), service rc toujours en marche
+OK    S6 table ajoutée avec id (historique des corrections) : retour forcé après export (ABANDONNER_CORRECTIONS=OUI) → V9.0
+
+=== S7 colonne d'origine (description d'une saisie)
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+      2026-10-07T13:37:33Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-07T13:37:23) seraient écartées par le retour arrière : entries : 1 ligne(s) modifiée(s). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/ecarte-20261007T133723Z-retour-20261007T133729Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    S7 colonne d'origine (description d'une saisie) : retour refusé (« entries : 1 ligne(s) modifiée(s) »), service rc toujours en marche
+OK    S7 colonne d'origine (description d'une saisie) : retour forcé après export (ABANDONNER_CORRECTIONS=OUI) → V9.0
+
+=== S8 VERSION du dépôt changée depuis le déploiement
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      2026-10-07T13:37:47Z  NB : le dépôt est maintenant en 9.2-rc99 ; retour arrière du déploiement rc21 (sauvegarde 20261007T133741Z)
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+      colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+OK    S8 VERSION du dépôt changée depuis le déploiement : retour accepté, V9.0 et base = sauvegarde
+
+=== S9 copie migrée impossible (refus prudent)
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      2026-10-07T13:38:04Z  copie migrée de la sauvegarde impossible (image : aucune ; journal : /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/ecarte-20261007T133755Z-retour-20261007T133803Z/migration-copie-m*.log) : tables et colonnes ajoutées par la migration comptées comme données nouvelles. Si le déploiement a échoué avant toute saisie (service jamais ouvert), ABANDONNER_CORRECTIONS=OUI n'écarte rien d'utile
+      2026-10-07T13:38:04Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-07T13:37:55) seraient écartées par le retour arrière : entries : colonnes ajoutées par la migration non vérifiables (import_batch_id ; copie migrée indisponible); projects : colonnes ajoutées par la migration non vérifiables (project_number, billing_contact, billing_address, dates_label, closed_at, closed_reason, client_legal_name, client_legal_id, short_name ; copie migrée indisponible); invoices : colonnes ajoutées par la migration non vérifiables (description, other_amount, other_label, invoice_date, reliquat_days, reliquat_treatment, reliquat_note, other_vat_mode ; copie migrée indisponible); credit_notes : colonnes ajoutées par la migration non vérifiables (status, issued_at, qty, unit_rate, vat, description, treatment, tva_amount, other_amount, other_vat_mode, refund_delay_days, refund_due_on, replaces_credit_id ; copie migrée indisponible); invoice_snapshots : 2 ligne(s) ajoutée(s) (table absente de la sauvegarde ; copie migrée indisponible); invoice_annex_entries : 6 ligne(s) ajoutée(s) (table absente de la sauvegarde ; copie migrée indisponible). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/ecarte-20261007T133755Z-retour-20261007T133803Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    S9 copie migrée impossible (refus prudent) : retour refusé (« copie migrée indisponible »), service rc toujours en marche
+OK    S9 copie migrée impossible (refus prudent) : retour forcé après export (ABANDONNER_CORRECTIONS=OUI) → V9.0
+
+=== S10 20 relancé pour une autre version sans 40
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+      2026-10-07T13:38:25Z  retour arrière effectué — santé : {"status":"ok","version":"9.0-rc1"} ; base = sauvegarde 20261007T133809Z (SHA-256 identique)
+OK    S10 : retour vers la sauvegarde du déploiement (20261007T133809Z), pas celle du 20 relancé (20261007T133814Z) → V9.0
+
+BILAN : 19 OK, 0 échec(s)

@@ -1,0 +1,4 @@
+Répétition de procedure/60-donnees-d1-d2-a01.sh sur un faux staging jetable (copie de pre-rc19-20261007T024945Z, image time-billing-v9-staging:latest = rc19, port 8497) :
+071830Z : 1er passage conforme (24 « à valider », 15 descriptions) ; 071847Z : 2e passage idempotent (0 écriture) ;
+071907Z : saisie 2146 à description « autre » → simulation refusée, rien écrit, service relancé ;
+071930Z (et 07:21Z après correctif mode/propriétaire) : dossier de données en lecture seule → application refusée, base remise identique à la sauvegarde.

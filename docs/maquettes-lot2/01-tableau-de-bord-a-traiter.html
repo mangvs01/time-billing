@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquette 1 — Tableau de bord « À traiter » — Time Billing lot 2</title>
+<!-- MAQUETTE STATIQUE (UX lot 2, proposition n° 1). Aucun script, aucune requête, aucun lien actif ; données fictives.
+     Jetons repris de app/templates/_ds.html (design system « Liquid Glass »). Ne fait pas partie du code produit. -->
+<style>
+:root{--ink:#0e1621;--ink-2:#4a5565;--ink-3:#667085;--line:rgba(14,22,33,.09);--line-strong:rgba(14,22,33,.16);
+--blue:#0f62fe;--blue-soft:rgba(15,98,254,.10);--blue-glow:rgba(15,98,254,.35);--ok:#0f7b53;--ok-soft:rgba(15,123,83,.11);
+--warn:#9a5b00;--warn-soft:rgba(224,148,0,.14);--err:#c3332b;--err-soft:rgba(224,64,50,.09);--titanium:#e9edf2;--track:rgba(14,22,33,.08);
+--glass:rgba(255,255,255,.66);--glass-strong:rgba(255,255,255,.8);--glass-border:rgba(255,255,255,.78);
+--shadow-1:0 1px 2px rgba(14,22,33,.04),0 10px 28px -12px rgba(14,22,33,.14);--shadow-2:0 2px 6px rgba(14,22,33,.05),0 28px 56px -20px rgba(15,60,140,.26);
+--hl:inset 0 1px 0 rgba(255,255,255,.95);--r-panel:24px;--r-ctl:14px;
+--f:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}html{background:linear-gradient(180deg,#fbfcfd 0,#f1f3f7 1100px) no-repeat #f1f3f7}
+body{margin:0;font-family:var(--f);color:var(--ink);-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1}
+a{color:var(--blue);text-underline-offset:3px}
+.mq-banner{background:#1d2a35;color:#fff;font-size:12.5px;padding:8px 16px;text-align:center}.mq-banner b{color:#ffd27a}
+.shell{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:16px;align-self:start;margin:16px 0 16px 16px;padding:22px 14px 16px;background:var(--glass-strong);border:1px solid var(--glass-border);border-radius:28px;box-shadow:var(--shadow-1),var(--hl);display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;gap:12px;align-items:center;padding:2px 8px}.logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(150deg,#5b9bff,#0b54e6)}
+.brand b{font-size:15px}.envtag{display:inline-block;margin-top:4px;padding:2px 10px;border-radius:99px;background:var(--blue-soft);color:var(--blue);font-size:11px;font-weight:650;letter-spacing:.06em}
+.nav{display:flex;flex-direction:column;gap:3px}.nav span{padding:11px 12px;border-radius:14px;font-size:14px;font-weight:550;color:var(--ink-2)}
+.nav span.on{background:#fff;color:var(--blue);box-shadow:0 8px 20px -10px var(--blue-glow);border:1px solid rgba(15,98,254,.16)}
+.main{padding:28px 28px 56px;max-width:1240px;width:100%}
+h1.page{font-size:22px;letter-spacing:-.02em;margin:4px 2px 18px}
+h2{font-size:18px;font-weight:600;letter-spacing:-.015em;margin:0}
+.panel{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r-panel);box-shadow:var(--shadow-1),var(--hl);padding:24px;margin:0 0 20px}
+.hint{color:var(--ink-3);font-size:12.5px;line-height:1.55}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 14px;border-radius:99px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;border:1px solid var(--line);background:#fff;color:var(--ink);box-shadow:var(--hl),0 1px 2px rgba(14,22,33,.05)}
+.btn.primary{background:linear-gradient(180deg,#3b82ff,#0f62fe);color:#fff;border:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 20px -10px var(--blue-glow)}
+.btn.danger{background:linear-gradient(180deg,#d9483f,#c3332b);color:#fff;border:0}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap;background:var(--titanium);color:var(--ink-2)}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.b-err{background:var(--err-soft);color:var(--err)}.b-blue{background:var(--blue-soft);color:var(--blue)}.b-warn{background:var(--warn-soft);color:var(--warn)}.b-ok{background:var(--ok-soft);color:var(--ok)}
+/* annotations de maquette */
+.ann{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#ffb020;color:#1d2a35;font-size:12px;font-weight:800;vertical-align:middle;margin:0 6px;box-shadow:0 0 0 3px rgba(255,176,32,.25)}
+.notes{background:#fffaf0;border:1px dashed #e0a000;border-radius:18px;padding:16px 20px;margin:0 0 20px;font-size:13.5px;line-height:1.55}
+.notes h2{font-size:15px;margin:0 0 8px}.notes ol{margin:0;padding-left:20px}.notes li{margin:4px 0}
+/* ---- proposition n° 1 : « À traiter » ---- */
+.todo-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}
+.todo{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.todo li{display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 14px 12px 0;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid var(--line);box-shadow:var(--hl)}
+.todo .bar{align-self:stretch;border-radius:0 4px 4px 0}
+.todo .t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.todo .t b{font-size:14px;font-weight:620;letter-spacing:-.01em}
+.todo .t small{font-size:12.5px;color:var(--ink-3)}
+.todo .t .row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.lv-err .bar{background:var(--err)}.lv-todo .bar{background:var(--blue)}.lv-advice .bar{background:#c9cfd8}
+.lv-advice{background:rgba(255,255,255,.45)!important}
+/* chiffres cliquables */
+.kpis{display:grid;grid-template-columns:minmax(0,1.5fr) repeat(2,minmax(0,1fr));gap:16px;margin:0 0 20px}
+.kpi{position:relative;display:flex;flex-direction:column;gap:6px;padding:20px 22px;border-radius:22px;background:var(--glass);border:1px solid var(--glass-border);box-shadow:var(--shadow-1),var(--hl);text-decoration:none;color:inherit}
+a.kpi::after{content:"→";position:absolute;right:18px;top:18px;color:var(--ink-3);font-weight:600}
+a.kpi:hover{border-color:rgba(15,98,254,.3)}
+.kpi.primary{grid-row:span 2;padding:26px 28px;background:linear-gradient(160deg,rgba(255,255,255,.85),rgba(232,241,255,.72));box-shadow:var(--shadow-2),var(--hl)}
+.k-label{font-size:12.5px;font-weight:600;color:var(--ink-3)}.k-value{font-size:27px;font-weight:600;letter-spacing:-.025em;white-space:nowrap}
+.kpi.primary .k-value{font-size:44px;color:var(--blue)}.unit{font-size:13px;color:var(--ink-3);font-weight:550;margin-left:4px}.k-sub{font-size:12.5px;color:var(--ink-3)}
+.meter{height:8px;border-radius:99px;background:rgba(15,98,254,.16);margin-top:auto;overflow:hidden}.meter i{display:block;height:100%;width:59%;background:linear-gradient(90deg,#4b8dff,var(--blue));border-radius:99px}
+.rings{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0 0 20px}
+.ring{padding:18px 20px;border-radius:22px;background:var(--glass);border:1px solid var(--glass-border);box-shadow:var(--shadow-1),var(--hl);display:flex;flex-direction:column;gap:8px}
+.ring b{font-size:14px}.ring small{color:var(--ink-3);font-size:12.5px}
+.bbar{display:flex;height:10px;border-radius:99px;background:var(--track);overflow:hidden}.bbar i{display:block;height:100%}.s-bill{background:var(--blue)}.s-unb{background:#9cc2ff}.s-over{background:#e09400}
+table{width:100%;border-collapse:collapse}th{color:var(--ink-3);font-size:12px;font-weight:600;text-align:left;padding:8px 8px;border-bottom:1px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid var(--line);font-size:13px}tr:last-child td{border-bottom:0}
+details.fold{margin-top:4px}details.fold summary{cursor:pointer;font-weight:600;font-size:14px;padding:6px 0;color:var(--ink-2)}
+.sect{font-size:13px;font-weight:620;color:var(--ink-2);margin:6px 2px 10px}
+@media (max-width:1100px){.shell{grid-template-columns:84px minmax(0,1fr)}.nav span{font-size:0;height:44px;width:48px}.brand b,.envtag{display:none}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi.primary{grid-column:1/-1;grid-row:auto}.rings{grid-template-columns:1fr}}
+@media (max-width:760px){
+ .shell{grid-template-columns:1fr}.sidebar{position:static;margin:8px 8px 0;padding:10px 12px;border-radius:22px;flex-direction:row;align-items:center;gap:10px;overflow:hidden}
+ .brand b,.envtag{display:inline-block}.nav{flex-direction:row;overflow:hidden;gap:6px}.nav span{font-size:13px;width:auto;height:auto;white-space:nowrap;padding:9px 12px;background:rgba(14,22,33,.04)}
+ .main{padding:14px 12px 40px}.panel{padding:16px;border-radius:20px}
+ .todo li{grid-template-columns:4px minmax(0,1fr);padding-right:12px}.todo li .btn{grid-column:2;justify-self:start;min-height:44px}
+ .kpis{grid-template-columns:1fr 1fr;gap:10px}.kpi{padding:14px}.k-value{font-size:22px}.kpi.primary .k-value{font-size:32px}
+ .hide-m{display:none}
+}
+</style></head>
+<body>
+<div class="mq-banner"><b>MAQUETTE STATIQUE</b> — UX lot 2, proposition n° 1 · données fictives · aucun lien actif · ne fait pas partie de l'application</div>
+<div class="shell">
+<aside class="sidebar"><div class="brand"><span class="logo"></span><div><b>Time Billing V9.2</b><br><span class="envtag">MAQUETTE</span></div></div>
+<nav class="nav"><span class="on">Tableau de bord</span><span>Saisie des heures</span><span>Mandats &amp; prévisionnel</span><span>Édition des factures</span><span>Factures et brouillons</span></nav></aside>
+<main class="main">
+
+<section class="notes" aria-label="Notes de maquette"><h2>Ce qui change (proposition n° 1)</h2><ol>
+<li><span class="ann">1</span>Les bandeaux rouges deviennent une liste « À traiter » : <b>une ligne = une action = un bouton</b> qui ouvre la page où elle se fait (écart → page de décision, brouillon → contrôle avant émission, note de crédit → suivi).</li>
+<li><span class="ann">2</span>Trois niveaux : <b style="color:var(--err)">décision requise</b>, <b style="color:var(--blue)">à faire</b>, conseil (gris). La sauvegarde n'est plus rouge.</li>
+<li><span class="ann">3</span>Option R-4 (à valider) : le nombre de contrôles en échec du brouillon, calculé par les 14 contrôles existants.</li>
+<li><span class="ann">4</span>Les chiffres deviennent des liens (brouillons → archive filtrée, réalisé non facturé → Édition des factures, avoirs → notes de crédit).</li>
+<li><span class="ann">5</span>Proposition n° 11 : 5 dernières saisies, tableau chiffré repliable.</li>
+</ol><p class="hint" style="margin:8px 0 0">Aucun calcul nouveau : tout provient des données déjà passées au gabarit <code>index.html</code> (écarts ouverts, brouillons, notes de crédit, dernière sauvegarde).</p></section>
+
+<h1 class="page">Tableau de bord</h1>
+
+<section class="panel" aria-labelledby="todoTitle">
+<div class="todo-h"><h2 id="todoTitle">À traiter <span class="badge b-blue">5</span><span class="ann">1</span></h2><span class="hint hide-m">du plus urgent au simple conseil</span></div>
+<ul class="todo">
+<li class="lv-err"><span class="bar"></span><div class="t"><div class="row"><span class="badge b-err">Décision requise</span><span class="ann">2</span><b>Écart post-facturation sur la facture 2026-08</b></div><small>Mandat Beta — Étude de faisabilité · 1 saisie facturée corrigée · −5,00 h (−0,63 j) · la facture émise reste inchangée</small></div><a class="btn danger" href="#" aria-disabled="true">Décider</a></li>
+<li class="lv-todo"><span class="bar"></span><div class="t"><div class="row"><span class="badge b-blue">À émettre</span><b>Brouillon Mandat Alpha — Mission AMO</b></div><small>01.09.2026 → 31.10.2026 · 7,00 j · 6 930,30 CHF TTC · <span style="color:var(--err);font-weight:600">2 contrôles en échec (n° 12, 13)</span><span class="ann">3</span></small></div><a class="btn primary" href="#" aria-disabled="true">Contrôler et émettre</a></li>
+<li class="lv-todo"><span class="bar"></span><div class="t"><div class="row"><span class="badge b-blue">À émettre</span><b>Brouillon Mandat Gamma — Assistance ponctuelle</b></div><small>01.08.2026 → 31.08.2026 · 4,50 j · 3 240,00 CHF TTC · contrôles conformes</small></div><a class="btn primary" href="#" aria-disabled="true">Contrôler et émettre</a></li>
+<li class="lv-todo"><span class="bar"></span><div class="t"><div class="row"><span class="badge b-warn">À rembourser</span><b>Note de crédit NC-2026-08</b></div><small>sur 2026-08 · solde 351,33 CHF · échéance 22.11.2026 (dans 30 jours)</small></div><a class="btn" href="#" aria-disabled="true">Suivi</a></li>
+<li class="lv-advice"><span class="bar"></span><div class="t"><div class="row"><span class="badge">Conseil</span><b>Aucune sauvegarde JSON téléchargée</b></div><small>Le fichier contient toutes les données et les PDF figés ; le conserver hors du serveur.</small></div><a class="btn" href="#" aria-disabled="true">Télécharger</a></li>
+</ul>
+</section>
+
+<div class="kpis">
+<div class="kpi primary"><span class="k-label">Facturé 2026</span><span class="k-value">20 350,00<span class="unit">CHF</span></span><span class="k-sub">factures émises et historiques validées, moins notes de crédit, HT</span><span class="meter"><i></i></span><span class="k-sub">Facturé 59 % · prévision restante 41 % · total estimé <b style="color:var(--ink)">34 420,00 CHF</b></span></div>
+<a class="kpi" href="#" aria-disabled="true"><span class="k-label">Prévision restante 2026</span><span class="k-value">14 070,00<span class="unit">CHF</span></span><span class="k-sub">voir le prévisionnel</span></a>
+<a class="kpi" href="#" aria-disabled="true"><span class="k-label">Réalisé non facturé <span class="ann">4</span></span><span class="k-value">26,63<span class="unit">j</span></span><span class="k-sub">préparer une facture</span></a>
+<a class="kpi" href="#" aria-disabled="true"><span class="k-label">Brouillons en attente</span><span class="k-value">2</span><span class="k-sub">ouvrir les brouillons</span></a>
+<a class="kpi" href="#" aria-disabled="true"><span class="k-label">Avoirs à régler</span><span class="k-value">1</span><span class="k-sub">solde 351,33 CHF</span></a>
+</div>
+
+<p class="sect">Avancement des mandats actifs</p>
+<div class="rings">
+<div class="ring"><b>Mandat Alpha — Mission AMO</b><small>Société Fictive SA · PO-FICTIF-A</small><span class="bbar"><i class="s-bill" style="width:39%"></i><i class="s-unb" style="width:18%"></i></span><small>Facturé net <b style="color:var(--ink)">15,75 j</b> · réalisé non facturé <b style="color:var(--ink)">7,00 j</b> · solde <b style="color:var(--ink)">24,25 j</b> / 40 j</small></div>
+<div class="ring"><b>Mandat Beta — Étude de faisabilité</b><small>Commune Imaginaire · PO-FICTIF-B</small><span class="bbar"><i class="s-bill" style="width:67%"></i><i class="s-over" style="width:33%"></i></span><small>Facturé net <b style="color:var(--ink)">9,50 j</b> · réalisé non facturé <b style="color:var(--ink)">4,75 j</b> · solde <b style="color:var(--ink)">2,50 j</b> / 12 j</small><span><span class="badge b-warn">Réalisé &gt; commandé (+2,25 j)</span></span></div>
+<div class="ring"><b>Mandat Gamma — Assistance ponctuelle</b><small>Association Exemple · sans bon de commande</small><span class="bbar"><i class="s-unb" style="width:100%"></i></span><small>Réalisé non facturé <b style="color:var(--ink)">14,88 j</b> · facturé net 0,00 j</small></div>
+</div>
+
+<section class="panel"><h2 style="margin-bottom:10px">Dernières saisies <span class="ann">5</span></h2>
+<table><tr><th>Date</th><th>Mandat</th><th class="hide-m">Début – fin</th><th>Durée</th><th class="hide-m">Description</th></tr>
+<tr><td>28.09.2026</td><td>Gamma</td><td class="hide-m">durée saisie</td><td>6,50 h</td><td class="hide-m">Suivi de projet</td></tr>
+<tr><td>27.09.2026</td><td>Beta</td><td class="hide-m">durée saisie</td><td>5,75 h</td><td class="hide-m">Analyse documentaire</td></tr>
+<tr><td>26.09.2026</td><td>Alpha</td><td class="hide-m">08:30 – 12:15</td><td>3,75 h</td><td class="hide-m">Atelier client</td></tr>
+<tr><td>25.09.2026</td><td>Gamma</td><td class="hide-m">durée saisie</td><td>4,25 h</td><td class="hide-m">Rédaction du rapport</td></tr>
+<tr><td>24.09.2026</td><td>Beta</td><td class="hide-m">durée saisie</td><td>3,50 h</td><td class="hide-m">Visite de chantier</td></tr></table>
+<p class="hint"><a href="#" aria-disabled="true">Toutes les saisies →</a></p>
+<details class="fold"><summary>Situation chiffrée des mandats (9 colonnes)</summary><p class="hint">Contenu identique au tableau actuel « Situation synthétique des mandats », replié par défaut sur mobile.</p></details>
+</section>
+</main></div>
+</body></html>

@@ -1,0 +1,103 @@
+{
+ "original / mapping historique": {
+  "sha": "c93c610c",
+  "statuts": {
+   "error": 2295,
+   "excluded_project": 1,
+   "needs_decision": 1
+  },
+  "importables_sans_decision": 0,
+  "importables_si_tout_importer": 1,
+  "already_imported": 2245,
+  "source_row_changed": 33,
+  "previously_excluded": 0,
+  "exemples_importables": [
+   "JAN 26!90 2026-10-23 1 h ['date_outside_sheet_month', 'date_suspect', 'source_row_changed']"
+  ]
+ },
+ "original / tout vers un mandat actif": {
+  "sha": "c93c610c",
+  "statuts": {
+   "error": 2265,
+   "needs_decision": 32
+  },
+  "importables_sans_decision": 0,
+  "importables_si_tout_importer": 32,
+  "already_imported": 2245,
+  "source_row_changed": 33,
+  "previously_excluded": 0,
+  "exemples_importables": [
+   "JAN!9 2015-01-07 1 h ['year_differs_from_sheet', 'source_row_changed']",
+   "JAN!10 2015-01-07 0.75 h ['year_differs_from_sheet', 'source_row_changed']",
+   "JAN!11 2015-01-09 0.5 h ['year_differs_from_sheet', 'source_row_changed']",
+   "JAN!12 2015-01-09 0.5 h ['year_differs_from_sheet', 'source_row_changed']",
+   "JAN!13 2015-01-09 0.5 h ['year_differs_from_sheet', 'source_row_changed']",
+   "FEV!62 2025-06-26 0.75 h ['date_outside_sheet_month', 'time_overlap', 'source_row_changed']",
+   "FEV!63 2025-03-26 1.5 h ['date_outside_sheet_month', 'source_row_changed']",
+   "AVR!15 2025-01-01 1.25 h ['date_outside_sheet_month', 'source_row_changed']"
+  ]
+ },
+ "R1 / mapping historique": {
+  "sha": "a6f6b7ef",
+  "statuts": {
+   "error": 2296,
+   "excluded_project": 1
+  },
+  "importables_sans_decision": 0,
+  "importables_si_tout_importer": 0,
+  "already_imported": 2278,
+  "source_row_changed": 0,
+  "previously_excluded": 0,
+  "exemples_importables": []
+ },
+ "R1 / tout vers un mandat actif": {
+  "sha": "a6f6b7ef",
+  "statuts": {
+   "error": 2297
+  },
+  "importables_sans_decision": 0,
+  "importables_si_tout_importer": 0,
+  "already_imported": 2278,
+  "source_row_changed": 0,
+  "previously_excluded": 0,
+  "exemples_importables": []
+ },
+ "original réenregistré / mapping historique": {
+  "sha": "0262b3a8",
+  "statuts": {
+   "error": 2295,
+   "excluded_project": 1,
+   "needs_decision": 1
+  },
+  "importables_sans_decision": 0,
+  "importables_si_tout_importer": 1,
+  "already_imported": 2245,
+  "source_row_changed": 33,
+  "previously_excluded": 0,
+  "exemples_importables": [
+   "JAN 26!90 2026-10-23 1 h ['date_outside_sheet_month', 'date_suspect', 'source_row_changed']"
+  ]
+ },
+ "original réenregistré / tout vers un mandat actif": {
+  "sha": "0262b3a8",
+  "statuts": {
+   "error": 2265,
+   "needs_decision": 32
+  },
+  "importables_sans_decision": 0,
+  "importables_si_tout_importer": 32,
+  "already_imported": 2245,
+  "source_row_changed": 33,
+  "previously_excluded": 0,
+  "exemples_importables": [
+   "JAN!9 2015-01-07 1 h ['year_differs_from_sheet', 'source_row_changed']",
+   "JAN!10 2015-01-07 0.75 h ['year_differs_from_sheet', 'source_row_changed']",
+   "JAN!11 2015-01-09 0.5 h ['year_differs_from_sheet', 'source_row_changed']",
+   "JAN!12 2015-01-09 0.5 h ['year_differs_from_sheet', 'source_row_changed']",
+   "JAN!13 2015-01-09 0.5 h ['year_differs_from_sheet', 'source_row_changed']",
+   "FEV!62 2025-06-26 0.75 h ['date_outside_sheet_month', 'time_overlap', 'source_row_changed']",
+   "FEV!63 2025-03-26 1.5 h ['date_outside_sheet_month', 'source_row_changed']",
+   "AVR!15 2025-01-01 1.25 h ['date_outside_sheet_month', 'source_row_changed']"
+  ]
+ }
+}

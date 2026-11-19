@@ -1,0 +1,30 @@
+# Time Billing V9 — RC11. Aucun secret ici : valeurs lues dans .env (mode 600, généré par rotate-secrets.sh).
+# Écoute locale uniquement : l'accès externe passe par le reverse proxy HTTPS (Caddy).
+services:
+  time-billing-v9:
+    build: .
+    container_name: ${TB_CONTAINER:-time-billing-v9}
+    restart: unless-stopped
+    stop_grace_period: 30s   # 2026-10-07 : > --graceful-timeout 20 du Dockerfile : les requêtes en cours finissent avant la sauvegarde (pas de SIGKILL en pleine écriture)
+    # RC11 : service non privilégié, système de fichiers en lecture seule (seul /data et /tmp sont inscriptibles), aucune capacité
+    user: "10001:10001"
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    ports:
+      - "127.0.0.1:${TB_PORT:-8091}:8000"
+    environment:
+      DB_PATH: /data/timebilling.db
+      APP_USER: ${APP_USER:-admin}
+      APP_PASSWORD_HASH: ${APP_PASSWORD_HASH:?APP_PASSWORD_HASH manquant dans .env}
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY manquant dans .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-1}
+      TRUST_PROXY: ${TRUST_PROXY:-1}
+      SESSION_HOURS: ${SESSION_HOURS:-8}
+      EXTERNAL_INVOICE_NUMBERS: ${EXTERNAL_INVOICE_NUMBERS:-2026-09}   # G4 (N1) : n° de factures réelles émises hors application, jamais réattribués
+    volumes:
+      - ./data:/data

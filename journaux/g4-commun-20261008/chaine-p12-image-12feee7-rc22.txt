@@ -1,0 +1,51 @@
+== 2026-10-07T22:22:07Z départ ; HEAD c57ea53 + arbre de travail ; source 958c76ed0fc6ec0426e530c068c7fcf960fc73dc6b79626057121df7166703b4 (copie du staging, aucune lecture sous /opt) ; image sha256:ffaa37ae8618535b147da989f009d1815f0485d49146bc32e8aec43e559913ae
+== 2026-10-07T22:22:08Z lot R (copie fraîche de la source)
+lot R rc=0 RÉSULTAT R : 49/49 OK, 0 KO
+== 2026-10-07T22:22:34Z lots A–K + prévision + Q (journaux : journaux/fonc/reprise-2025-p12/)
+A–K/Q rc=0
+ab rc=0 RÉSULTAT A+B : 57/57 OK, 0 KO
+cg rc=0 RÉSULTAT C-G : 96/96 OK, 0 KO
+dg rc=0 RÉSULTAT D-E-G : 53/53 OK, 0 KO
+extra rc=0 RÉSULTAT extra : 23/23 OK, 0 KO
+hij rc=0 RÉSULTAT H-I-J : 37/37 OK, 0 KO
+forecast rc=0 RÉSULTAT K : 21/21 OK, 0 KO
+entites_vides rc=0 RÉSULTAT Q : 18/18 OK, 0 KO
+version testée: {"status":"ok","version":"9.2-rc22"}
+base staging réelle inchangée
+rc=0
+== 2026-10-07T22:23:35Z lots M, N, L (mandats préparés, première facture)
+M/N/L rc=0
+RÉSULTAT M : 10/10 OK, 0 KO
+RÉSULTAT N : 3/3 OK, 0 KO
+RÉSULTAT L : 19/19 OK, 0 KO
+base staging réelle inchangée
+== 2026-10-07T22:23:45Z navigateur complet + e2e 2 phases + concurrence + rc13 + lot rc19 navigateur (sorties : recette/fonc/reprise-2025-p12-nav/)
+navigateur rc=1
+base staging inchangée
+recette-metier-phase1.log: RESULT phase1: 107/107 — erreurs console : 0  FAIL=0
+recette-metier-phase2.log: RESULT phase2: 15/15 — erreurs console : 0  FAIL=0
+recette-saisies-phase1.log: RESULT phase1: 36/36 — erreurs console : 0  FAIL=0
+recette-saisies-phase2.log: RESULT phase2: 8/8 — erreurs console : 0  FAIL=0
+recette-responsive.log: RESULT: 33/33 pages sans défaut — erreurs console : 0  FAIL=0
+recette-rc12.log: RC12 navigateur : 22/22 réussis, 0 échec(s)  FAIL=0
+recette-rc14.log: RC14 navigateur : 56/56 réussis, 0 échec(s)  FAIL=0
+recette-nuit.log: NUIT navigateur : 34/34 réussis, 0 échec(s)  FAIL=0
+recette-minuit.log: RÉSULTAT minuit : 15/15 OK, 0 KO  FAIL=0
+recette-rc19.log: RÉSULTAT rc19 navigateur : 37/37 OK, 0 KO  FAIL=0
+e2e_rc13.log: RESULT rc13: 5/5 passed  FAIL=0
+e2e_phase1.log: RESULT phase1: 28/30 passed  FAIL=2
+ÉCHEC : e2e_phase1.log vide ou en échec
+e2e_phase2.log: RESULT phase2: 16/18 passed  FAIL=2
+ÉCHEC : e2e_phase2.log vide ou en échec
+concurrence.log: RESULT: 11/11  FAIL=0
+rc=1
+FIN : copie source inchangée (958c76ed0fc6ec0426e530c068c7fcf960fc73dc6b79626057121df7166703b4)
+conteneurs de recette restants : 
+== 2026-10-07T22:31:58Z FIN
+== NOTE (Claude2, 2026-10-07T22:35Z) : les 4 échecs e2e (remboursement partiel / opérations de crédit) sont un défaut du TEST, pas de rc22 :
+   tests/e2e_http.py envoyait la date UTC du conteneur (datetime.now()) comme date d'exécution du remboursement ; la chaîne a tourné à
+   00:2x heure de Zurich, la date UTC était la veille du jour (Zurich) d'émission de la note → refus légitime de l'application
+   (credit_service.record_refund, inchangé depuis rc11). Test corrigé (jour de Zurich) ; phases e2e rejouées sur tb-g4-cand:2282419 (même
+   code rc22) à 22:32 UTC = 00:32 Zurich : phase1 30/30, phase2 18/18 (journaux/g4-commun-20261008/e2e-fenetre-minuit/).
+   Image 12feee7 = code app identique à 2282419 (git diff vide sur app/, requirements, Dockerfile). Chaîne précédente p11 (17:48Z) : interrompue
+   par la fin de session (navigateur fermé) ; son unique KO R0b attendait « rc21 » (test déjà corrigé avant p12).

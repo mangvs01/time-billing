@@ -1,0 +1,97 @@
+{
+ "ECIO 2025": {
+  "lignes": 1,
+  "heures": 0.25,
+  "refs": [
+   "FEV!28"
+  ]
+ },
+ "NC STC June": {
+  "lignes": 1,
+  "heures": 0.75,
+  "refs": [
+   "MAR!49"
+  ]
+ },
+ "(nom source sans mandat) Help Sabrina EAU reconciliatn": {
+  "lignes": 1,
+  "heures": 0.0,
+  "refs": [
+   "AVR!90"
+  ]
+ },
+ "NC STC Sept": {
+  "lignes": 10,
+  "heures": 9.75,
+  "refs": [
+   "AUG!175",
+   "AUG!178",
+   "AUG!180",
+   "AUG!185",
+   "AUG!188",
+   "AUG!192",
+   "AUG!195",
+   "AUG!196",
+   "AUG!198",
+   "AUG!200"
+  ]
+ },
+ "ASN 2025": {
+  "lignes": 4,
+  "heures": 4.25,
+  "refs": [
+   "AUG!176",
+   "AUG!184",
+   "AUG!189",
+   "OCT!94"
+  ]
+ },
+ "SMM 2026": {
+  "lignes": 4,
+  "heures": 2.25,
+  "refs": [
+   "AUG!177",
+   "AUG!179",
+   "AUG!181",
+   "AUG!193"
+  ]
+ },
+ "SMART Y90": {
+  "lignes": 3,
+  "heures": 1.25,
+  "refs": [
+   "AUG!182",
+   "AUG!202",
+   "OCT!93"
+  ]
+ },
+ "Rising stars Q3": {
+  "lignes": 6,
+  "heures": 3.75,
+  "refs": [
+   "AUG!183",
+   "AUG!186",
+   "AUG!191",
+   "AUG!194",
+   "AUG!197",
+   "AUG!199"
+  ]
+ },
+ "CIRSE 2025": {
+  "lignes": 4,
+  "heures": 1.75,
+  "refs": [
+   "AUG!187",
+   "AUG!190",
+   "AUG!201",
+   "AUG!203"
+  ]
+ },
+ "NHAF 2026": {
+  "lignes": 1,
+  "heures": -0.05,
+  "refs": [
+   "JUL 26!39"
+  ]
+ }
+}

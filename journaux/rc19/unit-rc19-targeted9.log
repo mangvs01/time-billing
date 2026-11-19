@@ -1,0 +1,14 @@
+..........F....................................................
+======================================================================
+FAIL: test_R6_R7_R8_R9_R10_the_users_example (tests.test_rc19.PostInvoicing.test_R6_R7_R8_R9_R10_the_users_example)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_rc19.py", line 194, in test_R6_R7_R8_R9_R10_the_users_example
+    self.assertIn(f'invoices={num}:billed', a); self.assertIn('reason=durée réelle 4,5 h', a)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'invoices=2026-09:billed' not found in '{"id": 1, "before": "2026-09-10/5.0h/Mandat RC19", "after": "2026-09-10/4.5h/Mandat RC19", "invoices": ["2026-09:billed"], "by": "admin", "reason": "durée réelle 4,5 h"}'
+
+----------------------------------------------------------------------
+Ran 63 tests in 29.206s
+
+FAILED (failures=1)

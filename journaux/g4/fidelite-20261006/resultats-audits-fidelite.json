@@ -1,0 +1,1207 @@
+{
+ "source": "workflow tb-g4-fidelite wf_8494c934-f2e (session 215222, 2026-10-06 08:47-09:20 UTC), copie brute des résultats",
+ "agents": [
+  {
+   "label": "audit:import-donnees",
+   "state": "done",
+   "agentId": "a7293bba0d9e043d3"
+  },
+  {
+   "label": "audit:import-code",
+   "state": "done",
+   "agentId": "a0d2dd5c57f466a53"
+  },
+  {
+   "label": "audit:corrections",
+   "state": "done",
+   "agentId": "a1116baf8d244bd3c"
+  },
+  {
+   "label": "audit:registre-d1",
+   "state": "done",
+   "agentId": "a30cfea2315cc02f4"
+  },
+  {
+   "label": "audit:decisions-code",
+   "state": "done",
+   "agentId": "aad8066db5dad89fb"
+  },
+  {
+   "label": "verif:import-donnees",
+   "state": "done",
+   "agentId": "a62c8f9e2c797be32"
+  },
+  {
+   "label": "verif:import-code",
+   "state": "done",
+   "agentId": "a51f8c13fae40aba1"
+  },
+  {
+   "label": "verif:registre-d1",
+   "state": "done",
+   "agentId": "a3c6c591993472085"
+  },
+  {
+   "label": "verif:corrections",
+   "state": "done",
+   "agentId": "aa800af6b3c3245c6"
+  },
+  {
+   "label": "verif:decisions-code",
+   "state": "error",
+   "agentId": "a9e6f68db1884d254"
+  }
+ ],
+ "logs": [
+  "[verif:decisions-code] failed: You've hit your session limit · resets 1:40pm (UTC)"
+ ],
+ "result": [
+  {
+   "axis": "import-donnees",
+   "audit": {
+    "axis": "A — Fidélité des données Excel importées (copie du staging comparée au classeur)",
+    "resume": "J'ai écrit mon propre analyseur, lancé dans des conteneurs jetables `--rm --network none` de l'image rc19, sur des copies placées dans /tmp/tb-g4-0842/A. Il lit toutes les cellules, valeurs et formules, de l'original et de la copie corrigée. Je l'ai rapproché, saisie par saisie, de la copie du staging et de la sauvegarde pre-mandats. Résultats : 2 282 lignes source pour 1 958,4487 h, plus 15 SUBTOTAL. La copie corrigée ne diffère de l'original que par 33 cellules B, au niveau XML. Les 32 corrections R1 et l'exception AUG 26!67 sont vérifiées une à une. Les 2 247 saisies concordent toutes avec leur ligne source (date corrigée, début, fin, heures déclarées exactes, motif, mandat selon les plans F1-F5/G1-G5, découpages cohérents) : 0 écart. Le compte tombe juste : 2 247 + 31 doublons A1, chacun avec un jumeau importé identique, + 4 exceptions = 2 282 ; en heures, 1 934,4987 + 21,75 + 2,20 = 1 958,4487. La table entries est identique, colonne par colonne, à pre-mandats, et l'empreinte vaut 93a442b1…. Restent trois points non documentés, qui reproduisent fidèlement la source mais peuvent tromper l'utilisateur : 15 notes de la colonne I « Colonne1 » non importées, 11 dates hors séquence dans leur propre mois, et une notation h.mm mêlée au décimal sur 42 saisies. Production et staging inchangés, aucun conteneur restant, dépôt non modifié.",
+    "checks": [
+     {
+      "name": "Intégrité des entrées (sha256)",
+      "result": "OK",
+      "detail": "Classeur /root/Time sheet CP.xlsx = c93c610c…eac438 (copié en orig.xlsx). /tmp/tb-g4-0842/staging-now.db = 958c76ed…03b4, copié par sqlite3 backup Python en mode ro vers A/snap.db. pre-mandats copié en A/premandats.db (intégrité ok). classeur-corrige-R1.xlsx = a6f6b7ef…, identique au file_sha256 des lots G1 et G2."
+     },
+     {
+      "name": "1. Lignes source du classeur",
+      "result": "OK",
+      "detail": "s/src.py + s/step1.py : 21 onglets mensuels (en-tête ligne 5, colonnes trouvées par leur titre ; FEV n'a pas de colonne « Numéro de projet »). On obtient 2 282 lignes SRC pour 1 958,4487 h, 15 SUBTOTAL (AUG, SEPT, OCT, NOV, DEC, JAN 26, FEB 26, MAR 26, APR 26, MAY 26, JUN 26 ×2 (97, 98), JUL 26, AUG 26, SEPT 26!283 avec « 22/09/2026 » en B) et 234 lignes modèles vides. Chaque SUBTOTAL égale la somme de son onglet ; leur total vaut 1 415,0987 h. Aucune ligne n'a de « Numéro de projet » renseigné."
+     },
+     {
+      "name": "2. Copie corrigée : seules 33 cellules diffèrent",
+      "result": "OK",
+      "detail": "s/diff.py compare toutes les cellules des 23 feuilles, valeurs data_only et formules : 33 cellules B diffèrent (66 lignes de diff), rien d'autre. Au niveau ZIP, 8 sheet*.xml changent ; hors balises <c>, le XML est identique, et seules ces 33 balises <c> changent (édition XML, valeurs en cache conservées)."
+     },
+     {
+      "name": "2. Règle R1 et exception AUG 26!67, cellule par cellule",
+      "result": "OK",
+      "detail": "s/step2.py : pour les 32 corrections, l'année et le mois sont ceux de l'onglet, le jour est conservé, et la date corrigée est comprise entre les voisines non corrigées ; les bornes égalent la colonne voisines_non_corrigees du journal (33/33). AUG 26!67 (vide → 2026-08-31) : la ligne précédente (66) est au 31.08.2026 et c'est la dernière ligne source avant le total → un seul jour possible."
+     },
+     {
+      "name": "3. Chaque saisie comparée à sa ligne source (date, début, fin, heures, motif, mandat)",
+      "result": "OK",
+      "detail": "s/step3.py : 2 247 saisies, 1 934,4987 h ; 2 247 source_ref distincts ; toutes en source=historical_excel avec un lot. La conversion des horaires est la mienne (décimal, time, série 1900 pour AVR!32 et JUN!31). Résultat : 0 écart sur la date (corrigée), le début, la fin, les heures (égalité float exacte avec la valeur déclarée), le motif et le mandat. Planifié par lot : LOT1 1 371, F1-F5 784, G1-G5 92 ; rien de planifié n'est absent. Détail : A/rapprochement-saisies.csv."
+     },
+     {
+      "name": "3. Cohérence des règles de rattachement aux mandats",
+      "result": "OK",
+      "detail": "Pour chaque libellé, mandat et plage de dates, les découpages sont étanches. NC STC : June jusqu'au 2025-06-04, Sept à partir du 2025-06-10 (G2 : JUN!13/15/28/32/56/57/62 et AUG!107/108). GEM STC : Avril jusqu'au 2026-04-23, Oct à partir du 2026-04-28 (G2 : APR 26!125/129). PCR LV : 2025 en 2025, 2026 en 2026. GEM STC 2026 → STC GEM Oct (G3, 40 l., 33,00 h). EAHAD 2026 + EHEAD → EAHAD (G4, 8 l., 8,50 h). PI SMM → SMM 2026 et SMARTT Y90 → SMART Y90 (G5, 1,25 h). Tout est conforme à RAPPORT-DERNIERE-PASSE-G1-G5."
+     },
+     {
+      "name": "3. import_batch_rows cohérentes avec entries",
+      "result": "OK",
+      "detail": "11 lots COMMITTED, chacun avec 2 297 lignes au registre et autant d'entry_id liés que d'inserted_rows et de saisies du lot. Chaque saisie est liée exactement une fois, avec la même feuille, ligne et lot ; aucune référence n'est importée dans deux lots. s/step3b.py : raw_json = cellules source (copie corrigée pour G1 et G2) sur les 2 247 lignes, 0 écart."
+     },
+     {
+      "name": "4. Doublons A1 (31 lignes, 21,75 h)",
+      "result": "OK",
+      "detail": "s/step4.py : FEV!28↔FEV!25, MAR!49↔MAR!47, AUG!175-203↔SEPT!6-34. Chaque doublon a un jumeau importé : même date, même libellé exact, même début, même fin, mêmes heures et même motif. Total 21,75 h."
+     },
+     {
+      "name": "4. Exceptions OCT!93, OCT!94, JUL 26!39 et AVR!90",
+      "result": "OK",
+      "detail": "OCT!93/94 : date vide, entre OCT!92 (17.10) et OCT!95 (20.10), 0,75 h + 1,50 h. JUL 26!39 : 8,5 → 8,45, soit −0,05 h. AVR!90 : 0 écrit à la main (pas une formule), motif « DM ». Total 2,20 h. Aucune n'est en base."
+     },
+     {
+      "name": "4. Bilan des lignes et des heures",
+      "result": "OK",
+      "detail": "2 247 + 31 + 4 = 2 282, 0 ligne non classée, aucun recouvrement entre catégories. 1 934,4987 + 21,75 + 2,2000 = 1 958,4487, égal à la source. Les 0,0013 h d'arrondi viennent de SEPT 26!82 (0,7487 h, début 12,2513)."
+     },
+     {
+      "name": "4. Totaux par mois et par mandat",
+      "result": "OK",
+      "detail": "21 mois (2025-01 → 2026-09) et 24 mandats, identiques à REEL2-etat-annee-mois.csv et REEL2-etat-par-mandat.csv. 2025 : 1 291 saisies / 1 132,80 h ; 2026 : 956 / 801,70 h. Dates du 2025-01-06 au 2026-09-30."
+     },
+     {
+      "name": "5. Comparaison avec pre-mandats-20261005T090824Z et empreinte",
+      "result": "OK",
+      "detail": "entries : mêmes colonnes, 2 247 lignes identiques à pre-mandats, 0 différence. import_batches et import_batch_rows identiques, noms des mandats utilisés identiques. lib.entries_digest = 93a442b133281a06f6a76747e1ebcd7ac12ee92a904e7814e843c6b4484231dc (2 247, 1 934,4987) pour snap.db, premandats.db et staging-now.db."
+     },
+     {
+      "name": "Notes de la colonne I « Colonne1 »",
+      "result": "ECART",
+      "detail": "15 cellules texte non importées, voir finding A-01."
+     },
+     {
+      "name": "Dates hors séquence dans leur propre mois",
+      "result": "ECART",
+      "detail": "11 lignes importées telles quelles et non signalées, voir finding A-02."
+     },
+     {
+      "name": "Bases production et staging inchangées en fin de travail",
+      "result": "OK",
+      "detail": "Production /opt/time-billing-v9/data/timebilling.db = bd31f410…f6d6 (attendu). Staging = 958c76ed…03b4 (inchangé). Aucun conteneur tb-g4v-a ; git status du dépôt inchangé."
+     }
+    ],
+    "findings": [
+     {
+      "id": "A-01",
+      "severity": "majeur",
+      "kind": "donnees",
+      "title": "Notes de la colonne I « Colonne1 » perdues à l'import (15 saisies)",
+      "evidence": "Les tableaux de MAR 26, APR 26, MAY 26, JUL 26, AUG 26 et SEPT 26 vont jusqu'à la colonne I, intitulée « Colonne1 ». 15 lignes y portent un texte alors que leur Motif (colonne C) est vide : MAR 26!I148 « debrief » (saisie 1069, EAU 2026), APR 26!I57 « cloture » (1537, EAU 2026), APR 26!I64 « Debrief Anna » (2146, EHRA 2026), MAY 26!I56 « TL brief » (1214, EUROPCR 2026), JUL 26!I51 « DM » (1599, NHAF 2026, actif), SEPT 26!I88/90/96/99/100/101/122/125/126/127 « session management » (2056, 2057, 2060-2063, 2076, 2078-2080, STC GEM Oct - DM job, actif). En base, ces 15 saisies ont une description vide. historical_import.parse_workbook ne lit que motif/description. Aucun document d'import ne mentionne cette colonne (grep « Colonne1 », « session management » : rien), et les rapports annoncent « 0 écart description ». 11 de ces saisies sont sur des mandats actifs et facturables : leur annexe sortira sans motif.",
+      "proposed_fix": "Soumettre à l'utilisateur : (a) reporter ces 15 notes dans la description via la correction de saisie rc19, motif « note colonne I du classeur », ou (b) acter qu'elles sont ignorées. Dans les deux cas, mentionner la colonne I dans RAPPORT-FINAL-IMPORT-HISTORIQUE-STAGING.md."
+     },
+     {
+      "id": "A-02",
+      "severity": "mineur",
+      "kind": "donnees",
+      "title": "11 dates hors séquence dans leur propre mois importées sans signalement",
+      "evidence": "La règle R1 ne traite que les dates hors du mois de l'onglet. Ces lignes ont une date dans le bon mois mais incohérente avec leurs voisines, alors que les horaires s'enchaînent : AUG!40 au 06.08.2025, 11:30-11:45, entre deux lignes du 08.08 (11:00-11:30 et 11:45-13:00) → saisie 505 ; OCT!163/164 au 02.10.2025, 21:30-22:00, juste après OCT!162 (28.10, 21:00-21:30) → saisies 771, 772 ; APR 26!64-67 aux 16, 17, 18 (samedi) et 19.04.2026 (dimanche), horaires continus de 15:45 à 19:30, probable recopie incrémentée → saisies 2146, 2147, 2148 (NHAF 2026, actif), 1123 ; APR 26!74 au 18.04.2026 (samedi), 18:15-19:15, entre deux lignes du 17.04 → saisie 2152 ; SEPT 26!67 au 19.09.2026 (samedi), 16:45-17:30, juste après SEPT 26!66 (16.09, se termine à 16:45) → saisie 1351 ; SEPT 26!68 (16.09) apparaît comme conséquence. L'import reproduit fidèlement la source et les totaux mensuels ne changent pas, mais le jour affiché dans les listes et les annexes est probablement faux. Aucun de ces numéros de ligne ne figure dans les registres ni dans les rapports.",
+      "proposed_fix": "Ajouter ces lignes au registre des points à confirmer (signalement seulement, ne rien corriger sans réponse). Si l'utilisateur confirme un autre jour, passer par la correction de saisie rc19 avec motif."
+     },
+     {
+      "id": "A-03",
+      "severity": "info",
+      "kind": "donnees",
+      "title": "Notation h.mm mêlée au décimal : horaires artificiels sur 42 saisies",
+      "evidence": "49 cellules d'horaire ne tombent pas sur un quart d'heure décimal (ex. MAY!44 11,45→12,45, importé 11:27-12:27 ; AUG 26!61 17,25→17,3 = 0,05 h, saisie 1610, NHAF 2026 ; SEPT 26!127 14,15, importé 14:09). L'import garde, conformément à la règle, la durée déclarée calculée par Excel. Les horaires affichés (11:27, 14:09…) ne sont pourtant pas ceux tapés par l'utilisateur. Si ces valeurs étaient en h.mm, le total varierait de −1,67 h net (STC GEM Oct −1,30 h ; EULAR 2026 +1,00 h ; EHRA 2026 −0,67 h). Seul JUL 26!39 est documenté.",
+      "proposed_fix": "Aucune modification. Ajouter au rapport d'import une phrase signalant cette ambiguïté de notation et la liste des 42 saisies (disponible dans le script s/ de ma vérification)."
+     },
+     {
+      "id": "A-04",
+      "severity": "info",
+      "kind": "doc",
+      "title": "Heures en base avec le bruit flottant d'Excel (39 saisies)",
+      "evidence": "39 saisies ont une valeur du type 1.8000000000000007, et SEPT 26!82 vaut 0,7486999999999995 h (saisie 1358, début 12,2513). Ce sont exactement les valeurs en cache du classeur (égalité float vérifiée). Elles expliquent l'écart d'arrondi 1 958,4487 / 1 958,45 décrit dans le rapport.",
+      "proposed_fix": "Aucune ; c'est conforme à la règle « durée déclarée conservée »."
+     },
+     {
+      "id": "A-05",
+      "severity": "info",
+      "kind": "donnees",
+      "title": "La copie du staging contient un brouillon de facture",
+      "evidence": "invoices : id 1, statut draft, project_id 22 (EUROPCR 2027), description « test », créé le 2026-10-05 22:42:39. Les rapports d'import indiquent 0 facture ; il s'agit du brouillon n° 1 de l'utilisateur, postérieur à l'import. entries et entry_changes ne sont pas touchées (0 ligne dans entry_changes).",
+      "proposed_fix": "Aucune pour l'axe A ; à garder en tête dans les contrôles qui supposent 0 facture."
+     }
+    ],
+    "artefacts": [
+     "/tmp/tb-g4-0842/A/rapprochement-saisies.csv",
+     "/tmp/tb-g4-0842/A/cells.json",
+     "/tmp/tb-g4-0842/A/s/src.py",
+     "/tmp/tb-g4-0842/A/s/parse.py",
+     "/tmp/tb-g4-0842/A/s/diff.py",
+     "/tmp/tb-g4-0842/A/s/step1.py",
+     "/tmp/tb-g4-0842/A/s/step2.py",
+     "/tmp/tb-g4-0842/A/s/step2b.py",
+     "/tmp/tb-g4-0842/A/s/step3.py",
+     "/tmp/tb-g4-0842/A/s/step3b.py",
+     "/tmp/tb-g4-0842/A/s/step4.py",
+     "/tmp/tb-g4-0842/A/run.sh"
+    ],
+    "prod_sha_after": "bd31f410305d6623dbf2237158ad8820cd3cbbfba20a37df0f17c54af7b0f6d6",
+    "staging_sha_after": "958c76ed0fc6ec0426e530c068c7fcf960fc73dc6b79626057121df7166703b4",
+    "containers_left": []
+   },
+   "verdicts": {
+    "verdicts": [
+     {
+      "id": "A-01",
+      "real": true,
+      "severity_corrected": "majeur",
+      "reasoning": "Constat confirmé. Seuls MAR 26, APR 26, MAY 26, JUL 26, AUG 26 et SEPT 26 ont l'en-tête I5 « Colonne1 ». Sur toutes les lignes de ces onglets, exactement 15 cellules I sont remplies, chacune avec le Motif (C) vide. Les 15 saisies liées ont une description vide en base : 1069, 1537, 2146, 1214, 1599, 2056, 2057, 2060, 2061, 2062, 2063, 2076, 2078, 2079 et 2080. Onze sont sur des mandats actifs : NHAF 2026 (1599) et « STC GEM Oct - DM job » (10). Dans les autres onglets, les colonnes J/K portent des tableaux récapitulatifs (PROJET/TOTAL H), pas des notes. historical_import.parse_workbook (l. 228) ne mappe que « motif »/« description ». Le PDF de l'annexe imprime bien une colonne « Motif » (pdf_layout.motif_lines). Un grep sur « Colonne1 », « session management » et « Debrief Anna » dans tout le dépôt ne trouve rien. Nuance qui relativise l'impact : les 134 saisies de STC GEM Oct et les 99 de NHAF 2026 ont toutes une description vide. Ces notes seraient donc les seuls motifs de ces annexes, et aucun montant n'est touché. Je garde « majeur » : l'information est perdue sans être documentée, alors que les rapports affirment « 0 écart description ».",
+      "reproduction": "/tmp/tb-g4-0842/A-verif/dump.py (image rc19, --network none, --user 0) produit dump.json. Script python3 hôte sur snap.db (copie par sqlite3 backup de staging-now.db, sha 958c76ed… vérifié) : pour chaque cellule I non vide de ces onglets, jointure entries.source_ref → 15 lignes, toutes avec description=''. Exemple : SEPT 26!127 I=« session management » → saisie 2080, 14:09-15:15, 1,1 h, STC GEM Oct - DM job, active=1. Puis grep -rIl -i 'colonne1|session management|Debrief Anna' dans le dépôt : aucun résultat."
+     },
+     {
+      "id": "A-02",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Les dates hors séquence sont confirmées dans le classeur et en base. AUG!40 est au 06.08, entre deux lignes du 08.08 dont les horaires s'enchaînent ; saisie 505. OCT!163/164 sont au 02.10 et suivent OCT!162 (28.10, fin 21:30) ; saisies 771 et 772. APR 26!64-67 sont aux 16, 17, 18 (samedi) et 19.04 (dimanche), avec des horaires continus de 15:45 à 19:30. APR 26!74 est au 18.04 (samedi) ; saisie 2152. SEPT 26!67 est au 19.09 (samedi) ; saisie 1351. En revanche, l'affirmation « aucun de ces numéros ne figure dans les registres » est FAUSSE pour APR 26!64, 65, 66 et 74. Ces lignes sont dans import/arbitrage-final/chevauchements/chevauchements-A7-*.csv et ARBITRAGE-FINAL-RC9.md, aux grappes C14, C15 et C16. Elles figurent aussi dans import/registre-final/decisions-finales.csv (M5.C14 à M5.C16, décision OBLIGATOIRE) : l'utilisateur les a vues et a choisi « conserver » (lot F5). L'hypothèse d'un jour erroné ne lui a toutefois jamais été proposée. AUG!40, OCT!163, OCT!164, APR 26!67, SEPT 26!67 et SEPT 26!68 sont classées « ligne valide sans anomalie » dans traitement-autonome/ledger-lignes.csv. Le décompte annoncé est aussi incohérent : 11 lignes annoncées, 10 références citées. Il s'agit d'une hypothèse, sans effet sur les montants : « mineur » est correct.",
+      "reproduction": "Script python3 sur dump.json + snap.db : voisins des lignes AUG 38-42, OCT 160-166, APR 26 61-76 et SEPT 26 64-70 (dates, F/G, saisies), à lire dans la sortie de la commande. APR 26!64 (16.04, 15:45-16:15) chevauche APR 26!71 (16.04, 15:30-16:00). Les jours de la semaine ont été calculés avec datetime. Ensuite, grep -rIF 'APR 26!64;' import trouve arbitrage-final/chevauchements/chevauchements-A7-lignes.csv (C14), et grep C1[4-6] import/registre-final/decisions-finales.csv donne M5.C14 à C16. Pour AUG!40, OCT!163, OCT!164, APR 26!67 et SEPT 26!67, on ne trouve que des lignes « valide sans anomalie »."
+     }
+    ],
+    "missed": "L'auditeur mentionne dans son résumé « une notation h.mm mêlée au décimal sur 42 saisies », mais n'en a fait aucun constat (finding). Je l'ai reproduit : 42 saisies (36,75 h) ont un début ou une fin qui ne tombe pas sur un quart d'heure, avec des valeurs F/G du type 13.45, 14.15 ou 12.3 lues en décimal (14.15 donne 14:09). Dix d'entre elles sont sur des mandats actifs facturables : NHAF 2026 (1577, 1598, 1610, 2155) et STC GEM Oct - DM job (2071, 2080, 2213, 2217, 2220, 2237). Si l'utilisateur voulait écrire des h.mm, les heures déclarées changent : environ −0,87 h au total, dont −0,47 h sur les mandats actifs (exemple : SEPT 26!115, 1,80 h au lieu de 1,67 h). Les registres ne traitent cette ambiguïté que pour JUL 26!39 (B3). Elle mérite un constat soumis à l'utilisateur (au moins « mineur », puisqu'elle touche les montants si l'hypothèse est confirmée). Pour le reste, les points 1 à 5 de l'axe sont couverts avec des preuves ; je ne les ai pas réexécutés intégralement (NON_VERIFIE de ma part pour la conformité R1 cellule par cellule et pour l'empreinte 93a442b1…). Fin de vérification : production bd31f410…f6d6 et staging 958c76ed…03b4, tous deux inchangés ; aucun conteneur tb-g4v-av ; dépôt non modifié. Travail limité à /tmp/tb-g4-0842/A-verif (chmod 700)."
+   }
+  },
+  {
+   "axis": "import-code",
+   "audit": {
+    "axis": "B — Fidélité du chemin d'import Excel (rc19 candidate)",
+    "resume": "Le code d'import de rc19 ne diffère de rc15 que sur deux points : already_imported passe de warning à error (règle rc16) et l'INSERT utilise désormais un id explicite (NEXT_ENTRY_ID). Les routes /import* de app.py sont identiques. Le parse du classeur original et de R1 donne un JSON strictement identique avec l'image rc15, l'image rc19 et le dépôt (sha c8a63884…). Les 2 247 saisies du staging correspondent exactement aux valeurs parsées (0 écart). Sur une copie, réimporter le classeur ORIGINAL bloque bien les 2 205 lignes déjà importées. En revanche, la protection rc16 repose uniquement sur le sha256 du fichier. Il suffit d'une copie dont seuls les octets changent (classeur ré-enregistré, R1, ou même classeur complété de nouveaux mois) pour qu'il n'y ait plus aucune ligne « déjà importée ». J'ai alors créé 151 à 400 doublons, dont 134 à 136 au statut « ok » sans aucune décision ni avertissement, et une saisie corrigée en rc19 a été réimportée silencieusement avec son ancienne valeur : c'est bloquant. Sur base vide, le classeur synthétique (42 cas limites) est stocké exactement comme parsé et les rejets sont clairs, mais plusieurs écarts mineurs existent entre les règles d'import et celles de la saisie manuelle. Ces écarts portent sur minuit, les secondes, les durées inférieures à 0,01 h ou supérieures à 24 h, les descriptions de plus de 1 000 caractères, et les heures arrondies ou abandonnées. Production et staging sont inchangés, et il ne reste aucun conteneur.",
+    "checks": [
+     {
+      "name": "Diff rc15 → dépôt : historical_import.py, import_service.py, routes import de app.py, rollback_service.py, import_review.html",
+      "result": "OK",
+      "detail": "diff (code rc15 extrait par docker run --entrypoint cat) : historical_import.py a 1 seul changement, already_imported 'warning'→'error' (rc16). import_service.py : import post_billing + INSERT avec id=NEXT_ENTRY_ID (MAX des ids entries/entry_changes/annexe/import_batch_rows +1), sans effet sur les valeurs parsées. app.py : section '# --- historical import' jusqu'à la fin, /imports/rollback et migration identiques (diff vide). import_review.html identique. rollback_service.py : refus du rollback si des saisies du lot ont été corrigées (rc19). Aucun changement sur dates, heures, durées, descriptions, mapping, règle de minuit ou arrondi. Les fichiers du dépôt et de l'image rc19 ont le même sha256 (historical_import 17b0ef39…, import_service 739eb2c0…, app.py 4c2aa350…)."
+     },
+     {
+      "name": "Parse comparé rc15 / rc19 / dépôt sur le classeur original et sur R1",
+      "result": "OK",
+      "detail": "Conteneurs --network none (openpyxl 3.1.5, Python 3.12.15 dans les deux images), today figé au 2026-10-06 : 2 297 lignes par fichier. parse-rc15-img.json, parse-rc19-img.json et parse-repo.json ont le même sha256 c8a638844aa67a5435a21b1dc4cc5546ee098d5c42670d69ead0d026f119f10f : sortie identique ligne à ligne."
+     },
+     {
+      "name": "Fidélité des 2 247 saisies du staging par rapport au parse",
+      "result": "OK",
+      "detail": "Pour chaque import_batch_rows avec entry_id (2 205 issues du sha c93c…, 42 du sha R1 a6f6…), work_date, start/end, description, raw_json et source_ref sont égaux au parse, et les heures égales à 1e-12 près : 0 écart, 0 saisie manquante, 0 entry_changes dans le snapshot."
+     },
+     {
+      "name": "Réimport du classeur original par HTTP (copie, port 8482), mapping historique",
+      "result": "OK",
+      "detail": "2 206 occurrences de « déjà importée… aucun doublon possible », 0 ligne décidable, bouton « Valider l'import de 0 ligne(s) » désactivé, commit forcé refusé (« Aucune ligne importable »). Empreinte des entries 93a442b1… identique avant et après (2 247 saisies / 1 934,4987 h). Seul l'audit a reçu +1 ligne (aperçu)."
+     },
+     {
+      "name": "Réimport du classeur original, mapping vers les mandats actifs + « importer » partout",
+      "result": "ECART",
+      "detail": "7 saisies créées (lot b116a9fc…) : 5 lignes exclues explicitement lors de l'arbitrage du 05/10 (NOV!48, NOV!55, NOV!56, DEC!35, JAN 26!90), sans rappel de cette décision, et 2 doublons de lignes importées depuis R1 (APR 26!125 et APR 26!129, simple avertissement possible_existing_entry)."
+     },
+     {
+      "name": "Import de R1 (classeur-corrige-R1.xlsx, sha a6f6…)",
+      "result": "ECART",
+      "detail": "Seules 43 occurrences « déjà importée » (les 42 lignes importées depuis R1). Mapping historique : 151 saisies créées, toutes doublons même projet, même date, mêmes heures et même description, forcées via l'avertissement « Prestation identique ». Mapping actif : 393 saisies créées, toutes doublons d'une saisie existante (252 même projet, 141 autre projet), dont 136 au statut « ok » sans aucun avertissement."
+     },
+     {
+      "name": "Import d'une copie de l'original différant uniquement par docProps/core.xml (ré-enregistrement simulé)",
+      "result": "ECART",
+      "detail": "sha 4d2097d2… : 0 ligne « déjà importée ». Mapping historique : 151 doublons. Mapping actif : 400 saisies créées (empreinte bbd7937d…, 2 647 saisies, 2 266,3974 h), dont 134 « ok » sans décision ni avertissement, doublons sous un autre mandat."
+     },
+     {
+      "name": "Saisie corrigée en rc19 puis réimport d'une copie ré-enregistrée",
+      "result": "ECART",
+      "detail": "Saisie 1876 (MAR 26!40) corrigée par HTTP de 17:00–17:15 à 17:00–17:30. Après réimport de resaved.xlsx, nouvelle saisie 2374 à 17:00–17:15 / 0,25 h avec decision='ok' et issues='' : l'ancienne valeur revient en double, sans alerte. Le chevauchement n'est pas signalé à l'import."
+     },
+     {
+      "name": "Base vide (port 8483) : import du classeur synthétique de 42 cas limites",
+      "result": "OK",
+      "detail": "32 saisies créées, 10 lignes non importées avec un motif clair : date absente, date illisible ×3 (texte en lettres, numéro de série, formule sans format date), durée nulle, durée négative, durée illisible, formule sans valeur, total, sous-total sans libellé. Les 32 saisies sont strictement égales au parse (date, début, fin, description, repr des heures, raw_json) : 0,25 ; 7,3333 ; 7,333333333333333 ; '1,5'→1,5 ; time(1,30)→1,5 ; '2:45'→2,75. Les écarts par rapport à la source sont listés en mineur."
+     },
+     {
+      "name": "Cas limites synthétiques : écarts source → base",
+      "result": "ECART",
+      "detail": "Points relevés : bornes espaces/insécables du motif retirées (strip). Fin 15,33 arrondie à 15:20 en statut ok (info). Fractions 0,5 / 0,625 abandonnées si « importer » (heures vides). Minuit 23:00→03:00 déclaré 3 h sans contrôle d'écart. 15:00→14:00 1 h relu ensuite comme 23 h. 0,001 h, 30 h, 09:00:30 et description de 1 502 caractères importées alors que la saisie les refuse. Voir findings B5 à B8."
+     },
+     {
+      "name": "Correction ultérieure des saisies importées atypiques (formulaire rc19)",
+      "result": "ECART",
+      "detail": "POST /entry/<id>/edit avec les valeurs par défaut de la page. 0,001 h : refus « durée inférieure à 0,01 h ». 30 h : refus « supérieure à 24 h ». 09:00:30 : refus « heure invalide (format HH:MM attendu) ». 11:00 sans fin : début effacé à l'enregistrement (mode durée). 15:00→14:00 : avertissement « soit 23 h » mais heures conservées à 1,0. Description > 1 000 caractères : refus d'après le code (parse_entry_form, MAX_DESC=1000), non rejoué."
+     },
+     {
+      "name": "Saisies importées dont les heures diffèrent des horaires : correction du seul motif",
+      "result": "OK",
+      "detail": "Saisies 2187 (09:00–12:00, 4,0 h) et 1358 (12:15–13:00, 0,7486999999999995 h) : heures conservées après l'édition."
+     },
+     {
+      "name": "Sécurité : sha256 en fin de session, conteneurs, dépôt",
+      "result": "OK",
+      "detail": "Production bd31f410…f6d6 (attendu). Staging 958c76ed…03b4 (égal au snapshot, inchangé). Classeur source c93c610c… et snapshot inchangés. docker rm -f tb-g4v-b-a tb-g4v-b-f : aucun conteneur tb-g4v-b restant. Dépôt : git status identique au début (HEAD 40ee1dc), aucun fichier modifié par moi. Aucune requête vers les ports 8091 ou 8092."
+     }
+    ],
+    "findings": [
+     {
+      "id": "B1",
+      "severity": "bloquant",
+      "kind": "code",
+      "title": "Anti-doublon rc16 lié au sha256 du fichier : toute copie modifiée réimporte les lignes déjà importées",
+      "file": "app/historical_import.py",
+      "line": 303,
+      "evidence": "validate() ne pose already_imported que si b.file_sha256 = sha du fichier envoyé (même onglet et même ligne). possible_existing_entry n'est qu'un avertissement et exige le même projet ET les mêmes date, heures, début et fin. Sur une copie du staging : resaved.xlsx (seul docProps/core.xml change) donne 0 ligne « déjà importée ». Mapping historique : 151 doublons créés. Mapping vers les mandats actifs : 400 saisies créées (lot b0ca2b02…), toutes doublons d'existantes, dont 134 au statut « ok » sans décision ni avertissement (mandat différent : « PCR LV » → PCR LV 2026 alors que les lignes 2025 sont sous PCR LV 2025). R1.xlsx : 151 et 393 doublons (136 « ok »). C'est exactement le cas « réimporter le classeur complété de nouveaux mois ».",
+      "proposed_fix": "Identifier une ligne déjà importée indépendamment du sha, par (onglet, ligne source, date, début, fin, heures, motif normalisé) contre import_batch_rows et entries, tous projets confondus et y compris les saisies corrigées (entry_changes). Classer en error (non forçable) toute correspondance avec un lot COMMITTED non annulé. Étendre possible_existing_entry à tous les projets et le rendre bloquant. Ajouter un test unitaire « même contenu, sha différent »."
+     },
+     {
+      "id": "B2",
+      "severity": "bloquant",
+      "kind": "code",
+      "title": "Une saisie corrigée après import est réimportée silencieusement avec son ancienne valeur",
+      "file": "app/historical_import.py",
+      "line": 298,
+      "evidence": "Saisie 1876 (MAR 26!40) corrigée par HTTP à 17:00–17:30. Réimport de resaved.xlsx, mapping actif : saisie 2374 créée à 17:00–17:15 / 0,25 h, import_batch_rows.decision='ok', issues='' (aucun avertissement, aucune décision demandée). La correction est doublée par l'ancienne valeur, d'où une heure facturable en trop.",
+      "proposed_fix": "Inclure dans le contrôle d'existence le source_ref (onglet!ligne) des saisies existantes et l'historique entry_changes (before_json). Une ligne source dont la saisie a été corrigée doit être signalée « déjà importée puis corrigée » (error)."
+     },
+     {
+      "id": "B3",
+      "severity": "majeur",
+      "kind": "code",
+      "title": "Réimport : décisions d'exclusion antérieures non rappelées, lignes jadis exclues importables d'un clic",
+      "file": "app/historical_import.py",
+      "line": 303,
+      "evidence": "Classeur original, mapping actif, « importer » partout : 7 saisies créées (lot b116a9fc…). 5 de ces lignes avaient été exclues explicitement lors de l'arbitrage du 05/10 (NOV!48, NOV!55, NOV!56, DEC!35, JAN 26!90 daté du 2026-10-23), sans rappel de ce choix. Les 2 autres (APR 26!125 et 129) doublonnent des lignes importées depuis R1 et ne déclenchent qu'un avertissement.",
+      "proposed_fix": "Afficher et pré-appliquer la décision antérieure (import_batch_rows.decision='exclude' ou 'excluded_project' d'un lot COMMITTED du même contenu). Exiger un motif pour l'inverser."
+     },
+     {
+      "id": "B4",
+      "severity": "mineur",
+      "kind": "doc",
+      "title": "CHECKPOINT surestime la règle rc16 (« une ligne déjà importée ne peut plus être forcée en doublon »)",
+      "file": "CHECKPOINT-TIME-BILLING-V9.md",
+      "line": 33,
+      "evidence": "La règle ne vaut que pour un fichier identique à l'octet près (voir B1). Même formulation ligne 93 et dans NOTE-SESSIONS-PARALLELES.md ligne 68.",
+      "proposed_fix": "Préciser « depuis le même fichier (même sha256) » tant que B1 n'est pas corrigé."
+     },
+     {
+      "id": "B5",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Import plus permissif que la saisie : valeurs importées ensuite impossibles à corriger",
+      "file": "app/historical_import.py",
+      "line": 233,
+      "evidence": "Classeur synthétique : 0,001 h importée sans avertissement, 30 h importée après avertissement, horaires 09:00:30–10:00:30, description de 1 502 caractères sans avertissement, motif multiligne. À la correction : « durée inférieure à 0,01 h (36 secondes) refusée », « durée supérieure à 24 h pour une seule prestation », « heure invalide (format HH:MM attendu) », MAX_DESC=1000 (app.py l. 586). Le champ <input> du motif supprime les retours à la ligne. Aucune occurrence dans les données réelles (max 46 caractères, 0 saut de ligne, 0 seconde).",
+      "proposed_fix": "Aligner historical_import sur parse_entry_form : erreur si hours < 0,01 ou > 24, si horaire avec secondes non nulles, si motif > 1 000 caractères. Signaler les sauts de ligne."
+     },
+     {
+      "id": "B6",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Règle de minuit absente de l'import : écart déclaré/horaires non contrôlé, fin<début relue ensuite comme 23 h",
+      "file": "app/historical_import.py",
+      "line": 262,
+      "evidence": "Avec elapsed <= 0, seul time_order_ambiguous est posé et clock_hours reste vide. 23:00→03:00 déclaré 3 h est importé à 3,0 sans contrôle d'écart (4 h selon app.clock_minutes). 15:00→14:00 déclaré 1 h est importé ; à l'édition, l'application affiche « Saisie passant minuit … soit 23 h » mais conserve 1,0 h. Aucun passage de minuit dans les données réelles.",
+      "proposed_fix": "Calculer la durée sur horloge avec la règle de minuit d'app.py (e+1440-s) et appliquer declared_vs_clock_mismatch. Distinguer « passe minuit » (durée cohérente) de « fin < début incohérente »."
+     },
+     {
+      "id": "B7",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Heures décimales arrondies en statut ok, fractions Excel abandonnées si « importer »",
+      "file": "app/historical_import.py",
+      "line": 124,
+      "evidence": "Fin 15,33 stockée 15:20 (exact 15:19:48), statut ok sans décision, info clock_rounded seulement. Début/fin 0,5 / 0,625 (clock_ambiguous) : après « importer », saisie stockée sans horaires (raw conservé dans import_batch_rows). Les heures déclarées (1,83 ; 3) sont intactes.",
+      "proposed_fix": "Faire de clock_rounded un avertissement à décision. Libeller clock_ambiguous « les horaires ne seront pas importés »."
+     },
+     {
+      "id": "B8",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Paire horaire incomplète : la correction du motif efface l'heure de début importée",
+      "file": "app/templates/entry_edit.html",
+      "line": 4,
+      "evidence": "Saisie importée 11:00 / '' (incomplete_time_pair, « importer »). Le formulaire d'édition s'ouvre en mode durée ; après enregistrement, start_time='' sans message.",
+      "proposed_fix": "Refuser l'import d'une paire incomplète, ou signaler à l'édition que l'heure isolée sera supprimée."
+     },
+     {
+      "id": "B9",
+      "severity": "info",
+      "kind": "code",
+      "title": "Lignes strictement identiques dans un même onglet importées toutes deux par défaut",
+      "file": "app/historical_import.py",
+      "line": 288,
+      "evidence": "dup_a et dup_b (2026-01-12 08:00–09:00, 1 h) importées toutes deux au statut ok : repeated_in_file est une simple info, la proposition « ne pas importer cette occurrence » n'est pas appliquée. Conforme au principe « rien n'est fusionné ».",
+      "proposed_fix": "Aucune obligatoire. Éventuellement exiger une décision explicite pour la 2e occurrence."
+     },
+     {
+      "id": "B10",
+      "severity": "info",
+      "kind": "code",
+      "title": "Normalisations constatées : espaces de bord retirés, insécable interne conservé, variantes de nom de projet distinctes",
+      "file": "app/historical_import.py",
+      "line": 63,
+      "evidence": "'  Motif  avec\\xa0insécable…  ' est stocké sans les espaces de bord ; l'espace double et l'insécable internes sont conservés. 'Projet Alpha  ' est fusionné avec 'Projet Alpha'. 'Projet\\xa0Alpha', 'Projet Ete' et 'Projet Été' restent des noms sources distincts à associer explicitement. Les accents sont préservés.",
+      "proposed_fix": "Aucune ; documenter le strip des motifs."
+     }
+    ],
+    "artefacts": [
+     "/tmp/tb-g4-0842/B/rc15/ (code rc15 extrait de l'image pre-rc16)",
+     "/tmp/tb-g4-0842/B/parse-rc15-img.json",
+     "/tmp/tb-g4-0842/B/parse-rc19-img.json",
+     "/tmp/tb-g4-0842/B/parse-repo.json",
+     "/tmp/tb-g4-0842/B/scripts/drive.py",
+     "/tmp/tb-g4-0842/B/scripts/analyse.py",
+     "/tmp/tb-g4-0842/B/scripts/gen.py",
+     "/tmp/tb-g4-0842/B/scripts/synth_http.py",
+     "/tmp/tb-g4-0842/B/resaved.xlsx",
+     "/tmp/tb-g4-0842/B/after-r1-active.db",
+     "/tmp/tb-g4-0842/B/after-r1-hist.db",
+     "/tmp/tb-g4-0842/B/after-resaved-active.db",
+     "/tmp/tb-g4-0842/B/after-resaved-hist.db",
+     "/tmp/tb-g4-0842/B/r1-active-detail.json",
+     "/tmp/tb-g4-0842/B/synth/synthetique.xlsx",
+     "/tmp/tb-g4-0842/B/synth/meta.json",
+     "/tmp/tb-g4-0842/B/synth/out-rc19.txt",
+     "/tmp/tb-g4-0842/B/synth/apercu.csv",
+     "/tmp/tb-g4-0842/B/inst-f/data/timebilling.db"
+    ],
+    "prod_sha_after": "bd31f410305d6623dbf2237158ad8820cd3cbbfba20a37df0f17c54af7b0f6d6",
+    "staging_sha_after": "958c76ed0fc6ec0426e530c068c7fcf960fc73dc6b79626057121df7166703b4",
+    "containers_left": []
+   },
+   "verdicts": {
+    "verdicts": [
+     {
+      "id": "B1",
+      "real": true,
+      "severity_corrected": "bloquant",
+      "reasoning": "Confirmé par le code et par un essai. Dans validate() (historical_import.py l. 329-332, et non l. 303), already_imported exige b.file_sha256 égal au sha du fichier envoyé. possible_existing_entry (l. 326) n'est qu'un avertissement et exige le même projet, la même date, les mêmes heures, le même début et la même fin. Aucun contrôle sur source_ref ni sur les autres mandats, et aucun contrôle de doublon parmi les 13 contrôles avant facturation (invoice_checks.py). Deux garde-fous limitent le risque sans l'annuler : project_closed bloque les mandats clôturés, et before_issued_invoice bloquera après émission (0 facture émise aujourd'hui). Le mapping que j'ai utilisé est réaliste : PCR LV → 17, celui du lot c5799f02 du 05/10. Avec lui, 63 lignes déjà importées sous PCR LV 2025 reviennent « ok » sans aucun avertissement ni décision, soit +44,25 h sur un mandat actif. Je garde « bloquant » : ajout silencieux d'heures facturables, et la règle annoncée (CHECKPOINT) est contournée. Ce n'est pas une régression de rc19 : rc15 était encore plus faible.",
+      "reproduction": "Dans /tmp/tb-g4-0842/B-verif, j'ai créé resaved.xlsx en modifiant seulement dcterms:modified dans docProps/core.xml (sha 45a8305b…). Le parse est identique à celui de l'original : 2 297 lignes, JSON égal (s/v1.py dans l'image rc19, --network none). validate(), mapping actif, sur la copie stg.db : avec l'original, 0 ligne déjà importée en ok ; avec resaved, 0 already_imported et 137 ok sur des source_ref déjà en base (s/v2.py). Bout en bout HTTP sur le conteneur tb-g4v-bv-a (:8482, copie de la base) avec map PCR LV→17 et le reste « skip » : les lignes en attente sont décidées « ne pas importer », ack, puis commit. Résultat « Import validé : 64 prestation(s) ajoutée(s) », entries 2247→2311 (1934,7487→1978,9987 h). Les 64 saisies doublonnent toutes une source_ref existante : 63 avec decision='ok' et issues='' (ancien mandat 15 → 17), 1 = MAR 26!40 (s/h2.py)."
+     },
+     {
+      "id": "B2",
+      "real": true,
+      "severity_corrected": "majeur",
+      "reasoning": "Confirmé. Une fois la saisie corrigée, la ligne source ne correspond plus à rien pour possible_existing_entry (fin ou heures différentes). Sous un sha différent, elle revient donc « ok » sans aucun signal, et _flag_overlaps ne compare que les lignes du fichier, jamais la base. C'est la même cause que B1 : la correction proposée pour B1 (identification par source_ref et historique, indépendamment du sha) le couvre. D'où « majeur » plutôt qu'un second « bloquant ».",
+      "reproduction": "Sur tb-g4v-bv-a, POST /entry/1876/edit (17:00–17:30, avec rev) : « Saisie n° 1876 modifiée », 1 ligne entry_changes. Ensuite, import de resaved.xlsx avec PCR LV→17. La nouvelle saisie 2311 est créée avec MAR 26!40, 2026-03-05, 17:00–17:15, 0,25 h, projet 17, import_batch_rows.decision='ok', issues=''. La saisie 1876 reste à 17:00–17:30 / 0,5 h. Contre-épreuve (s/v3.py) : même base corrigée, fichier original → status error ['already_imported'] ; fichier resaved → ok []."
+     },
+     {
+      "id": "B3",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Le constat est exact (7 lignes importables en décidant « importer »), mais les preuves sont mal lues. NOV!48, NOV!55, NOV!56, DEC!35, JAN 26!90, APR 26!125 et APR 26!129 n'ont pas été simplement « exclues » : elles ont été importées depuis R1 (lots 0ba463 et 00bf39, sha a6f6…, decision 'ok'), avec des dates corrigées (saisies 2170, 2177, 2178, 2181, 2183, 2196, 2197). Les exclusions dans les lots du fichier original servaient à les remplacer par leur version corrigée. Le vrai défaut : réimporter depuis l'original crée 7 doublons, dont 5 à l'ancienne date erronée, sans signaler que la version corrigée existe déjà. C'est la détection inter-fichiers de B1. Chaque ligne exige une décision « importer » explicite (warnings date_outside_sheet_month, date_suspect, possible_existing_entry), d'où « mineur ».",
+      "reproduction": "s/v4.py (image rc19, copie stg.db, original, mapping actif) : by_status = excluded_project 1878, error 412, needs_decision 7. Pour ces 7 lignes, import_batch_rows contient 'exclude' dans les lots du sha c93c… et 'ok' dans un lot du sha a6f6… (R1). La requête entries par source_ref montre, par exemple, NOV!48 → saisie 2170, 2025-11-13 (l'original porte 2025-10-13), lot R1."
+     },
+     {
+      "id": "B4",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "CHECKPOINT-TIME-BILLING-V9.md l. 33 dit « une ligne déjà importée ne peut plus être forcée en doublon », et l. 93 parle de « ligne déjà importée » sans préciser le fichier. NOTE-SESSIONS-PARALLELES.md l. 68 reprend la même formule. Le libellé du code est exact (« depuis ce même fichier ») mais la documentation surestime la règle, comme le prouvent B1 et B2.",
+      "reproduction": "grep dans les documents : CHECKPOINT l. 33 et l. 93, NOTE-SESSIONS-PARALLELES l. 68. ISSUES['already_imported'] dans historical_import.py l. 44 : « Ligne déjà importée depuis ce même fichier ». Le comportement est démontré en B1."
+     },
+     {
+      "id": "B5",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Confirmé par l'exécution des fonctions. L'import accepte 0,001 h (sans avertissement), 30 h (simple avertissement hours_suspect), des horaires avec secondes et une description sans limite de longueur. parse_entry_form refuse chacun de ces cas, et le motif est un <input maxlength=1000>. Une telle saisie ne peut donc pas être corrigée en gardant ses valeurs. Aucune occurrence dans les données réelles, selon l'auditeur ; je n'ai pas revérifié ce point.",
+      "reproduction": "s/v5.py (image rc19) : read_clock(time(9,0,30)) → '09:00:30' ; read_hours(0.001) → 0.001 sans issue ; read_hours(30) → 30 (hours_suspect posé par parse_workbook l. 249). parse_entry_form refuse dans les quatre cas : « heure invalide (format HH:MM attendu) », « durée inférieure à 0,01 h (36 secondes) refusée », « durée supérieure à 24 h pour une seule prestation », « description trop longue (1502 caractères ; 1000 au maximum) »."
+     },
+     {
+      "id": "B6",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Confirmé par le code (l. 270-275). Si elapsed <= 0, seul time_order_ambiguous est posé, et c'est un avertissement à décision explicite, donc pas silencieux. Il n'y a ni calcul de durée sur horloge (clock_hours vide) ni contrôle declared_vs_clock_mismatch, alors qu'app.clock_minutes applique e+1440-s. Je n'ai pas rejoué l'affichage « soit 23 h » de l'édition. À l'édition, des horaires inchangés conservent les heures stockées (h=e['hours'], app.py l. 791), ce qui est cohérent avec la description.",
+      "reproduction": "Lecture de historical_import.py l. 270-275 et de app.py l. 539-544 (clock_minutes). Non rejoué en HTTP, je m'appuie sur l'essai de l'auditeur."
+     },
+     {
+      "id": "B7",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Confirmé. read_clock(15.33) donne '15:20' avec la seule info clock_rounded, donc statut ok sans décision. Les heures déclarées restent intactes, et donc le montant aussi. read_clock(0.5) donne '' avec clock_ambiguous (avertissement à décision) ; si l'on choisit « importer », les horaires sont stockés vides sans que le libellé « Heure ambiguë (valeur < 1) » le dise.",
+      "reproduction": "s/v5.py : read_clock(15.33) → ('15:20', None, 'clock_rounded') ; read_clock(0.5) → ('', 'clock_ambiguous', None). import_service.commit_batch insère r['start_time'] et r['end_time'] tels quels (vides)."
+     },
+     {
+      "id": "B8",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Confirmé par le code. entry_edit.html l. 4 fixe entry_mode='duration' si start ou end est absent. Dans parse_entry_form, le mode durée force start='' et end='' (app.py l. 580). Avec l'ancien start '11:00', l'enregistrement n'est pas « same » : l'UPDATE efface le début, sans message spécifique. L'ancienne valeur reste toutefois dans entry_changes.before_json.",
+      "reproduction": "s/v5.py : parse_entry_form({'entry_mode':'duration','manual_hours':'1','start_time':'11:00',…}) → ('2025-01-01', '', '', 1.0). Lecture de entry_edit.html l. 4 (entry_mode='clock' seulement si start ET end) et de app.py l. 788-805."
+     }
+    ],
+    "missed": "L'auditeur n'a pas vérifié l'antécédent des 5 lignes « exclues » de B3 : elles avaient en fait été importées sous forme corrigée depuis R1 (saisies 2170 à 2183), donc sa lecture est fausse. Il n'a pas mesuré la portée réelle de B1. La plupart des mandats étant clôturés, project_closed bloque la majorité des lignes, et before_issued_invoice bloquera après émission (0 facture émise à ce jour). Le risque se concentre donc sur les mandats actifs, avec le mapping réellement utilisé le 05/10 (PCR LV→17 : 63 doublons « ok »). Il n'a pas non plus relevé qu'aucun des 13 contrôles avant émission (invoice_checks.py) ne détecte les doublons, ni que time_overlap ignore les saisies déjà en base. La possibilité de réparer un lot doublon par /imports/rollback n'a pas été vérifiée : refus si une saisie du lot a été corrigée, ce qui reste NON_VERIFIE de mon côté. Vérification finale : production bd31f410…f6d6 et staging 958c76ed…03b4 inchangés, classeur c93c610c… inchangé, conteneur tb-g4v-bv-a supprimé, dépôt inchangé (HEAD 40ee1dc)."
+   }
+  },
+  {
+   "axis": "corrections",
+   "audit": {
+    "axis": "C — fidélité des corrections de saisies (rc19)",
+    "resume": "J'ai relu le chemin de correction et de suppression : app/app.py (lignes 530-910), app/post_billing.py, les déclencheurs rc19 et le gabarit entry_edit.html. J'ai ensuite lancé le lot R sur une copie jetable du snapshot staging (image rc19, port 8485) : 49/49 OK. J'ai écrit 446 sondes supplémentaires, que j'ai exécutées sur une copie neuve (port 8488 ; essais préparatoires sur 8486 et 8487) : 439 OK et 7 KO, tous des constats réels. Les valeurs stockées sont fidèles à ce qui est soumis : 7 h 20 donne exactement 440/60, les quarts d'heure et le passage de minuit (22:00→02:00 = 4 h, jour de début) sont exacts, la durée déclarée des lignes importées est conservée (1358 = 0,7487 h ; 2187 = 4 h), la description garde l'unicode et les espaces, la provenance n'est jamais touchée. Les champs before_json et after_json sont identiques aux lignes réelles, aucune autre saisie n'est modifiée (toutes colonnes) et les factures émises (ligne, copie figée, PDF, PDF du ZIP) restent inchangées. L'écart post-facturation affiché (−2,58 h, −0,3229 j, −209,90 CHF) correspond à la différence réelle. Défaut le plus sérieux (majeur), dans le code G4 mais trouvé par ces sondes : une période qui contient 7 h 20 ne peut pas être émise, même avec les dérogations 12 et 13, à cause d'un arrondi à 4 décimales contre 6. Les autres écarts sont mineurs : la durée accepte « 1_5 » (15 h), « ٣ » et « 1e1 » ; le motif accepte U+2028 et U+200B ; une description multi-ligne est aplatie par le navigateur lors d'une correction d'un autre champ ; la trace du déclencheur ne garde que 15 chiffres significatifs ; le message pour « 7:05 » est une erreur Python brute. Les bases de production et de staging sont inchangées et tous mes conteneurs ont été supprimés.",
+    "checks": [
+     {
+      "name": "Lot R (run_rc19.py) sur copie rc19 :8485",
+      "result": "OK",
+      "detail": "RÉSULTAT R : 49/49 OK, 0 KO (journal /tmp/tb-g4-0842/C/lotR.log) ; /health = 9.2-rc19 ; image sha256:131cf0c998ea9"
+     },
+     {
+      "name": "Sondes complémentaires axe C (copie neuve :8488)",
+      "result": "ECART",
+      "detail": "RÉSULTAT C : 439/446 OK ; 7 KO = constats C1 à C5 (/tmp/tb-g4-0842/C/probes3.log, script /tmp/tb-g4-0842/C/scripts/probes.py)"
+     },
+     {
+      "name": "Saisie importée : description seule, date seule, mandat seul → heures déclarées, horaires et provenance inchangés",
+      "result": "OK",
+      "detail": "1358 (12:15-13:00, déclarée 0.7486999999999995) : heures conservées bit à bit ; import_batch_rows inchangé ; source, source_ref, import_batch_id et created_at inchangés"
+     },
+     {
+      "name": "Changement de début ou de fin → recalcul exact",
+      "result": "OK",
+      "detail": "13:00→13:15 = 1.0 ; 08:00-15:20 = 440/60 ; 08:15-12:45 = 4.5 ; 08:10-08:11 = 1/60 ; 09:00-12:20 = 200/60 ; espaces autour de l'heure ôtés ; 24:00 et fin = début refusés"
+     },
+     {
+      "name": "Passage de minuit et nuit de changement d'heure",
+      "result": "OK",
+      "detail": "22:00→02:00 = 4.0 h, work_date de début conservée, message « passant minuit » ; 23:45→00:15 = 0.5 ; 24.10.2026 23:00→04:00 = 5 h (horloge) avec avertissement « changement d'heure »"
+     },
+     {
+      "name": "Mode durée décimal",
+      "result": "ECART",
+      "detail": "« 2,345 » → 2.345 ; « 7.3333 » → 7.3333 ; 0.009, 24.0001, nan et 1/2 refusés ; mais « 1_5 » → 15.0, « ٣ » → 3.0 et « 1e1 » → 10.0 sont acceptés (C2)"
+     },
+     {
+      "name": "Changement de mandat (actif, clôturé sans case, case sans motif, motif fait d'espaces, case + motif, mandat inexistant)",
+      "result": "OK",
+      "detail": "refus et acceptations conformes ; motif stocké sans les espaces de début et de fin ; avertissement de facturation affiché"
+     },
+     {
+      "name": "Description unicode, espaces, limites",
+      "result": "OK",
+      "detail": "NBSP, emoji, NFD, tabulation, guillemets et balises, chaîne vide, 1000 caractères et 1000 emoji stockés à l'identique et réaffichés à l'identique dans le formulaire ; 1001 caractères refusés. Seule exception : la description multi-ligne (C4)"
+     },
+     {
+      "name": "Validation du motif",
+      "result": "ECART",
+      "detail": "500 caractères acceptés et stockés tels quels ; 501, \\n, \\t, U+202E, U+2067 et U+0085 refusés ; U+2028 et U+200B acceptés (C3)"
+     },
+     {
+      "name": "Concurrence (rev périmé) et double envoi",
+      "result": "OK",
+      "detail": "rev périmé avec une autre valeur → refusé, sans historique ; rev périmé avec des valeurs identiques → « déjà enregistrée » ; double envoi → une seule ligne entry_changes. Formulaire sans rev → non contrôlé (le navigateur l'envoie toujours)"
+     },
+     {
+      "name": "Suppression puis historique",
+      "result": "OK",
+      "detail": "rev périmé refusé ; before_json = ligne réelle, after NULL, motif sans espaces ; page /historique 200 ; /edit redirige vers l'historique ; aucune résurrection ; 2e suppression → « déjà supprimée » ; l'identifiant suivant n'est jamais réutilisé"
+     },
+     {
+      "name": "before_json / after_json comparés aux lignes réelles",
+      "result": "OK",
+      "detail": "égalité exacte de toutes les clés (12) pour chaque correction acceptée ; une seule ligne entry_changes par correction"
+     },
+     {
+      "name": "Trace du déclencheur entry_row_updated",
+      "result": "ECART",
+      "detail": "contenu juste à 1e-12 près, mais heures tronquées à 15 chiffres significatifs : 0.7486999999999995→0.748699999999999, 7.333333333333333→7.33333333333333 (C6)"
+     },
+     {
+      "name": "Aucune autre saisie touchée",
+      "result": "OK",
+      "detail": "à chaque sonde, toutes les autres lignes de entries sont identiques sur toutes les colonnes ; bilan final : seules les saisies sondées ont changé, une seule supprimée"
+     },
+     {
+      "name": "Factures émises, copies figées, PDF et ZIP inchangés",
+      "result": "OK",
+      "detail": "invoices, invoice_snapshots (hex du PDF compris), invoice_annex_entries, PDF servi et PDF du ZIP identiques après chaque sonde ; brouillon n°1 de l'utilisateur inchangé. LISEZMOI.txt du ZIP exclu de la comparaison car horodaté à chaque génération (faux positif constaté sur :8487)"
+     },
+     {
+      "name": "Correction d'une saisie facturée : écart = différence réelle",
+      "result": "OK",
+      "detail": "facture 2026-10 (NHAF, 05-06.10) émise sur la copie. billed_ids périmé refusé. Corrections : −0,25 h, date reclassée −0,5 h, description seule, autre mandat −1 h, nuit +0,6667 h, suppression −1,5 h. Écart réel −2,5833 h ; page : −2,58 h, −0,3229 j, −209,90 CHF, 15,75 h → 13,17 h, statuts corrects ; ligne d'écart dans l'historique des factures ; rôles billed et arrival corrects"
+     },
+     {
+      "name": "Émission d'une période contenant 7 h 20",
+      "result": "ECART",
+      "detail": "refusée, même avec derogation_12 et derogation_13 : « 12 … heures de la période ≠ total de la section période » (C1)"
+     },
+     {
+      "name": "Sécurité : prod, staging et conteneurs",
+      "result": "OK",
+      "detail": "prod bd31f410…f6d6 inchangée ; staging 958c76ed…03b4 (= snapshot) ; aucun POST sur 8091 ou 8092 ; dépôt non modifié ; conteneurs tb-g4v-c-* supprimés (0 restant)"
+     }
+    ],
+    "findings": [
+     {
+      "id": "C1",
+      "severity": "majeur",
+      "kind": "code",
+      "title": "Facture impossible à émettre dès que la période contient 7 h 20 (ou toute fraction de tiers d'heure)",
+      "file": "app/invoice_checks.py",
+      "line": 83,
+      "evidence": "Le contrôle 12 compare hrs = round(Σ heures de la période, 4) (invoice_checks.py:83) à header['period_hours'] = round(Σ, 6) (invoice_service.py:55), avec EPS = 1e-5. Pour 440/60 : 7.3333 contre 7.333333, soit 3.3e-5 > EPS. Sonde P12 (:8488) : saisie 08:00-15:20 sur NHAF, brouillon du 12.10.2026 → « Émission refusée : … 12. … heures de la période ≠ total de la section période », même avec derogation_12 et derogation_13 (échec arithmétique, jamais dérogeable). Même échec pour P10 sur :8486 avec 13:00-17:20. Toute saisie ou correction en 10, 20, 40 ou 50 minutes, ou en 5 minutes, bloque la période. Aucune des 2 247 saisies actuelles n'est concernée (requête : 0), donc le problème est latent.",
+      "proposed_fix": "Comparer avec la même précision des deux côtés (round 6, ou EPS ≥ 5e-5 sur les heures), puis ajouter un test unitaire avec une saisie de 7 h 20 et de 20 minutes."
+     },
+     {
+      "id": "C2",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Durée : float() accepte « 1_5 », des chiffres non latins et la notation exponentielle",
+      "file": "app/app.py",
+      "line": 575,
+      "evidence": "parse_entry_form fait float(raw). Sondes P4h, P4i et P4j (envoi HTTP direct) : « 1_5 » → 15.0 h stockées, « ٣ » → 3.0, « 1e1 » → 10.0, chaque fois avec « Saisie modifiée ». Un input type=number de navigateur bloque « 1_5 » mais laisse passer « 1e1 ». Même parseur pour la création (/entry).",
+      "proposed_fix": "Valider raw avec une expression régulière ^\\d+([.,]\\d+)?$ (chiffres ASCII) avant la conversion, idéalement en Decimal."
+     },
+     {
+      "id": "C3",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Motif : U+2028 (séparateur de ligne) et caractères invisibles acceptés",
+      "file": "app/app.py",
+      "line": 663,
+      "evidence": "change_reason refuse les codes < 32, de 0x7f à 0x9f et les caractères bidi. Sondes P7h et P7i : motif « a b » et « a​b » acceptés et stockés. Cela contredit la règle « une ligne » de CONCEPTION-RC19 §2 et permet un motif qui s'affiche autrement qu'il n'est stocké (espace sans chasse).",
+      "proposed_fix": "Refuser aussi les catégories Unicode Zl, Zp et Cf (U+2028, U+2029, U+200B-U+200D, U+2060-U+2064, U+FEFF, U+206A-U+206F)."
+     },
+     {
+      "id": "C4",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Description multi-ligne aplatie en silence par le formulaire (input) lors d'une autre correction",
+      "file": "app/templates/entry_edit.html",
+      "line": 17,
+      "evidence": "La description est un <input>, que le navigateur prive de ses \\r\\n. Sonde P6 : description 'ligne1\\nligne2' (POST direct) puis correction de la date seule via le formulaire simulé → description stockée 'ligne1ligne2' et correction enregistrée sans que l'utilisateur ait touché la description. Le cas est latent : 0 description multi-ligne aujourd'hui, mais historical_import._text conserve les sauts de ligne internes d'une cellule Excel.",
+      "proposed_fix": "Utiliser un <textarea> pour la description, ou normaliser les sauts de ligne de façon explicite et visible (à l'import comme à la saisie)."
+     },
+     {
+      "id": "C5",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Heure « 7:05 » acceptée par la regex puis refusée avec une erreur Python brute",
+      "file": "app/app.py",
+      "line": 542,
+      "evidence": "TIME_RE ^([01]?\\d|2[0-3]):… accepte « 7:05 », mais clock_minutes fait int(start[:2]). Sonde P3g : message « Saisie non modifiée : invalid literal for int() with base 10: '7:' ». Les données ne sont pas altérées et le navigateur envoie toujours HH:MM.",
+      "proposed_fix": "Imposer deux chiffres (^([01]\\d|2[0-3]):[0-5]\\d$) ou normaliser en HH:MM avant le calcul."
+     },
+     {
+      "id": "C6",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Trace des déclencheurs entry_row_updated et entry_row_deleted : heures limitées à 15 chiffres significatifs",
+      "file": "app/app.py",
+      "line": 47,
+      "evidence": "json_object() de SQLite (image rc19) sérialise les REAL sur 15 chiffres. Sondes P1c, P3a, P4c et P10k : 0.7486999999999995 → 0.748699999999999, 7.333333333333333 → 7.33333333333333, 4.166666666666667 → 4.16666666666667. entry_changes (applicatif) reste exact. Aucun calcul ne relit ces valeurs (variance_candidates n'utilise que l'id).",
+      "proposed_fix": "Stocker printf('%!.17g', hours) ou les heures en texte dans la trace, ou documenter que la trace de la base est indicative au 1e-12 près."
+     },
+     {
+      "id": "C7",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Mode durée : step=0.01 empêche de saisir 7,3333 (7 h 20) dans le navigateur",
+      "file": "app/templates/entry_edit.html",
+      "line": 16,
+      "evidence": "<input name=manual_hours type=number step=0.01>. Un navigateur refuse l'envoi de 7.3333 (valeur non conforme au pas) : seul le mode horaires permet 7 h 20. Une saisie en mode durée dont les heures ne sont pas un multiple de 0,01 ne pourrait plus être corrigée via le formulaire, quel que soit le champ (0 cas aujourd'hui, requête sur la copie). Constat tiré de la lecture du gabarit ; je ne l'ai pas testé dans un vrai navigateur.",
+      "proposed_fix": "step=\"any\" (le serveur borne déjà de 0,01 à 24)."
+     },
+     {
+      "id": "C8",
+      "severity": "info",
+      "kind": "code",
+      "title": "Description : caractères bidi et de contrôle acceptés (imprimés dans l'annexe PDF), contrairement au motif",
+      "file": "app/app.py",
+      "line": 584,
+      "evidence": "Sonde P6 : description 'abc‮def' et tabulation acceptées et stockées telles quelles. Le motif, lui, refuse ces caractères au motif qu'ils feraient lire l'historique autrement qu'il n'est stocké ; la description est imprimée sur les annexes des factures.",
+      "proposed_fix": "Décider si la même règle doit s'appliquer à la description (au moins pour les caractères bidi)."
+     },
+     {
+      "id": "C9",
+      "severity": "info",
+      "kind": "test",
+      "title": "ZIP d'archive : LISEZMOI.txt horodaté, donc l'empreinte du ZIP change à chaque génération",
+      "file": "app/app.py",
+      "evidence": "Sur :8487, le ZIP différait d'une sonde à l'autre uniquement par LISEZMOI.txt (« Générée le … à 11:03:16 »). Les PDF, index.csv et SHA256SUMS sont restés identiques. Le lot R ne compare que les PDF : correct. À savoir pour toute recette qui comparerait le ZIP entier.",
+      "proposed_fix": "Aucune action ; comparer les membres PDF ou SHA256SUMS."
+     }
+    ],
+    "artefacts": [
+     "/tmp/tb-g4-0842/C/lotR.log",
+     "/tmp/tb-g4-0842/C/probes3.log",
+     "/tmp/tb-g4-0842/C/probes2.log",
+     "/tmp/tb-g4-0842/C/probes.log",
+     "/tmp/tb-g4-0842/C/scripts/probes.py",
+     "/tmp/tb-g4-0842/C/scripts/inspect.py",
+     "/tmp/tb-g4-0842/C/scripts/q.py",
+     "/tmp/tb-g4-0842/C/copy.db"
+    ],
+    "prod_sha_after": "bd31f410305d6623dbf2237158ad8820cd3cbbfba20a37df0f17c54af7b0f6d6",
+    "staging_sha_after": "958c76ed0fc6ec0426e530c068c7fcf960fc73dc6b79626057121df7166703b4",
+    "containers_left": []
+   },
+   "verdicts": {
+    "verdicts": [
+     {
+      "id": "C1",
+      "real": true,
+      "severity_corrected": "majeur",
+      "reasoning": "Confirmé dans le code et en exécution. invoice_checks.py:83 calcule hrs = round(somme, 4) et invoice_service.py:55 calcule period_hours = round(somme, 6). La ligne 155 compare les deux avec EPS = 1e-5 et range l'écart parmi les invariants arithmétiques de bad12 (derogable=False), donc blocking() le rejette avant toute lecture des motifs. Toute période dont le total en minutes n'est pas un multiple de 3 min est concernée (1, 5, 10 ou 20 min donnent un écart de 3,3e-5). Le problème est latent : 0 saisie et 0 total mensuel par mandat concernés dans le snapshot (requête sur ma copie). Aucun montant n'est faux et un contournement existe (passer en mode durée), donc le niveau majeur est juste.",
+      "reproduction": "Conteneur rc19 tb-g4v-cv-a sur :8485, copie /tmp/tb-g4-0842/C-verif/copy.db, script /tmp/tb-g4-0842/C-verif/scripts/p1.py. Saisie 2248 du 05.10.2026, 08:00-15:20 sur NHAF 2026 (hours = 7.333333333333333). Brouillon 2 sur la période 05.10-05.10, émis avec derogation_12 et derogation_13 → « Émission refusée : … 12. … heures de la période ≠ total de la section période ». Contre-épreuve : saisie corrigée à 08:00-15:15 (7.25), même brouillon et même formulaire → « Facture 2026-10 émise ». Conteneur supprimé ensuite."
+     },
+     {
+      "id": "C2",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "parse_entry_form fait float(raw) sans autre validation. En Python, float accepte les tirets bas, les chiffres Unicode et l'exposant. Le cas n'est atteignable que par un envoi direct, sauf « 1e1 » qu'un input type=number accepte. Le niveau mineur convient.",
+      "reproduction": "Script p2.py sur :8485, saisie 2249 en mode durée : « 1_5 » → hours 15.0, avec « Saisie n° 2249 modifiée » et l'avertissement « 15 h … (plus de 12 h) » ; « ٣ » → 3.0 ; « 1e1 » → 10.0."
+     },
+     {
+      "id": "C3",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "change_reason ne refuse que les codes < 32, la plage 0x7f-0x9f et la liste _BIDI. CONCEPTION-RC19.md ligne 36 dit « Motif : une ligne ». U+2028 et U+2029 contredisent cette règle ; U+200B et U+FEFF sont invisibles à l'affichage. Le niveau mineur convient.",
+      "reproduction": "Script p3.py sur :8485, saisie 2250 avec une durée modifiée à chaque essai : motif 'a​b' accepté et stocké tel quel dans entry_changes.reason ; 'a b' et 'a﻿b' acceptés ; 'a\\nb' refusé. Script p2.py : 'a b' accepté et stocké."
+     },
+     {
+      "id": "C4",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "La description est un <input> dans entry_edit.html:17 et dans index.html:19. Le navigateur retire les sauts de ligne de la valeur d'un input texte, et le serveur stocke ce qu'il reçoit. Le cas est latent : 0 description multi-ligne dans le snapshot. historical_import._text ne fait que strip() et garde donc les sauts de ligne internes d'une cellule. La correction reste tracée dans entry_changes, donc elle n'est pas totalement silencieuse.",
+      "reproduction": "Chromium headless (--dump-dom sur une URL data:, sans réseau) avec <input value=\"ligne1\\nligne2\"> : input.value = \"ligne1ligne2\" et FormData envoie \"ligne1ligne2\". Je n'ai pas refait le POST de bout en bout ; le stockage de la valeur envoyée découle de parse_entry_form, qui n'applique aucune normalisation."
+     },
+     {
+      "id": "C5",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "TIME_RE accepte un seul chiffre pour l'heure, mais clock_minutes fait int(start[:2]). Le ValueError Python est affiché tel quel. Les données ne sont pas altérées et un input type=time envoie toujours HH:MM. Le défaut est cosmétique (on pourrait le classer info) ; je garde mineur.",
+      "reproduction": "Script p2.py sur :8485 : start 7:05 → « Saisie non modifiée : invalid literal for int() with base 10: '7:' » ; end 9:00 → même message avec '9:'. Saisie inchangée (2.0 h)."
+     },
+     {
+      "id": "C6",
+      "real": true,
+      "severity_corrected": "info",
+      "reasoning": "Le comportement est réel : json_object de SQLite 3.46.1 (version de l'image) écrit les REAL sur 15 chiffres significatifs. L'écart est de l'ordre de 1e-15 et aucun lecteur n'utilise ces heures : post_billing.py:171-173 et rollback_service.py:44 n'extraient que $.id. Le journal applicatif entry_changes reste exact. Aucune conséquence fonctionnelle : simple observation.",
+      "reproduction": "Script p2.py sur :8485 : audit entry_row_updated de la saisie 2249 → \"hours\":7.33333333333333, alors que entry_changes.after_json contient 7.333333333333333 et la ligne entries 7.333333333333333. Version SQLite dans le conteneur : 3.46.1. grep des lecteurs : seulement json_extract(a.detail,'$.id')."
+     },
+     {
+      "id": "C7",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Le champ manual_hours a step=0.01 et min=0.01. Il n'est actif et pré-rempli que pour une saisie en mode durée ; en mode horaires il est désactivé, donc non validé. Une saisie en mode durée dont les heures ne sont pas un multiple de 0,01 bloquerait donc toute correction par le formulaire. Le cas est latent : 0 saisie en mode durée hors multiple de 0,01 dans le snapshot (requête).",
+      "reproduction": "Chromium headless : input type=number min=0.01 step=0.01 → valeur 7.3333 : checkValidity()=false, stepMismatch=true ; valeur 0.7486999999999995 : false ; valeur 2.5 : true ; form.checkValidity()=false. Requête sur la copie : aucune saisie sans début/fin avec des heures hors multiple de 0,01."
+     }
+    ],
+    "missed": "Couverture de l'auditeur large, sans NON_VERIFIE injustifié. Deux points absents de son rapport. (1) L'horodatage changed_at des corrections (fuseau UTC ou Europe/Zurich) et son affichage dans /historique et sur la page de la saisie ne sont pas vérifiés. (2) Une saisie modifiée dans la période du brouillon n°1 de l'utilisateur (mandat 22, du 03.09 au 31.10.2026) n'est pas testée : avertissement « brouillon couvre cette date » et effet sur la quantité du brouillon. Pour C1, la portée est plus large que les tiers d'heure : tout total de période en minutes non multiple de 3 bloque l'émission (1, 2, 5, 10 ou 20 min). Contrôles finaux : prod bd31f410…f6d6 inchangée, staging 958c76ed…03b4 (= snapshot), conteneur tb-g4v-cv-a supprimé (0 restant), dépôt non modifié."
+   }
+  },
+  {
+   "axis": "registre-d1",
+   "audit": {
+    "axis": "D — Fidélité du registre des factures historiques (D1, D2=NON, D3=NON, D4=OUI)",
+    "resume": "Les feuilles SUIVI 2025 et SUIVI 2026 ont été relues indépendamment (valeurs et formules) dans un conteneur rc19 jetable sans réseau. Les 23 cellules D1 sont conformes une à une (mandat, en-tête « Facture jj.mm » → date, jours, montant, tarif) : 23 lignes, 205,63 j, 133 659,50 CHF (67 236,00 en 2025, 66 423,50 en 2026). Le tarif est de 650 partout, dans le SUIVI comme dans l'application. Seule SUIVI 2026!M15 reste hors chargement. Une nouvelle simulation sur copie reproduit à l'octet près les trois fichiers de import/g4-simulation-d1-20261006, et la copie est restée inchangée (même sha). Sur une autre copie, le chargement --appliquer : 23 lignes « à valider », sans aucun effet sur le dashboard. Il est refusé sans la phrase de confirmation et le rejeu n'ajoute rien. Après validation HTTP mandat par mandat (18 mandats), les chiffres du §7 sont retrouvés : 205,63 j ; solde −40,29 j ; 8,40 j non facturés (somme des valeurs affichées 8,39) ; 27,78 j actifs ; 66 423,50 CHF ; prévision 27 050 CHF ; 19 clôturés / 5 actifs. Les déclencheurs bloquent bien la modification des valeurs source et la suppression. Écart principal : la réservation N1 n'existe pas. Une facture de l'application sur septembre 2026 a été émise sous le n° « 2026-09 », déjà porté par la facture réelle CIRSE 2026. Autre écart : un rejet efface définitivement la note de provenance D4. N5 est corrigé dans import/MANDATS-DECISIONS-UTILISATEUR.md, mais CHECKPOINT-TIME-BILLING-V9.md présente encore les 7 j comme un fait.",
+    "checks": [
+     {
+      "name": "Relecture indépendante SUIVI 2025 (I2:P2) et SUIVI 2026 (J2:Q2), valeurs et formules",
+      "result": "OK",
+      "detail": "scripts/dump_suivi.py (openpyxl, rc19, --network none) -> suivi-dump.txt. Les 23 cellules sont conformes (14 en jours pour 2025, 9 en montants pour 2026). En-têtes : 2025 09.04/12.05/16.06/14.07/30.09/03.10/27.11/15/12 ; 2026 16/02/31/03/03/04/27/04/11/05/16/06/16/07/01/10. Totaux recalculés : 23 lignes, 205,63 j, 133 659,50 CHF (2025 : 67 236,00 = H15 86 636 − AL 19 400 ; 2026 : 66 423,50)."
+     },
+     {
+      "name": "Tarif par ligne (650)",
+      "result": "OK",
+      "detail": "Tarif SUIVI (G 2025, H 2026) = 650 sur les 18 lignes. Tarif de l'application = 650 pour les 18 mandats (seul STC GEM Oct est à 600, et il n'est pas chargé). Les jours 2026 obtenus par montant ÷ 650 sont égaux à la colonne NB J (G) du SUIVI."
+     },
+     {
+      "name": "Comparaison ligne à ligne avec simulation-lignes.csv",
+      "result": "OK",
+      "detail": "0 écart sur la date, les jours, le montant, la colonne et le mandat (script de comparaison sur suivi-dump.txt)."
+     },
+     {
+      "name": "Simulation fraîche (rc19, --network none, copie de l'instantané)",
+      "result": "OK",
+      "detail": "simulation-lignes.csv et simulation-mandats.csv identiques ; resume.json identique (diff JSON trié). sha de la copie avant et après : 958c76ed… inchangé."
+     },
+     {
+      "name": "Correspondance des mandats, numéros, provenance, notes D4",
+      "result": "OK",
+      "detail": "18 mandats distincts, tous clôturés. invoice_ref non nul uniquement sur SUIVI 2026!Q12 = 2026-09 (facture réelle : date 01.10.2026, 8 j × 650 = 5 200). Notes sur exactement J3 (2026), K7, M14, N10, N8 (2025)."
+     },
+     {
+      "name": "Exclusions D2/D3/ERA 2026/ECIO 2025",
+      "result": "OK",
+      "detail": "Seule cellule de facture non chargée : SUIVI 2026!M15 (4 550). H3 (AL) est dans la colonne TOTAL et n'est pas chargé. Il n'existe aucun mandat ERA 2026. 0 ligne sur ECIO 2025 ni sur un mandat actif."
+     },
+     {
+      "name": "Garde --appliquer (phrase, base non migrée, rejeu)",
+      "result": "OK",
+      "detail": "Sans --confirmer, ou avec une phrase en minuscules : ARRÊT, rc=1, sha inchangé. Sur une base sans registre : ARRÊT. Avec la phrase : 23 lignes chargées (ids 1…23). Rejeu : « 0 ligne(s) … 23 déjà présente(s) à l'identique » (rc=0, sans doublon ; rejeu idempotent, pas un refus)."
+     },
+     {
+      "name": "Chargement : 23 lignes à valider, sans effet avant validation",
+      "result": "OK",
+      "detail": "Statut proposed 23, 205,63 j, 133 659,50 CHF. Empreintes entries/projects/invoices/credit_notes identiques avant et après. Texte du dashboard et de l'onglet mandats identique (diff) avant et après chargement."
+     },
+     {
+      "name": "Validation HTTP mandat par mandat et chiffres §7",
+      "result": "OK",
+      "detail": "18 POST /historique/mandat/<id>/valider -> 23 validées, audit 23+23. Tableau : 19 clôturés / 5 actifs ; jours facturés clôturés 205,63 ; solde −40,29 ; non facturé clôturés 8,39 (somme des arrondis affichés ; 8,40125 exact dans la simulation) ; KPI actifs 27,78 j inchangé ; Facturé 2026 66 423,50 CHF ; prévision 6 762,51 + 20 287,49 = 27 050 CHF inchangée."
+     },
+     {
+      "name": "Déclencheurs d'immuabilité / suppression / rejet motivé",
+      "result": "OK",
+      "detail": "UPDATE sur amount_ht, qty_days, invoice_date, invoice_ref, project_id, unit_rate, source_cell : refusé. DELETE : refusé. Ré-insertion de la même cellule : UNIQUE. Rejet sans motif : refusé. En revanche, la colonne note n'est pas protégée (voir finding D-02)."
+     },
+     {
+      "name": "N1 : réservation du n° 2026-09",
+      "result": "ECART",
+      "detail": "Brouillon NHAF 2026 sur la période 01–30.09.2026 : la page d'émission annonce « Numéro qui sera attribué 2026-09 », puis émission sur la copie : « Facture 2026-09 émise ». La jointure invoices.number = historical_invoices.invoice_ref donne (2, '2026-09', 'SUIVI 2026!Q12')."
+     },
+     {
+      "name": "N5 : MANDATS-DECISIONS-UTILISATEUR.md",
+      "result": "OK",
+      "detail": "La ligne 67 est barrée ; la ligne 68 contient « RECTIFIÉ le 2026-10-06 (D2 = NON, N5) ». CHECKPOINT-TIME-BILLING-V9.md:99 présente toutefois encore les 7 j comme un fait (finding D-05)."
+     },
+     {
+      "name": "Sécurité : sha prod/staging, conteneurs, dépôt",
+      "result": "OK",
+      "detail": "Prod bd31f410…f6d6 (attendu). Staging 958c76ed…03b4 (= instantané ; inchangé pendant la session). Classeur c93c610c… inchangé. git status identique au départ, HEAD 40ee1dc. Conteneurs tb-g4v-d-* supprimés (docker rm -f)."
+     }
+    ],
+    "findings": [
+     {
+      "id": "D-01",
+      "severity": "bloquant",
+      "kind": "code",
+      "title": "N1 non implémenté : une facture de l'application peut recevoir le n° 2026-09 de la facture réelle CIRSE 2026",
+      "file": "app/billing_rules.py",
+      "line": 249,
+      "evidence": "next_invoice_number ne lit que invoices.number ; invoice_ref n'est utilisé nulle part dans app/ (hors schéma). Test sur une copie (rc19, :8490) : brouillon NHAF 2026, période 01.09–30.09.2026 -> page d'émission « Numéro qui sera attribué 2026-09 » -> « Facture 2026-09 émise ». La jointure invoices.number = historical_invoices.invoice_ref renvoie (2,'2026-09','SUIVI 2026!Q12'). Aucun test ne couvre N1. Le OUI à D1 reprenait le n° 2026-09 en renvoyant à N1. Cas probable : NHAF 2026 a 31 saisies en septembre 2026.",
+      "proposed_fix": "Dans next_invoice_number (et dans le contrôle de numérotation à l'émission), considérer comme pris les invoice_ref des factures historiques (statut proposed ou validated, voire tous). Ajouter un test unitaire : période se terminant en 2026-09 -> « 2026-09-2 »."
+     },
+     {
+      "id": "D-02",
+      "severity": "majeur",
+      "kind": "code",
+      "title": "Un rejet écrase définitivement la note de provenance D4",
+      "file": "app/historical_billing.py",
+      "line": 75,
+      "evidence": "set_status écrit note=motif lors d'un rejet. La colonne note n'est pas couverte par le déclencheur historical_invoices_source_values, et l'audit historical_invoice_proposed ne conserve pas la note. Test HTTP sur N8 : rejet avec motif « x », puis re-validation -> statut validated, note='x'. La note « Provenance (D4)… 1,75 h ; effet possible 0,169 j » est perdue sans trace.",
+      "proposed_fix": "Stocker le motif de rejet dans une colonne dédiée (reject_reason) ou l'ajouter à la note au lieu de la remplacer. Protéger la note initiale (déclencheur), ou l'inclure dans l'audit de proposition."
+     },
+     {
+      "id": "D-03",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Le n° 2026-09 de CIRSE 2026 n'apparaît pas sur la page « Factures historiques », qui annonce « aucun numéro »",
+      "file": "app/templates/historical.html",
+      "evidence": "grep -c '2026-09' sur la page /historique (avant et après validation) : 0. Le texte de la page dit « aucun numéro ». Pourtant SUIVI 2026!Q12 porte invoice_ref='2026-09' en base, et l'utilisateur valide sans voir ce numéro.",
+      "proposed_fix": "Afficher invoice_ref lorsqu'il est présent (« n° imprimé sur la facture réelle »). Reformuler : « aucun numéro attribué par Time Billing »."
+     },
+     {
+      "id": "D-04",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Le motif de rejet d'une facture historique n'a pas de longueur minimale (1 caractère accepté)",
+      "file": "app/app.py",
+      "line": 657,
+      "evidence": "POST /historique/7/statut avec statut=rejected et motif='x' -> « Facture historique rejetée (CIRSE 2025) ». change_reason ne contrôle que la longueur maximale ; les dérogations D8 exigent au moins 10 caractères.",
+      "proposed_fix": "Imposer un minimum (par exemple MIN_REASON = 10) pour le rejet d'une facture historique."
+     },
+     {
+      "id": "D-05",
+      "severity": "mineur",
+      "kind": "doc",
+      "title": "CHECKPOINT-TIME-BILLING-V9.md présente encore « 7 j déjà facturés le 27/04 » pour STC GEM Oct comme un fait",
+      "file": "CHECKPOINT-TIME-BILLING-V9.md",
+      "line": 99,
+      "evidence": "« Impact résiduel : STC GEM Oct - DM job affichera 18 j de solde au lieu de 11 (7 j déjà facturés le 27/04). » Cela contredit D2 = NON. N5 n'a été rectifié que dans import/MANDATS-DECISIONS-UTILISATEUR.md (lignes 67-68, correct).",
+      "proposed_fix": "Barrer cette phrase ou la compléter par un renvoi « rectifié par D2 = NON / N5 ; solde 18 j correct »."
+     },
+     {
+      "id": "D-06",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Le prévisionnel affiche « Facturé 2025 (émis) 67 236,00 CHF », alors que D3/§7 annoncent un CA 2025 non affiché ; libellé « émis / par date d'émission » inexact",
+      "file": "app/templates/index.html",
+      "evidence": "Avant validation, aucun bloc 2025. Après validation : « 2025 … Facturé 2025 (émis) 67 236,00 CHF … Total estimé 2025 67 236,00 CHF », sans mention de l'écart AL de 19 400 CHF (classeur 86 636). La légende indique « « Facturé » = factures émises moins notes de crédit, HT, par date d'émission » alors que le chiffre inclut l'historique validé, compté à sa date de facture.",
+      "proposed_fix": "Corriger la légende (« émises et historiques validées »). Soit masquer les années antérieures, soit signaler l'écart D3 ; mettre à jour le §7 et la fiche D3."
+     },
+     {
+      "id": "D-07",
+      "severity": "mineur",
+      "kind": "doc",
+      "title": "L'usage documenté du chargeur échoue sans PYTHONPATH=/app",
+      "file": "outils/charger_factures_historiques.py",
+      "line": 17,
+      "evidence": "La commande « python outils/charger_factures_historiques.py … » lancée dans l'image rc19 avec -w /app échoue : ModuleNotFoundError: No module named 'app'. migration-blanc/dry-run-d-g4.sh passe -e PYTHONPATH=/app, mais pas la docstring.",
+      "proposed_fix": "Ajouter PYTHONPATH=/app à l'usage documenté, ou insérer la racine du dépôt dans sys.path au début du script."
+     },
+     {
+      "id": "D-08",
+      "severity": "info",
+      "kind": "code",
+      "title": "Tarif 650 codé en dur dans le chargeur, sans comparaison au tarif SUIVI ni au tarif du mandat",
+      "file": "outils/charger_factures_historiques.py",
+      "line": 28,
+      "evidence": "RATE = 650.0 s'applique à toutes les lignes, sans lire la colonne TARIF ni projects.rate. Vérifié à part : les 18 lignes valent 650 dans le SUIVI et dans l'application, donc pas d'écart aujourd'hui.",
+      "proposed_fix": "Facultatif : arrêter le chargement si le TARIF de la ligne SUIVI ou projects.rate diffère de 650."
+     },
+     {
+      "id": "D-09",
+      "severity": "info",
+      "kind": "donnees",
+      "title": "Valeurs « lues » de 4 cellules 2026 = formules dérivées des jours ; artefact flottant sur J4",
+      "file": "import/g4-simulation-d1-20261006/simulation-lignes.csv",
+      "evidence": "J3, J4, P10 et Q12 contiennent =Tableau7[TOTAL] = TARIF × NB J (G). Le montant « lu » est donc lui-même calculé à partir des jours. J4 vaut 364.00000000000006 dans la colonne « valeur lue » (arrondi à 364,00 dans le registre).",
+      "proposed_fix": "Aucune action nécessaire ; éventuellement l'indiquer en provenance."
+     },
+     {
+      "id": "D-10",
+      "severity": "info",
+      "kind": "donnees",
+      "title": "Réalisé non facturé des clôturés : 8,39 j en sommant les valeurs affichées contre 8,40 j attendus",
+      "file": "DECISIONS-G4-D1-D10.md",
+      "line": 276,
+      "evidence": "La somme des 19 valeurs arrondies du tableau donne 8,39 ; la valeur exacte (simulation-resume.json) est 8,40125. Le tableau n'affiche aucun total, donc pas d'incohérence visible.",
+      "proposed_fix": "Aucune action, ou préciser « valeur exacte » dans le §7."
+     }
+    ],
+    "artefacts": [
+     "/tmp/tb-g4-0842/D/suivi-dump.txt",
+     "/tmp/tb-g4-0842/D/scripts/dump_suivi.py",
+     "/tmp/tb-g4-0842/D/scripts/load.sh",
+     "/tmp/tb-g4-0842/D/scripts/validate.py",
+     "/tmp/tb-g4-0842/D/scripts/reject.py",
+     "/tmp/tb-g4-0842/D/scripts/n1.py",
+     "/tmp/tb-g4-0842/D/scripts/n1b.py",
+     "/tmp/tb-g4-0842/D/scripts/sums.py",
+     "/tmp/tb-g4-0842/D/sim1/out/simulation-lignes.csv",
+     "/tmp/tb-g4-0842/D/sim1/out/simulation-mandats.csv",
+     "/tmp/tb-g4-0842/D/sim1/out/simulation-resume.json",
+     "/tmp/tb-g4-0842/D/pages/before-dash.html",
+     "/tmp/tb-g4-0842/D/pages/proposed-dash.html",
+     "/tmp/tb-g4-0842/D/pages/validated-dash.html",
+     "/tmp/tb-g4-0842/D/pages/validated-hist.txt",
+     "/tmp/tb-g4-0842/D/pages/issue-n1.txt",
+     "/tmp/tb-g4-0842/D/inst-a/data/timebilling.db"
+    ],
+    "prod_sha_after": "bd31f410305d6623dbf2237158ad8820cd3cbbfba20a37df0f17c54af7b0f6d6",
+    "staging_sha_after": "958c76ed0fc6ec0426e530c068c7fcf960fc73dc6b79626057121df7166703b4",
+    "containers_left": []
+   },
+   "verdicts": {
+    "verdicts": [
+     {
+      "id": "D-01",
+      "real": true,
+      "severity_corrected": "majeur",
+      "reasoning": "Confirmé dans le code. app/billing_rules.py:249 next_invoice_number ne lit que invoices.number, et invoice_ref n'est utilisé dans app/ que par le schéma et par add_proposed. invoice_checks.py ne contient aucun contrôle de numérotation. Reproduit sur une copie. Je corrige toutefois la sévérité : N1 figure dans DECISIONS-G4-D1-D10.md §D (« Points nouveaux (hors D1–D10) ») comme simple « Proposition ». Ce n'est pas une décision tranchée par l'utilisateur, même si la fiche D1 y renvoie (« voir N1 »). REPRISE-G4.md (« Fait ») ne la mentionne pas. Le défaut n'altère ni les données ni les montants. C'est une garde absente, avec une conséquence irréversible : un numéro en double sur un document émis et figé. Le risque existe même sans chargement du registre. Sévérité retenue : majeur, à traiter avant toute émission d'une facture dont la période se termine en septembre 2026.",
+      "reproduction": "Copie /tmp/tb-g4-0842/D-verif/base.db (sha 958c76ed…). Lancement de rc19 tb-g4v-dv-a sur :8490, puis chargeur --appliquer --confirmer CHARGER-23-A-VALIDER : 23 lignes proposées, Q12 invoice_ref='2026-09'. Validation des 18 mandats par POST /historique/mandat/<id>/valider (23 validées). POST /invoice pour project_id=13 (NHAF 2026), période 2026-09-01→2026-09-30 : brouillon id 2. GET /issue/2 : « Numéro qui sera attribué 2026-09 » et « Émettre définitivement la facture 2026-09 ». Je n'ai pas émis la facture moi-même : l'émission effective reste NON_VERIFIE de mon côté, mais issue() reprend ctx['number'] (app.py, issue_context)."
+     },
+     {
+      "id": "D-02",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Confirmé. Lors d'un rejet, set_status (historical_billing.py:75) écrit note=motif. À la re-validation, il conserve r['note'], c'est-à-dire le motif. Le déclencheur historical_invoices_source_values ne couvre pas la colonne note, et l'audit historical_invoice_proposed ne contient pas la note. Pire, une fois la ligne re-validée, la page affiche le motif « x » dans la colonne « Origine des chiffres », à la place de la provenance D4. Je ramène la sévérité à mineur : le cas suppose un rejet ou retrait puis une re-validation de l'une des 5 lignes annotées. Le défaut n'a aucun effet sur les jours ni sur les montants. Enfin, le texte de provenance reste dans le dépôt (outils/charger_factures_historiques.py et import/g4-simulation-d1-20261006/simulation-lignes.csv, colonne note : 5 occurrences « D4 »). L'affirmation « perdue sans trace » est donc excessive : la perte ne concerne que la base.",
+      "reproduction": "Même instance :8490. Ligne id 7 (SUIVI 2025!N8), note initiale « Provenance (D4) : … 1,75 h ; effet possible 0,169 j au plus. ». POST /historique/7/statut statut=rejected motif=x : « Facture historique rejetée (CIRSE 2025) », base (rejected,'x'). POST statut=validated : base (validated,'x'). Les 4 lignes d'audit de l'id 7 ne contiennent jamais le texte D4. La page /historique affiche « jours lus dans le classeur ; montant = jours × tarif de la ligne x »."
+     },
+     {
+      "id": "D-03",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Confirmé. app/templates/historical.html n'affiche jamais r.invoice_ref, et l'introduction dit « aucun numéro ». Le n° réel 2026-09 de CIRSE 2026 est donc invisible pour l'utilisateur qui valide. La formule « aucun numéro » vise l'absence de numéro attribué par Time Billing (fiche D1 : « pas de numéro attribué ») : c'est ambigu plutôt que faux. Le défaut est cosmétique et documentaire, mais il prive l'utilisateur de l'indice qui ferait apparaître N1.",
+      "reproduction": "Après validation sur :8490, la page GET /historique compte 0 occurrence de « 2026-09 », et 'aucun numéro' in page = True. Lecture du template : aucune référence à invoice_ref."
+     },
+     {
+      "id": "D-04",
+      "real": true,
+      "severity_corrected": "info",
+      "reasoning": "Le comportement est confirmé : change_reason (app.py:657) ne borne que la longueur maximale (500) et refuse les caractères de contrôle. Un motif d'un caractère est accepté. Aucune décision n'impose pourtant de minimum pour le rejet d'une facture historique : le minimum de 10 caractères de D8 ne vise que les dérogations aux contrôles 12 et 13. La fiche D1 demande seulement un « rejet motivé », et le motif reste obligatoire et tracé dans l'audit. C'est une suggestion de durcissement, pas un écart : sévérité info.",
+      "reproduction": "Sur :8490, POST /historique/7/statut statut=rejected motif=x : (302, [« Facture historique rejetée (CIRSE 2025)… »]), base status='rejected', note='x'."
+     },
+     {
+      "id": "D-05",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Confirmé. CHECKPOINT-TIME-BILLING-V9.md:99 dit encore « STC GEM Oct - DM job affichera 18 j de solde au lieu de 11 (7 j déjà facturés le 27/04) ». Cela contredit D2 = NON. N5 ne visait explicitement que import/MANDATS-DECISIONS-UTILISATEUR.md, qui est bien rectifié (ligne 67 barrée, ligne 68 « RECTIFIÉ le 2026-10-06 »). Le CHECKPOINT est un document d'état antérieur : l'écart est documentaire et mineur.",
+      "reproduction": "sed -n 95,102p CHECKPOINT-TIME-BILLING-V9.md et sed -n 60,70p import/MANDATS-DECISIONS-UTILISATEUR.md."
+     },
+     {
+      "id": "D-06",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Confirmé. Après validation, l'onglet prévision affiche un bloc 2025 : « Facturé 2025 (émis) 67 236,00 CHF … Total estimé 2025 67 236,00 CHF ». La légende reste « « Facturé » = factures émises moins notes de crédit, HT, par date d'émission », alors que le chiffre ne vient que de l'historique validé, compté à sa date de facture. La carte KPI 2026 porte pourtant le bon libellé (« factures émises et historiques validées »). Le §7 annonçait un CA 2025 « non affiché ». Le montant de 67 236 est conforme à D3 = NON, mais la page ne signale pas l'écart de 19 400 CHF avec le classeur (86 636). L'écart porte sur le libellé et la documentation, pas sur un montant faux.",
+      "reproduction": "Sur :8490, après validation des 23 lignes, GET /?tab=dashboard : texte « « Facturé » = factures émises moins notes de crédit, HT, par date d'émission. 2025 … Facturé 2025 (émis) 67 236,00 CHF Prévision restante 2025 0,00 CHF Total estimé 2025 67 236,00 CHF ». Ni « 19 400 » ni « 86 636 » n'apparaissent."
+     },
+     {
+      "id": "D-07",
+      "real": true,
+      "severity_corrected": "mineur",
+      "reasoning": "Confirmé. Sans PYTHONPATH, l'image rc19 a PYTHONPATH vide et le répertoire de travail /app. Lancé comme outils/charger_factures_historiques.py, le script ne met que /app/outils dans sys.path. La commande documentée échoue donc. migration-blanc/dry-run-d-g4.sh passe bien -e PYTHONPATH=/app : c'est la docstring qui est inexacte, sans risque pour les données (l'échec intervient avant toute écriture).",
+      "reproduction": "docker run --rm --network none -v app:/app/app:ro -v outils:/app/outils:ro … -w /app rc19 python -W ignore outils/charger_factures_historiques.py --classeur /src/classeur.xlsx --base /data/timebilling.db --sortie /out donne « ModuleNotFoundError: No module named 'app' » (ligne import app.app as m). docker run rc19 sh -c 'echo PYTHONPATH=$PYTHONPATH; pwd' donne « PYTHONPATH= » et « /app ». Avec -e PYTHONPATH=/app et --appliquer : « CHARGÉ : 23 ligne(s) « à valider » ». Copie : 23 proposed, 205.63 j, 133659.5 CHF."
+     }
+    ],
+    "missed": "Aucun contrôle essentiel de l'axe n'a été omis. Quelques réserves : (1) L'écart 8,39 j (somme des valeurs affichées) contre 8,40 j (§7) est mentionné dans les contrôles, mais il n'est ni expliqué ni versé en finding : il faudrait dire si l'application affiche un total des clôturés ou si 8,39 est un recalcul de l'auditeur. (2) Le rejeu du chargeur est idempotent (rc=0, 0 ligne ajoutée) et non refusé comme le demandait l'axe. L'auditeur le signale sans le qualifier d'écart, ce qui me paraît acceptable. (3) Pour N1, l'auditeur n'a pas relevé que le problème existe même sans chargement du registre (next_invoice_number ignore toute facture externe), ni que N1 n'est qu'une « proposition » hors D1–D10, d'où la sévérité surestimée. (4) Il n'a pas vérifié l'effet des lignes historiques sur les contrôles avant émission (contrôle 5 : ligne « à valider » en attente) ni sur l'annexe : c'est hors du périmètre strict de l'axe. Sécurité de fin de session : prod bd31f410…f6d6 (attendu) ; staging 958c76ed…03b4 (inchangé) ; instantané 958c76ed… inchangé ; classeur c93c610c… inchangé ; dépôt inchangé (HEAD 40ee1dc, même git status) ; conteneur tb-g4v-dv-a supprimé ; travail limité à /tmp/tb-g4-0842/D-verif (700)."
+   }
+  },
+  {
+   "axis": "decisions-code",
+   "audit": {
+    "axis": "E — fidélité du code G4 (rc19) aux décisions D6, D8, D9, N1, N4 et aux corrections de mise en page du §6",
+    "resume": "J'ai relu invoice_checks.py, les routes d'émission d'app.py, pdf_layout.py, invoice_service.py et billing_rules.py. J'ai ensuite tout exécuté sur un conteneur jetable rc19 (tb-g4v-e1, :8495), monté sur une copie du snapshot staging, avec la liste de mots de test par défaut. D8 est conforme sur tous les points vérifiés : 13 contrôles ; seuls 12 (partie narrative) et 13 sont dérogeables, chacun séparément, avec un motif d'au moins 10 caractères après normalisation des espaces. Chaque dérogation donne une ligne d'audit en ajout seul (contrôle, anomalie, motif, auteur, horodatage) et le motif n'apparaît ni dans le PDF figé, ni dans le header_json, ni dans les pages. L'échec arithmétique du 12 reste non dérogeable (vérifié en injectant l'erreur dans le processus). Pour D6, la période est bien dans la cellule DESCRIPTION, avec 3 lignes au plus (une 4e est refusée). L'annexe est chronologique, historique d'abord ; un mois coupé donne deux groupes « partie du mois ». Les légendes n'apparaissent qu'en cas d'antériorité, toutes les pages sont numérotées et la ligne de dernière page est conforme. Sans antériorité, l'écart vertical avec la facture 2026-09 reste ≤ 0,7 pt, et la légende ne déplace rien dans l'annexe. Il reste des écarts. N1 n'est pas implémenté : une facture de l'app sur septembre 2026 a reçu le n° 2026-09, déjà porté par la facture réelle CIRSE 2026 du registre. D9 n'est pas appliqué à la lettre : les factures historiques sont coupées à la date de la facture et non à la fin de période (une facture historique du 03.10 est comptée dans une facture au 30.09). Le libellé « AUTRES — … » s'imprime avec un montant à 0. La note libre reste sous les totaux et décale « Je vous remercie » de +5,4 pt. Production inchangée (bd31f410…), staging inchangé (958c76ed…), conteneurs supprimés.",
+    "checks": [
+     {
+      "name": "D8 — 13 contrôles, seuls 12 et 13 dérogeables",
+      "result": "OK",
+      "detail": "invoice_checks.py : DEROGABLE=(12,13), add(..., derogable=True) seulement sur le 12 narratif et le 13. Écran /issue/7 (brouillon NHAF 01–31.10.2026, date 06.10.2026) : 12 et 13 en ANOMALIE, deux zones de texte derogation_12/derogation_13 avec minlength=10, bouton actif. Brouillon n°1 : 10 bloquant, donc pas de zone de texte et bouton désactivé."
+     },
+     {
+      "name": "D8 — motif ≥ 10 caractères, une dérogation par contrôle",
+      "result": "OK",
+      "detail": "POST /issue/7 : sans motif → refusé (12 et 13 cités) ; motif du 13 = « court » → refusé (13) ; motif du 12 = 9 caractères → refusé ; « a b c » noyé dans des espaces → refusé (espaces normalisés) ; seul le 12 motivé → refusé (13) ; seul le 13 motivé → refusé (12). Aucune ligne d'audit après les refus. Avec deux motifs valides : facture 2026-10 émise."
+     },
+     {
+      "name": "D8 — audit (contrôle, anomalie, motif, auteur, horodatage)",
+      "result": "OK",
+      "detail": "Deux événements audit 'invoice_check_derogation' en JSON : {invoice_id:7, number:'2026-10', check:12|13, title, anomaly (texte exact), reason (espaces normalisés), by:'admin', at:'2026-10-06T09:13:39'}. invoice_issued porte derogations=12,13. La table audit est en ajout seul (déclencheurs audit_no_update/no_delete). Il n'existe pas de table dédiée invoice_check_derogation : c'est un événement d'audit."
+     },
+     {
+      "name": "D8 — motif imprimé nulle part",
+      "result": "OK",
+      "detail": "Marqueur ZZMOTIF absent du PDF figé (pdftotext), de invoice_snapshots.header_json et des pages / et /archive. Une recherche dans toutes les colonnes de toutes les tables ne le trouve que dans audit.detail (2 lignes)."
+     },
+     {
+      "name": "D8 — échec arithmétique du 12 jamais dérogeable",
+      "result": "OK",
+      "detail": "Test dans le processus (docker run --network none, image rc19, copie de base) : position falsifiée (realized+1) → 6 et 12 en échec avec derogable=False, et derogations() refuse malgré des motifs. Falsification de current (+0,5) → 12 « quantité de la page 1 ≠ jours cette facture », derogable=False, refusé."
+     },
+     {
+      "name": "D8 — autres contrôles strictement bloquants",
+      "result": "OK",
+      "detail": "Code : aucun autre add() ne passe derogable ni warn=True. Brouillon n°1 : contrôle 10 bloquant (test, punaise, unn), zones de dérogation masquées, POST refusé, table invoices inchangée."
+     },
+     {
+      "name": "N4 / contrôle 13 (fin de période ≤ date de facture)",
+      "result": "OK",
+      "detail": "Brouillon n°1 : « fin de période 31.10.2026 postérieure à la date de facture 07.10.2026 », dérogeable. La date future reste refusée de toute façon (date_problem)."
+     },
+     {
+      "name": "Brouillon n°1 — contrôles attendus d'après DECISIONS §D8 (1/12, 3, 10, 13)",
+      "result": "ECART",
+      "detail": "Observé : 10, 12 et 13 en échec ; 1 et 3 « ok ». Le contrôle 3 affiche « 2.0 × 0.0 = 0.00 CHF HT » comme conforme. Le tarif nul est bloqué ailleurs (« Champs à compléter : Client (nom court), Tarif journalier du mandat »). La période vide est traitée par le 12 dérogeable, ce qui est cohérent avec D8."
+     },
+     {
+      "name": "D6 (a) — période dans la cellule DESCRIPTION, 3 lignes maximum",
+      "result": "OK",
+      "detail": "brouillon1.pdf : « test » à y = 309,8 puis « Période : 03.09.2026 – 31.10.2026 » à y = 320,1, colonne DESCRIPTION, rien sous le TOTAL au sujet de la période. Une description de 4 lignes est refusée à la création (« 3 lignes au maximum … la 4e ligne porte la période »). Note de crédit : MAX_DESCRIPTION_LINES=4 (lu dans le code)."
+     },
+     {
+      "name": "D6 (a) — plus rien sous les totaux, gabarit immobile",
+      "result": "ECART",
+      "detail": "La note libre s'imprime toujours sous le TOTAL (pdf_layout.py:555). Mesures : « 3 PUNAISE… » à y = 455,3 et « Je vous remercie » à 479,8 contre 474,4 sans note (+5,4 pt), sur brouillon1.pdf et N-note.pdf. Avec une description de 3 lignes, la période passe en 4e ligne et SOUS-TOTAL descend de 342,4 à 352,7 (+10,3 pt), TOTAL aussi."
+     },
+     {
+      "name": "§6 — « AUTRES » : libellé seulement si montant ≠ 0",
+      "result": "ECART",
+      "detail": "brouillon1.pdf : « AUTRES — Cadeau unn jour   - CHF ». Rendu dans le processus avec other_label='Frais divers' et un montant à 0 : « AUTRES — Frais divers   - CHF ». other_label() ajoute le libellé quel que soit le montant."
+     },
+     {
+      "name": "§6 — retours à la ligne de l'adresse respectés",
+      "result": "OK",
+      "detail": "Le code respecte les retours saisis : une adresse tapée « Avenue du Bourgmestre\\nEtienne Demunter 5, boîte 10 » donne deux lignes (addr.pdf). En revanche, l'adresse stockée en staging (EUROPCR 2027, NHAF, CIRSE 2026) n'a pas ce retour : le brouillon n°1 imprime « Avenue du Bourgmestre Etienne Demunter 5, / boîte 10 », comme rendu-reference-d6."
+     },
+     {
+      "name": "D6 (b) — annexe cumulative chronologique, historique d'abord, légendes seulement si antériorité",
+      "result": "OK",
+      "detail": "A-coupe.pdf (NHAF, période 15.08–30.09.2026) : avr (2 p.), juin, juil, août « Historique cumulatif — antérieur… » « partie du mois » 3,75, puis août « Prestations de la période facturée » « partie du mois » 3,30, puis sept (2 p.). W-sans-anteriorite.pdf (01.04–30.09) : aucune légende, août « du mois » 7,05. Brouillon n°1 : 2 pages « Historique cumulatif ». La légende ne déplace aucun élément (W p.3 contre A p.3 : dx = dy = 0)."
+     },
+     {
+      "name": "D6 (c) — toutes les pages d'annexe numérotées ; ligne de dernière page",
+      "result": "OK",
+      "detail": "« Page k of n » sur chaque page d'annexe et sur la synthèse (A : 1 à 9 sur 9 ; W : 1 à 8 ; brouillon n°1 : 1 à 3). La dernière page porte « Période facturée : du 15.08.2026 au 30.09.2026 · Historique cumulatif des prestations jusqu'au 30.09.2026 ». Période vide : la mention « Aucune saisie datée de la période facturée … » est imprimée (facture C émise)."
+     },
+     {
+      "name": "Rendu sans antériorité identique à la référence",
+      "result": "OK",
+      "detail": "comparer_pdf_reference.py, facture réelle 2026-09 contre W page 1 : dy ≤ 0,7 pt sur 21 repères. Les dx viennent seulement des polices (Je 5,6 ; registre −2,8), plus le titre BROUILLON propre aux brouillons. Annexe : référence p.3 contre W p.3, dy ≤ 4,1 pt (boîtes de police, identique au §6). Le contrôle 11 répond « empreinte du gabarit conforme » sur l'image rc19."
+     },
+     {
+      "name": "P-4 — la facture ne se compte pas dans « déjà facturé »",
+      "result": "OK",
+      "detail": "Positions figées : facture 6 → historiques 3 / TB antérieurs 0 / cette facture 3,17 ; facture 7 → 3 / 3,17 / 1, solde 8,83. Code : others exclut id=iid, contract(exclude_invoice=iid)."
+     },
+     {
+      "name": "D9 — position limitée aux factures datées ≤ fin de période",
+      "result": "ECART",
+      "detail": "Factures historiques validées NHAF (copie) datées du 15.09 et du 03.10.2026. La facture émise 2026-09 (période jusqu'au 30.09, datée du 06.10) imprime « Jours facturés historiques 3 » et liste « 03.10.2026 : 2,00 j » sous le titre « Position contractuelle en jours au 30.09.2026 ». Le code coupe les factures historiques à la date de facture (invoice_service.py:41-42, app.py:1056, contrôle 5) et les factures TB au period_to, pas à leur date."
+     },
+     {
+      "name": "N1 — numéros historiques connus réservés",
+      "result": "ECART",
+      "detail": "Facture historique validée CIRSE 2026 invoice_ref='2026-09' ajoutée sur la copie. Brouillon NHAF 01–30.09.2026 : l'écran propose « Émettre définitivement la facture 2026-09 », puis la facture 2026-09 est émise (invoices id 6) ; aucun contrôle ne l'empêche. next_invoice_number (billing_rules.py:249) ne lit que la table invoices."
+     },
+     {
+      "name": "Sécurité — production, staging, dépôt",
+      "result": "OK",
+      "detail": "Fin de session : production bd31f410305d6623dbf2237158ad8820cd3cbbfba20a37df0f17c54af7b0f6d6, staging 958c76ed0fc6ec0426e530c068c7fcf960fc73dc6b79626057121df7166703b4 (= snapshot, inchangé depuis le début), classeur c93c610c… non ouvert. Dépôt HEAD 40ee1dc, git status identique au début. docker rm -f tb-g4v-e1 fait, aucun tb-g4v-e* restant. Seuls les ports 8495 et le réseau none ont servi."
+     }
+    ],
+    "findings": [
+     {
+      "id": "E-1",
+      "severity": "bloquant",
+      "kind": "code",
+      "title": "N1 non implémenté : l'app réattribue le n° 2026-09 de la facture réelle CIRSE 2026",
+      "evidence": "Sur une copie de base, avec la ligne historique validée CIRSE 2026 invoice_ref='2026-09', le brouillon NHAF 2026 (période 01–30.09.2026) affiche « Émettre définitivement la facture 2026-09 ». POST /issue/6 → « Facture 2026-09 émise le 06.10.2026 ». next_invoice_number (app/billing_rules.py:249) ne lit que la table invoices, et aucun des 13 contrôles ne vérifie le numéro. NHAF, STC GEM Oct, PCR LV 2026 et MSD ont tous des saisies en septembre 2026 : la 1re facture de l'app portant sur septembre recevra donc ce numéro en double.",
+      "proposed_fix": "Dans next_invoice_number, considérer comme pris les numéros historiques connus (historical_invoices.invoice_ref, au moins non rejetés, plus une liste fixe {'2026-09'} tant que le registre n'est pas chargé). Ajouter un contrôle avant émission « numéro libre dans l'app et dans le registre », plus un test unitaire.",
+      "file": "app/billing_rules.py",
+      "line": 249
+     },
+     {
+      "id": "E-2",
+      "severity": "majeur",
+      "kind": "code",
+      "title": "D9 non respecté à la lettre : factures historiques coupées à la date de facture, pas à la fin de période",
+      "evidence": "Factures historiques validées NHAF datées du 15.09 et du 03.10.2026 (copie). La facture émise 2026-09 (période jusqu'au 30.09.2026, datée du 06.10.2026) imprime « Position contractuelle en jours au 30.09.2026 … Jours facturés historiques 3 » avec « 03.10.2026 : 2,00 j ». Selon D9 (« datées au plus tard à sa date de fin de période »), seul 1 j aurait dû compter. Dans le code, historical_upto = invoice_date (invoice_service.py:41-42, app.py:1056, invoice_checks contrôle 5), et les factures TB sont filtrées sur leur period_to, pas sur leur date. La fiche D9 elle-même est ambiguë (« Si OUI : l'état à la date de la facture »).",
+      "proposed_fix": "Faire trancher l'utilisateur (fin de période ou date de facture). S'il s'agit de la fin de période, passer historical_upto=period_to dans live_data, issue_context et le contrôle 5, filtrer aussi les factures TB sur leur invoice_date ≤ period_to, et mettre à jour la légende de la page de synthèse.",
+      "file": "app/invoice_service.py",
+      "line": 42
+     },
+     {
+      "id": "E-3",
+      "severity": "majeur",
+      "kind": "code",
+      "title": "§6 / D6 : libellé « AUTRES — … » imprimé alors que le montant vaut 0",
+      "evidence": "brouillon1.pdf page 1 : « AUTRES — Cadeau unn jour   - CHF ». Rendu dans le processus avec other_label='Frais divers' et other_amount=0 : « AUTRES — Frais divers   - CHF ». pdf_layout.other_label() (l. 352) ajoute « — libellé » sans regarder le montant ; render_invoice l'utilise pour la ligne des totaux. La correction « n'imprimer le libellé que si montant ≠ 0 » du §6 n'est pas faite.",
+      "proposed_fix": "Dans other_label, ajouter « — {other_label} » seulement si le montant est ≠ 0 (garder « AUTRES » seul sinon, comme le modèle). Ajouter un test de rendu.",
+      "file": "app/pdf_layout.py",
+      "line": 352
+     },
+     {
+      "id": "E-4",
+      "severity": "majeur",
+      "kind": "code",
+      "title": "D6 (a) : la note libre reste sous les totaux et décale le modèle (+5,4 pt)",
+      "evidence": "pdf_layout.py:555 : extra = [h['note']], toujours imprimé sous le TOTAL. Mesures pdftotext -bbox : la note (« 3 PUNAISE DE JOUR OFFERT » ou une ligne de test) est à y = 455,3 et « Je vous remercie » à 479,8, contre 474,4 sans note (brouillon1.pdf, N-note.pdf). Chaque ligne de note supplémentaire ajoute 11 pt. Le §6 proposait une zone de note fixe hors flux ou un renvoi sur la page de synthèse, et D6 (a) demande « plus rien sous le TOTAL ».",
+      "proposed_fix": "Placer la note dans une zone fixe qui ne pousse pas « Je vous remercie » ni le bloc paiement (par exemple sous le bloc paiement, ou sur la page de synthèse), ou la limiter à une hauteur réservée. Ajouter un test de position.",
+      "file": "app/pdf_layout.py",
+      "line": 555
+     },
+     {
+      "id": "E-5",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Description de 3 lignes + période : les totaux descendent de 10,3 pt",
+      "evidence": "D3-desc3lignes.pdf : description sur 3 lignes, « Période » en 4e ligne (y = 340,7), SOUS-TOTAL à 352,7 contre 342,4 et TOTAL à 441,0 contre 430,7 (top += max(len(rows),2)*10,3+6, pdf_layout.py:306). L'immobilité du gabarit annoncée par D6 n'est vraie qu'avec une description de 1 ou 2 lignes, ce qui est le cas de la référence.",
+      "proposed_fix": "Limiter la description d'une facture à 2 lignes, ou documenter l'écart et ajouter ce cas à la comparaison de référence.",
+      "file": "app/pdf_layout.py",
+      "line": 306
+     },
+     {
+      "id": "E-6",
+      "severity": "mineur",
+      "kind": "code",
+      "title": "Contrôle 3 « conforme » avec un tarif à 0 (attendu en échec selon DECISIONS §D8)",
+      "evidence": "/issue/1 (brouillon n°1) : « 3 ok 2.0 × 0.0 = 0.00 CHF HT ». L'émission reste bloquée, mais par les champs manquants (« Tarif journalier du mandat … ») et le total ≤ 0, pas par le contrôle 3. Le brouillon PDF indique « Contrôles avant émission en échec : n° 10, 12, 13 » et ne mentionne pas le tarif.",
+      "proposed_fix": "Ajouter au contrôle 3 « tarif nul » (unit_rate ≤ 0 → échec non dérogeable), conformément à la fiche D8.",
+      "file": "app/invoice_checks.py",
+      "line": 98
+     },
+     {
+      "id": "E-7",
+      "severity": "mineur",
+      "kind": "doc",
+      "title": "Légende de la synthèse inexacte pour les factures TB antérieures",
+      "evidence": "La légende dit « Jours facturés Time Billing antérieurs : factures Time Billing émises avant celle-ci » (pdf_layout.py:510). Le calcul retient pourtant les factures dont period_to ≤ la fin de période (invoice_service.py:44) et exclut celles émises avant mais pour une période postérieure (champ « later », signalé seulement dans le détail du contrôle 6, pas sur le PDF).",
+      "proposed_fix": "Formuler « factures Time Billing émises dont la période se termine au plus tard le [cutoff] », ou aligner le calcul sur D9 (voir E-2).",
+      "file": "app/pdf_layout.py",
+      "line": 510
+     },
+     {
+      "id": "E-8",
+      "severity": "mineur",
+      "kind": "donnees",
+      "title": "Adresse EGG BE stockée sans retour à la ligne : coupure différente du modèle",
+      "evidence": "Le code respecte les retours saisis (addr.pdf : « Avenue du Bourgmestre » / « Etienne Demunter 5, boîte 10 »). Mais projects.billing_address de CIRSE 2026, EUROPCR 2027 et NHAF 2026 vaut 'EGG BE\\nAvenue du Bourgmestre Etienne Demunter 5, boîte 10\\n…'. brouillon1.pdf et rendu-reference-d6 impriment donc « Avenue du Bourgmestre Etienne Demunter 5, / boîte 10 », alors que la facture réelle imprime « Avenue du Bourgmestre / Etienne Demunter 5, boîte 10 ».",
+      "proposed_fix": "Prévenir l'utilisateur qu'il doit saisir le retour à la ligne dans l'adresse des mandats EGG BE (fiche mandat), après le déploiement. Aucun changement de code."
+     },
+     {
+      "id": "E-9",
+      "severity": "info",
+      "kind": "doc",
+      "title": "Dérogations tracées dans la table audit (pas de table dédiée)",
+      "evidence": "La table invoice_check_derogation n'existe pas. Les dérogations sont des événements audit 'invoice_check_derogation' en JSON (contrôle, titre, anomalie, motif, auteur, horodatage, n° et id de facture), dans une table en ajout seul (déclencheurs audit_no_update/no_delete). C'est conforme sur le fond à D8 et à REPRISE-G4.md.",
+      "proposed_fix": "Aucun. Si besoin, préciser « événement d'audit » dans les documents de recette."
+     }
+    ],
+    "artefacts": [
+     "/tmp/tb-g4-0842/E/out/brouillon1.pdf",
+     "/tmp/tb-g4-0842/E/out/issue1.html",
+     "/tmp/tb-g4-0842/E/out/cmp-brouillon1.txt",
+     "/tmp/tb-g4-0842/E/out/A-coupe.pdf",
+     "/tmp/tb-g4-0842/E/out/W-sans-anteriorite.pdf",
+     "/tmp/tb-g4-0842/E/out/cmp-W.txt",
+     "/tmp/tb-g4-0842/E/out/N-note.pdf",
+     "/tmp/tb-g4-0842/E/out/D3-desc3lignes.pdf",
+     "/tmp/tb-g4-0842/E/out/B-sept.pdf",
+     "/tmp/tb-g4-0842/E/out/issueB.html",
+     "/tmp/tb-g4-0842/E/out/C-emise.pdf",
+     "/tmp/tb-g4-0842/E/out/addr.pdf",
+     "/tmp/tb-g4-0842/E/out/autres0.pdf",
+     "/tmp/tb-g4-0842/E/bin/launch.sh",
+     "/tmp/tb-g4-0842/E/bin/s1.py",
+     "/tmp/tb-g4-0842/E/bin/s2.py",
+     "/tmp/tb-g4-0842/E/bin/s3.py",
+     "/tmp/tb-g4-0842/E/bin/annexcmp.py",
+     "/tmp/tb-g4-0842/E/arith.py",
+     "/tmp/tb-g4-0842/E/addr.py"
+    ],
+    "prod_sha_after": "bd31f410305d6623dbf2237158ad8820cd3cbbfba20a37df0f17c54af7b0f6d6",
+    "staging_sha_after": "958c76ed0fc6ec0426e530c068c7fcf960fc73dc6b79626057121df7166703b4",
+    "containers_left": []
+   },
+   "verdicts": null
+  }
+ ]
+}

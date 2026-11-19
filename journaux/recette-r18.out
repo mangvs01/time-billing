@@ -1,0 +1,15 @@
+base staging inchangée
+recette-metier-phase1.log: RESULT phase1: 107/107 — erreurs console : 0  FAIL=0
+recette-metier-phase2.log: RESULT phase2: 15/15 — erreurs console : 0  FAIL=0
+recette-saisies-phase1.log: RESULT phase1: 34/34 — erreurs console : 0  FAIL=0
+recette-saisies-phase2.log: RESULT phase2: 7/7 — erreurs console : 0  FAIL=0
+recette-responsive.log: RESULT: 33/33 pages sans défaut — erreurs console : 0  FAIL=0
+recette-rc12.log: RC12 navigateur : 22/22 réussis, 0 échec(s)  FAIL=0
+recette-rc14.log: RC14 navigateur : 56/56 réussis, 0 échec(s)  FAIL=0
+recette-nuit.log: NUIT navigateur : 34/34 réussis, 0 échec(s)  FAIL=0
+recette-minuit.log:   FAIL=0
+e2e_rc13.log: RESULT rc13: 5/5 passed  FAIL=0
+e2e_phase1.log: RESULT phase1: 30/30 passed  FAIL=0
+e2e_phase2.log: RESULT phase2: 18/18 passed  FAIL=0
+concurrence.log: RESULT: 11/11  FAIL=0
+rc=0

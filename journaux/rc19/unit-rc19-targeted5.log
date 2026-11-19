@@ -1,0 +1,13 @@
+...................F
+======================================================================
+FAIL: test_shared_check_is_clean_after_migration_and_catches_a_broken_trigger (tests.test_rc19.SchemaChecks.test_shared_check_is_clean_after_migration_and_catches_a_broken_trigger)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_rc19.py", line 468, in test_shared_check_is_clean_after_migration_and_catches_a_broken_trigger
+    self.assertTrue(any('non compilable' in p for p in schema_checks.rc19_problems(c)))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 20 tests in 14.142s
+
+FAILED (failures=1)

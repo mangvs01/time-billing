@@ -1,0 +1,5 @@
+avant : 47 ms
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+après : 9 ms

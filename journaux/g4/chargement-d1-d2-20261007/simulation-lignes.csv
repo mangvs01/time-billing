@@ -1,0 +1,25 @@
+cellule;colonne;mandat;date;valeur lue;base;jours;montant HT CHF;n° facture;note
+SUIVI 2025!I4;Facture 09.04;Endovascular Summit;2025-04-09;5.2;days;5.2;3380.0;;
+SUIVI 2025!K4;Facture 16.06;Endovascular Summit;2025-06-16;7.7;days;7.7;5005.0;;
+SUIVI 2025!I5;Facture 09.04;EUROPCR 2025;2025-04-09;6.6;days;6.6;4290.0;;
+SUIVI 2025!J5;Facture 12.05;EUROPCR 2025;2025-05-12;5.3;days;5.3;3445.0;;
+SUIVI 2025!K5;Facture 16.06;EUROPCR 2025;2025-06-16;7.5;days;7.5;4875.0;;
+SUIVI 2025!K7;Facture 16.06;NC STC June;2025-06-16;10.5;days;10.5;6825.0;;"Provenance (D4) : quantité fixée dans le classeur d'après un cumul qui comptait des lignes en double exclues du réalisé (A1) : NC STC (June + Sept, même tableau) 0,75 h (MAR!49) + 9,75 h (AUG) ; effet certain 1,2625 j sur K7 + M14."
+SUIVI 2025!N8;Facture 03.10;CIRSE 2025;2025-10-03;9.5;days;9.5;6175.0;;"Provenance (D4) : quantité fixée dans le classeur d'après un cumul qui comptait des lignes en double exclues du réalisé (A1) : 1,75 h ; effet possible 0,169 j au plus."
+SUIVI 2025!J9;Facture 12.05;ERA 2025;2025-05-12;5.6;days;5.6;3640.0;;
+SUIVI 2025!L9;Facture 14.07;ERA 2025;2025-07-14;8.4;days;8.4;5460.0;;
+SUIVI 2025!N10;Facture 03.10;Rising stars Q3;2025-10-03;6;days;6.0;3900.0;;"Provenance (D4) : quantité fixée dans le classeur d'après un cumul qui comptait des lignes en double exclues du réalisé (A1) : 3,75 h ; effet possible 0,469 j (6 j = PO : cumul ou PO facturé, indécidable)."
+SUIVI 2025!P11;Facture 15/12;PCR LV 2025;2025-12-15;6.34;days;6.34;4121.0;;
+SUIVI 2025!O12;Facture 27.11;SMART Y90;2025-11-27;10;days;10.0;6500.0;;
+SUIVI 2025!K13;Facture 16.06;EAHAD;2025-06-16;1;days;1.0;650.0;;
+SUIVI 2025!M14;Facture 30.09;NC STC Sept;2025-09-30;13.8;days;13.8;8970.0;;"Provenance (D4) : quantité fixée dans le classeur d'après un cumul qui comptait des lignes en double exclues du réalisé (A1) : NC STC (June + Sept, même tableau) 0,75 h (MAR!49) + 9,75 h (AUG) ; effet certain 1,2625 j sur K7 + M14."
+SUIVI 2026!J3;Facture 16/02;ASN 2025;2026-02-16;6389.5;amount;9.83;6389.5;;"Provenance (D4) : quantité fixée dans le classeur d'après un cumul qui comptait des lignes en double exclues du réalisé (A1) : 2,75 h (effet certain 0,344 j) ; s'y ajoutent 1,50 h de OCT!94 (exception C6, non importée)."
+SUIVI 2026!J4;Facture 16/02;ERA 2025;2026-02-16;364.00000000000006;amount;0.56;364.0;;
+SUIVI 2026!L5;Facture 03/04;SMM 2026;2026-04-03;9750;amount;15.0;9750.0;;
+SUIVI 2026!N6;Facture 11/05;EHRA 2026;2026-05-11;11700;amount;18.0;11700.0;;
+SUIVI 2026!K7;Facture 31/03;EAU 2026;2026-03-31;9100;amount;14.0;9100.0;;
+SUIVI 2026!M8;Facture 27/04;STC GEM Avril;2026-04-27;4550;amount;7.0;4550.0;;
+SUIVI 2026!O9;Facture 16/06;EUROPCR 2026;2026-06-16;11245;amount;17.3;11245.0;;
+SUIVI 2026!P10;Facture 16/07;EULAR 2026;2026-07-16;8125;amount;12.5;8125.0;;
+SUIVI 2026!Q12;Facture 01/10;CIRSE 2026;2026-10-01;5200;amount;8.0;5200.0;2026-09;
+SUIVI 2026!M15;Facture 27/04;STC GEM Oct - DM job;2026-04-27;4550;amount;7.583333;4550.0;;"D2 (2026-10-07) : facture émise selon l'utilisateur ; aucune pièce n'indique les jours : jours = montant ÷ tarif du mandat (600 CHF/j)."

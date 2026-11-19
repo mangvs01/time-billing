@@ -1,0 +1,802 @@
+{
+ "calcul_a": {
+  "P": 43,
+  "D": 12,
+  "H": 31,
+  "H_nonzero": 28,
+  "sum_delta": -1.032,
+  "active_sum_delta": -0.632,
+  "active_n": 14,
+  "per_mandate": [
+   {
+    "name": "EUROPCR 2025",
+    "active": false,
+    "n": 5,
+    "sum_delta": 0.0333
+   },
+   {
+    "name": "EHRA 2026",
+    "active": false,
+    "n": 2,
+    "sum_delta": 0.1333
+   },
+   {
+    "name": "EUROPCR 2026",
+    "active": false,
+    "n": 3,
+    "sum_delta": 0.0333
+   },
+   {
+    "name": "Endovascular Summit",
+    "active": false,
+    "n": 2,
+    "sum_delta": 0
+   },
+   {
+    "name": "EULAR 2026",
+    "active": false,
+    "n": 2,
+    "sum_delta": 0
+   },
+   {
+    "name": "EAU 2026",
+    "active": false,
+    "n": 2,
+    "sum_delta": -0.2333
+   },
+   {
+    "name": "SMART Y90",
+    "active": false,
+    "n": 1,
+    "sum_delta": 0.1333
+   },
+   {
+    "name": "CIRSE 2025",
+    "active": false,
+    "n": 3,
+    "sum_delta": -0.2333
+   },
+   {
+    "name": "ASN 2025",
+    "active": false,
+    "n": 1,
+    "sum_delta": 0
+   },
+   {
+    "name": "CIRSE 2026",
+    "active": false,
+    "n": 2,
+    "sum_delta": 0
+   },
+   {
+    "name": "NHAF 2026",
+    "active": true,
+    "n": 7,
+    "sum_delta": -0.232
+   },
+   {
+    "name": "ECIO 2025",
+    "active": false,
+    "n": 1,
+    "sum_delta": -0.1333
+   },
+   {
+    "name": "SMM 2026",
+    "active": false,
+    "n": 3,
+    "sum_delta": -0.1667
+   },
+   {
+    "name": "NC STC June",
+    "active": false,
+    "n": 1,
+    "sum_delta": 0.0333
+   },
+   {
+    "name": "STC GEM Avril",
+    "active": false,
+    "n": 1,
+    "sum_delta": 0
+   },
+   {
+    "name": "STC GEM Oct - DM job",
+    "active": true,
+    "n": 7,
+    "sum_delta": -0.4
+   }
+  ],
+  "rows": [
+   {
+    "cell": "JAN!15",
+    "entry_id": 5,
+    "mandate": "ECIO 2025",
+    "raw_start": "9.5",
+    "raw_end": "10.3",
+    "stored_hours": 0.8,
+    "duration_hmm": 0.6667,
+    "delta": -0.1333
+   },
+   {
+    "cell": "AVR!134",
+    "entry_id": 275,
+    "mandate": "EUROPCR 2025",
+    "raw_start": "18.15",
+    "raw_end": "19.5",
+    "stored_hours": 1.35,
+    "duration_hmm": 1.5833,
+    "delta": 0.2333
+   },
+   {
+    "cell": "MAY!43",
+    "entry_id": 320,
+    "mandate": "EUROPCR 2025",
+    "raw_start": "11",
+    "raw_end": "11.15",
+    "stored_hours": 0.15,
+    "duration_hmm": 0.25,
+    "delta": 0.1
+   },
+   {
+    "cell": "MAY!68",
+    "entry_id": 339,
+    "mandate": "EUROPCR 2025",
+    "raw_start": "17.45",
+    "raw_end": "21",
+    "stored_hours": 3.55,
+    "duration_hmm": 3.25,
+    "delta": -0.3
+   },
+   {
+    "cell": "JUN!25",
+    "entry_id": 416,
+    "mandate": "CIRSE 2025",
+    "raw_start": "13.5",
+    "raw_end": "14.3",
+    "stored_hours": 0.8,
+    "duration_hmm": 0.6667,
+    "delta": -0.1333
+   },
+   {
+    "cell": "JUN!26",
+    "entry_id": 417,
+    "mandate": "SMART Y90",
+    "raw_start": "14.3",
+    "raw_end": "15.5",
+    "stored_hours": 1.2,
+    "duration_hmm": 1.3333,
+    "delta": 0.1333
+   },
+   {
+    "cell": "AUG!119",
+    "entry_id": 541,
+    "mandate": "CIRSE 2025",
+    "raw_start": "14.45",
+    "raw_end": "15",
+    "stored_hours": 0.55,
+    "duration_hmm": 0.25,
+    "delta": -0.3
+   },
+   {
+    "cell": "AUG!152",
+    "entry_id": 562,
+    "mandate": "CIRSE 2025",
+    "raw_start": "15",
+    "raw_end": "15.3",
+    "stored_hours": 0.3,
+    "duration_hmm": 0.5,
+    "delta": 0.2
+   },
+   {
+    "cell": "MAR 26!9",
+    "entry_id": 961,
+    "mandate": "EUROPCR 2026",
+    "raw_start": "13.5",
+    "raw_end": "14.2",
+    "stored_hours": 0.7,
+    "duration_hmm": 0.5,
+    "delta": -0.2
+   },
+   {
+    "cell": "MAR 26!101",
+    "entry_id": 1029,
+    "mandate": "EHRA 2026",
+    "raw_start": "17.3",
+    "raw_end": "19.5",
+    "stored_hours": 2.2,
+    "duration_hmm": 2.3333,
+    "delta": 0.1333
+   },
+   {
+    "cell": "SEPT 26!82",
+    "entry_id": 1358,
+    "mandate": "NHAF 2026",
+    "raw_start": "12.2513",
+    "raw_end": "13",
+    "stored_hours": 0.7487,
+    "duration_hmm": 0.5833,
+    "delta": -0.1654
+   },
+   {
+    "cell": "FEB 26!52",
+    "entry_id": 1467,
+    "mandate": "EAU 2026",
+    "raw_start": "12.45",
+    "raw_end": "13",
+    "stored_hours": 0.55,
+    "duration_hmm": 0.25,
+    "delta": -0.3
+   },
+   {
+    "cell": "FEB 26!68",
+    "entry_id": 1476,
+    "mandate": "EAU 2026",
+    "raw_start": "13.4",
+    "raw_end": "13.5",
+    "stored_hours": 0.1,
+    "duration_hmm": 0.1667,
+    "delta": 0.0667
+   },
+   {
+    "cell": "FEB 26!75",
+    "entry_id": 1483,
+    "mandate": "EUROPCR 2026",
+    "raw_start": "11",
+    "raw_end": "11.35",
+    "stored_hours": 0.35,
+    "duration_hmm": 0.5833,
+    "delta": 0.2333
+   },
+   {
+    "cell": "JUN 26!60",
+    "entry_id": 1577,
+    "mandate": "NHAF 2026",
+    "raw_start": "12.3",
+    "raw_end": "15",
+    "stored_hours": 2.7,
+    "duration_hmm": 2.5,
+    "delta": -0.2
+   },
+   {
+    "cell": "JUL 26!50",
+    "entry_id": 1598,
+    "mandate": "NHAF 2026",
+    "raw_start": "12.2",
+    "raw_end": "12.5",
+    "stored_hours": 0.3,
+    "duration_hmm": 0.5,
+    "delta": 0.2
+   },
+   {
+    "cell": "AUG 26!61",
+    "entry_id": 1610,
+    "mandate": "NHAF 2026",
+    "raw_start": "17.25",
+    "raw_end": "17.3",
+    "stored_hours": 0.05,
+    "duration_hmm": 0.0833,
+    "delta": 0.0333
+   },
+   {
+    "cell": "MAY!46",
+    "entry_id": 1661,
+    "mandate": "NC STC June",
+    "raw_start": "13.45",
+    "raw_end": "15.5",
+    "stored_hours": 2.05,
+    "duration_hmm": 2.0833,
+    "delta": 0.0333
+   },
+   {
+    "cell": "AUG!153",
+    "entry_id": 1705,
+    "mandate": "SMM 2026",
+    "raw_start": "15.3",
+    "raw_end": "16",
+    "stored_hours": 0.7,
+    "duration_hmm": 0.5,
+    "delta": -0.2
+   },
+   {
+    "cell": "SEPT!129",
+    "entry_id": 1724,
+    "mandate": "SMM 2026",
+    "raw_start": "12.15",
+    "raw_end": "12.5",
+    "stored_hours": 0.35,
+    "duration_hmm": 0.5833,
+    "delta": 0.2333
+   },
+   {
+    "cell": "FEB 26!40",
+    "entry_id": 1838,
+    "mandate": "SMM 2026",
+    "raw_start": "20.3",
+    "raw_end": "21",
+    "stored_hours": 0.7,
+    "duration_hmm": 0.5,
+    "delta": -0.2
+   },
+   {
+    "cell": "SEPT 26!115",
+    "entry_id": 2071,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "13.45",
+    "raw_end": "15.25",
+    "stored_hours": 1.8,
+    "duration_hmm": 1.6667,
+    "delta": -0.1333
+   },
+   {
+    "cell": "SEPT 26!127",
+    "entry_id": 2080,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "14.15",
+    "raw_end": "15.25",
+    "stored_hours": 1.1,
+    "duration_hmm": 1.1667,
+    "delta": 0.0667
+   },
+   {
+    "cell": "APR 26!103",
+    "entry_id": 2155,
+    "mandate": "NHAF 2026",
+    "raw_start": "11.4",
+    "raw_end": "12.25",
+    "stored_hours": 0.85,
+    "duration_hmm": 0.75,
+    "delta": -0.1
+   },
+   {
+    "cell": "JUN 26!71",
+    "entry_id": 2213,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "14.45",
+    "raw_end": "16.25",
+    "stored_hours": 1.8,
+    "duration_hmm": 1.6667,
+    "delta": -0.1333
+   },
+   {
+    "cell": "JUN 26!83",
+    "entry_id": 2217,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "19.2",
+    "raw_end": "20",
+    "stored_hours": 0.8,
+    "duration_hmm": 0.6667,
+    "delta": -0.1333
+   },
+   {
+    "cell": "JUN 26!94",
+    "entry_id": 2220,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "15",
+    "raw_end": "15.15",
+    "stored_hours": 0.15,
+    "duration_hmm": 0.25,
+    "delta": 0.1
+   },
+   {
+    "cell": "JUL 26!49",
+    "entry_id": 2237,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "11.45",
+    "raw_end": "12.2",
+    "stored_hours": 0.75,
+    "duration_hmm": 0.5833,
+    "delta": -0.1667
+   }
+  ],
+  "script_path": "/tmp/tb-g4-1405/a03-a/a03.py",
+  "quirks": "RESULT: P=43, D=12, H=31, H with delta!=0 = 28. SUM(delta) = -1.0320 h; the exact value is -1.032033 = -61922/60000, plus about 4e-15 of float noise. If you add up the 28 per-row deltas after rounding each to 4 decimals you get -1.0321. On active mandates: 14 entries in P (NHAF 2026: 7, of which 2 D; STC GEM Oct - DM job: 7, of which 1 D). Their 11 H rows all have delta!=0, and the sum is -0.6320 (NHAF -0.2320, STC GEM Oct -0.4000). The other active mandates (PCR LV 2026, EUROPCR 2027, MSD) have no entries in P. In per_mandate, n counts the P entries (D and H together). Sum of the negative deltas: -2.7987; positive: +1.7667. Three H rows have delta=0: JAN!27 (12.3-13.3), MAY!44 (11.45-12.45), MAY!45 (12.45-13.45). This matches the earlier \"-1,03 h on 43 entries, 12 forcément décimales\".\n\nHow it was run: DB copied to /tmp/tb-g4-1405/a03-a/staging-copy.db (sha 958c76ed..., the same as /tmp/tb-g4-0842/staging-now.db) and opened with mode=ro. Workbooks copied to src-orig/ and src-r1/, sha checked, and parsed with a stdlib XML reader (openpyxl is not installed). All scripts were run with python3 -I. Output is in /tmp/tb-g4-1405/a03-a/a03-result.json. Variant checks are in explore_variants.py.\n\nQUIRKS:\n(1) raw_json holds str() of the openpyxl value, so every value is a JSON string (\"11.45\", \"9\"), never a JSON number. The only way to know a value is a number is to parse it. Cell types were checked against the workbook XML: all 86 start/end cells of the 43 P lines are numeric cells (t=n, format 0.00), and none is a text cell. raw_json matches the source workbook for all 2247 linked lines.\n(2) SEPT 26!82 (entry 1358, NHAF 2026, active) has start=12.2513, with 4 decimals. The importer flagged it clock_rounded and stored 12:15; declared hours are 0.7487. Under the definition this line is in P/H with frac=round(25.13)=25, giving delta -0.1654. If it is read as 12.25, or rebuilt from the stored HH:MM 12:15, it drops out of P: P=42, H=30, 27 nonzero, sum -0.8667, active sum -0.4667. That reproduces the earlier \"-0,87 h\".\n(3) Truncating frac with float int() instead of round(): 12.2 gives 19 and 15.6 gives 59, so SEPT 26!53/54 move from D to H. Result: D=10, H=33, 30 nonzero, sum -1.0820.\n(4) The \"-1,67 h on 42 entries\" figure was not reproduced by any variant I tested. Variants tried: float truncation; D rows computed in h.mm with or without the +24 rule (+71.0 / -1.83 / -2.00); 12.2513 read as 12.25; rebuilding from stored HH:MM; reading the whole workbook.\n(5) Declared hours are Excel formulas (=end-start on decimal numbers): 2240 of the 2247 hours cells are formulas. So raw_json and entries.hours carry float noise, e.g. 0.8000000000000007 on 39 of the 43 P lines. Rows above show stored_hours rounded to 4 decimals. For all 43 P lines, declared = decimal clock difference within 1e-6, so no P line has declared != clock. The only linked line flagged declared_vs_clock_mismatch is JUN!13 (entry 2187: 9-12 with 4 h declared). Its clocks are integers, so it is outside P.\n(6) R1 vs original: 42 entries come from R1 (batches 0ba463.../00bf396..., sha a6f6b7..., which is /tmp/tb-g4-0842/A/corr.xlsx). R1 differs from the original only in 33 date cells in column B. Start, end and hours are identical, and none of the 43 P lines comes from R1, so the choice of source does not change the figure.\n(7) Entries corrected after import: none in this DB copy. entry_changes is empty, the audit log has no entry update events, entries.hours equals the raw declared hours for all 2247 entries, and the stored start/end equal the decimal reading for all 43 P lines. This contradicts the brief, which says some entries were corrected after import.\n(8) AVR!32 and JUN!31 (entries 194 and 421) have date-formatted clock cells. raw_json holds '1900-01-13T12:00:00' (importer flag clock_from_date_format), so they are excluded as non-numbers. Their underlying serials (13.5/15.5 and 11.5/13) are multiples of 0.25, so they would be outside P anyway. 6 linked lines have empty start/end, which also keeps them out of P.\n(9) The +24 midnight rule never applies to any H row.\n(10) Workbook line JUL 26!39 (NHAF, 8.5 to 8.45, declared -0.05) was never imported (decision excluded_project/error). A computation that reads the workbook instead of the DB would put it in H, and the +24 rule would add +23.97 h.\n(11) Each entry is linked to exactly one ledger row with entry_id (2247/2247; 11 COMMITTED batches). The same sheet!row appears in up to 11 batches with entry_id NULL, so joining on sheet/row instead of entry_id multiplies rows."
+ },
+ "calcul_b": {
+  "P": 43,
+  "D": 12,
+  "H": 31,
+  "H_nonzero": 28,
+  "sum_delta": -1.032,
+  "active_sum_delta": -0.632,
+  "active_n": 14,
+  "per_mandate": [
+   {
+    "name": "NHAF 2026",
+    "active": true,
+    "n": 7,
+    "sum_delta": -0.232
+   },
+   {
+    "name": "STC GEM Oct - DM job",
+    "active": true,
+    "n": 7,
+    "sum_delta": -0.4
+   },
+   {
+    "name": "PCR LV 2026",
+    "active": true,
+    "n": 0,
+    "sum_delta": 0
+   },
+   {
+    "name": "EUROPCR 2027",
+    "active": true,
+    "n": 0,
+    "sum_delta": 0
+   },
+   {
+    "name": "MSD",
+    "active": true,
+    "n": 0,
+    "sum_delta": 0
+   },
+   {
+    "name": "ASN 2025",
+    "active": false,
+    "n": 1,
+    "sum_delta": 0
+   },
+   {
+    "name": "CIRSE 2025",
+    "active": false,
+    "n": 3,
+    "sum_delta": -0.2333
+   },
+   {
+    "name": "CIRSE 2026",
+    "active": false,
+    "n": 2,
+    "sum_delta": 0
+   },
+   {
+    "name": "EAU 2026",
+    "active": false,
+    "n": 2,
+    "sum_delta": -0.2333
+   },
+   {
+    "name": "ECIO 2025",
+    "active": false,
+    "n": 1,
+    "sum_delta": -0.1333
+   },
+   {
+    "name": "EHRA 2026",
+    "active": false,
+    "n": 2,
+    "sum_delta": 0.1333
+   },
+   {
+    "name": "EULAR 2026",
+    "active": false,
+    "n": 2,
+    "sum_delta": 0
+   },
+   {
+    "name": "EUROPCR 2025",
+    "active": false,
+    "n": 5,
+    "sum_delta": 0.0333
+   },
+   {
+    "name": "EUROPCR 2026",
+    "active": false,
+    "n": 3,
+    "sum_delta": 0.0333
+   },
+   {
+    "name": "Endovascular Summit",
+    "active": false,
+    "n": 2,
+    "sum_delta": 0
+   },
+   {
+    "name": "NC STC June",
+    "active": false,
+    "n": 1,
+    "sum_delta": 0.0333
+   },
+   {
+    "name": "SMART Y90",
+    "active": false,
+    "n": 1,
+    "sum_delta": 0.1333
+   },
+   {
+    "name": "SMM 2026",
+    "active": false,
+    "n": 3,
+    "sum_delta": -0.1667
+   },
+   {
+    "name": "STC GEM Avril",
+    "active": false,
+    "n": 1,
+    "sum_delta": 0
+   }
+  ],
+  "rows": [
+   {
+    "cell": "JAN!15",
+    "entry_id": 5,
+    "mandate": "ECIO 2025",
+    "raw_start": "9.5",
+    "raw_end": "10.3",
+    "stored_hours": 0.8000000000000007,
+    "duration_hmm": 0.6667,
+    "delta": -0.1333
+   },
+   {
+    "cell": "AVR!134",
+    "entry_id": 275,
+    "mandate": "EUROPCR 2025",
+    "raw_start": "18.15",
+    "raw_end": "19.5",
+    "stored_hours": 1.3500000000000014,
+    "duration_hmm": 1.5833,
+    "delta": 0.2333
+   },
+   {
+    "cell": "MAY!43",
+    "entry_id": 320,
+    "mandate": "EUROPCR 2025",
+    "raw_start": "11",
+    "raw_end": "11.15",
+    "stored_hours": 0.15000000000000036,
+    "duration_hmm": 0.25,
+    "delta": 0.1
+   },
+   {
+    "cell": "MAY!68",
+    "entry_id": 339,
+    "mandate": "EUROPCR 2025",
+    "raw_start": "17.45",
+    "raw_end": "21",
+    "stored_hours": 3.5500000000000007,
+    "duration_hmm": 3.25,
+    "delta": -0.3
+   },
+   {
+    "cell": "JUN!25",
+    "entry_id": 416,
+    "mandate": "CIRSE 2025",
+    "raw_start": "13.5",
+    "raw_end": "14.3",
+    "stored_hours": 0.8000000000000007,
+    "duration_hmm": 0.6667,
+    "delta": -0.1333
+   },
+   {
+    "cell": "JUN!26",
+    "entry_id": 417,
+    "mandate": "SMART Y90",
+    "raw_start": "14.3",
+    "raw_end": "15.5",
+    "stored_hours": 1.1999999999999993,
+    "duration_hmm": 1.3333,
+    "delta": 0.1333
+   },
+   {
+    "cell": "AUG!119",
+    "entry_id": 541,
+    "mandate": "CIRSE 2025",
+    "raw_start": "14.45",
+    "raw_end": "15",
+    "stored_hours": 0.5500000000000007,
+    "duration_hmm": 0.25,
+    "delta": -0.3
+   },
+   {
+    "cell": "AUG!152",
+    "entry_id": 562,
+    "mandate": "CIRSE 2025",
+    "raw_start": "15",
+    "raw_end": "15.3",
+    "stored_hours": 0.3000000000000007,
+    "duration_hmm": 0.5,
+    "delta": 0.2
+   },
+   {
+    "cell": "MAR 26!9",
+    "entry_id": 961,
+    "mandate": "EUROPCR 2026",
+    "raw_start": "13.5",
+    "raw_end": "14.2",
+    "stored_hours": 0.6999999999999993,
+    "duration_hmm": 0.5,
+    "delta": -0.2
+   },
+   {
+    "cell": "MAR 26!101",
+    "entry_id": 1029,
+    "mandate": "EHRA 2026",
+    "raw_start": "17.3",
+    "raw_end": "19.5",
+    "stored_hours": 2.1999999999999993,
+    "duration_hmm": 2.3333,
+    "delta": 0.1333
+   },
+   {
+    "cell": "SEPT 26!82",
+    "entry_id": 1358,
+    "mandate": "NHAF 2026",
+    "raw_start": "12.2513",
+    "raw_end": "13",
+    "stored_hours": 0.7486999999999995,
+    "duration_hmm": 0.5833,
+    "delta": -0.1654
+   },
+   {
+    "cell": "FEB 26!52",
+    "entry_id": 1467,
+    "mandate": "EAU 2026",
+    "raw_start": "12.45",
+    "raw_end": "13",
+    "stored_hours": 0.5500000000000007,
+    "duration_hmm": 0.25,
+    "delta": -0.3
+   },
+   {
+    "cell": "FEB 26!68",
+    "entry_id": 1476,
+    "mandate": "EAU 2026",
+    "raw_start": "13.4",
+    "raw_end": "13.5",
+    "stored_hours": 0.09999999999999964,
+    "duration_hmm": 0.1667,
+    "delta": 0.0667
+   },
+   {
+    "cell": "FEB 26!75",
+    "entry_id": 1483,
+    "mandate": "EUROPCR 2026",
+    "raw_start": "11",
+    "raw_end": "11.35",
+    "stored_hours": 0.34999999999999964,
+    "duration_hmm": 0.5833,
+    "delta": 0.2333
+   },
+   {
+    "cell": "JUN 26!60",
+    "entry_id": 1577,
+    "mandate": "NHAF 2026",
+    "raw_start": "12.3",
+    "raw_end": "15",
+    "stored_hours": 2.6999999999999993,
+    "duration_hmm": 2.5,
+    "delta": -0.2
+   },
+   {
+    "cell": "JUL 26!50",
+    "entry_id": 1598,
+    "mandate": "NHAF 2026",
+    "raw_start": "12.2",
+    "raw_end": "12.5",
+    "stored_hours": 0.3000000000000007,
+    "duration_hmm": 0.5,
+    "delta": 0.2
+   },
+   {
+    "cell": "AUG 26!61",
+    "entry_id": 1610,
+    "mandate": "NHAF 2026",
+    "raw_start": "17.25",
+    "raw_end": "17.3",
+    "stored_hours": 0.05000000000000071,
+    "duration_hmm": 0.0833,
+    "delta": 0.0333
+   },
+   {
+    "cell": "MAY!46",
+    "entry_id": 1661,
+    "mandate": "NC STC June",
+    "raw_start": "13.45",
+    "raw_end": "15.5",
+    "stored_hours": 2.0500000000000007,
+    "duration_hmm": 2.0833,
+    "delta": 0.0333
+   },
+   {
+    "cell": "AUG!153",
+    "entry_id": 1705,
+    "mandate": "SMM 2026",
+    "raw_start": "15.3",
+    "raw_end": "16",
+    "stored_hours": 0.6999999999999993,
+    "duration_hmm": 0.5,
+    "delta": -0.2
+   },
+   {
+    "cell": "SEPT!129",
+    "entry_id": 1724,
+    "mandate": "SMM 2026",
+    "raw_start": "12.15",
+    "raw_end": "12.5",
+    "stored_hours": 0.34999999999999964,
+    "duration_hmm": 0.5833,
+    "delta": 0.2333
+   },
+   {
+    "cell": "FEB 26!40",
+    "entry_id": 1838,
+    "mandate": "SMM 2026",
+    "raw_start": "20.3",
+    "raw_end": "21",
+    "stored_hours": 0.6999999999999993,
+    "duration_hmm": 0.5,
+    "delta": -0.2
+   },
+   {
+    "cell": "SEPT 26!115",
+    "entry_id": 2071,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "13.45",
+    "raw_end": "15.25",
+    "stored_hours": 1.8000000000000007,
+    "duration_hmm": 1.6667,
+    "delta": -0.1333
+   },
+   {
+    "cell": "SEPT 26!127",
+    "entry_id": 2080,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "14.15",
+    "raw_end": "15.25",
+    "stored_hours": 1.0999999999999996,
+    "duration_hmm": 1.1667,
+    "delta": 0.0667
+   },
+   {
+    "cell": "APR 26!103",
+    "entry_id": 2155,
+    "mandate": "NHAF 2026",
+    "raw_start": "11.4",
+    "raw_end": "12.25",
+    "stored_hours": 0.8499999999999996,
+    "duration_hmm": 0.75,
+    "delta": -0.1
+   },
+   {
+    "cell": "JUN 26!71",
+    "entry_id": 2213,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "14.45",
+    "raw_end": "16.25",
+    "stored_hours": 1.8000000000000007,
+    "duration_hmm": 1.6667,
+    "delta": -0.1333
+   },
+   {
+    "cell": "JUN 26!83",
+    "entry_id": 2217,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "19.2",
+    "raw_end": "20",
+    "stored_hours": 0.8000000000000007,
+    "duration_hmm": 0.6667,
+    "delta": -0.1333
+   },
+   {
+    "cell": "JUN 26!94",
+    "entry_id": 2220,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "15",
+    "raw_end": "15.15",
+    "stored_hours": 0.15000000000000036,
+    "duration_hmm": 0.25,
+    "delta": 0.1
+   },
+   {
+    "cell": "JUL 26!49",
+    "entry_id": 2237,
+    "mandate": "STC GEM Oct - DM job",
+    "raw_start": "11.45",
+    "raw_end": "12.2",
+    "stored_hours": 0.75,
+    "duration_hmm": 0.5833,
+    "delta": -0.1667
+   }
+  ],
+  "script_path": "/tmp/tb-g4-1405/a03-b/a03_hmm.py",
+  "quirks": "The figure is -1.0320 h (exactly -1.03203...). It was computed twice, independently, and both runs agree: (a) from the workbook cells (openpyxl data_only=True plus formulas, plus a direct read of the raw XML <v> values), mapped to entries through import_batch_rows (source_sheet, source_row), with each batch tied to its file by file_sha256; (b) from raw_json in the database alone. The earlier '-1.03 h on 43 entries, 12 forcément décimales' figure was correct.\n\nBreakdown:\n- Active mandates (projects.active=1): 14 entries in P. NHAF 2026 has 7 (2 D, 5 H, all 5 with delta != 0, sum -0.2320). STC GEM Oct - DM job has 7 (1 D, 6 H, all 6 nonzero, sum -0.4000). PCR LV 2026, EUROPCR 2027 and MSD have none.\n- Three H rows have delta = 0 because start and end have the same fraction: JAN!27 (12.3 to 13.3), MAY!44 (11.45 to 12.45) and MAY!45 (12.45 to 13.45).\n- D rows (delta = 0 by definition): MAY!69, AUG!163, MAR 26!99, MAR 26!100, MAY 26!18, JUN 26!62, JUN 26!95, SEPT 26!53, FEB 26!24, JUL 26!48, FEB 26!23, SEPT 26!54.\n- No H row crosses midnight.\n\nQuirks that could make another computation differ:\n\n1) SEPT 26!82 (entry 1358, NHAF 2026, active). It is the only value with more than 2 decimals: start = 12.2513 (XML 12.251300000000001). The cell format is 0.00, so Excel displays 12.25. The importer flagged it clock_rounded and stored start 12:15, with stored hours 0.7487 (the formula end minus start). Under the spec, frac = 25, so it is H with delta -0.1654. If the raw values are rounded to 2 decimals before the 0.25 test, it drops out of P: |P| = 42, sum = -0.8667, active sum = -0.4667. This exactly explains the earlier '-0.87 h' figure.\n\n2) The earlier '-1.67 h on 42' figure could not be reproduced. Variants tried:\n- truncating frac instead of rounding: -1.0820, and 2 D rows become H (16.6 or 15.6 stored as ...0.59999 truncates to 59);\n- truncation plus 2-decimal rounding: -0.9167;\n- also computing D rows in h.mm: -0.9987, or -0.8333 with 42 rows;\n- rounding stored hours to 2 decimals: -1.0333.\n\n3) raw_json stores str(value), so it cannot tell a text cell '11.45' from a number 11.45. The workbook shows no text start/end cells and no formulas in start/end for any of the 2247 entries. Six entries have empty clocks: JUN!6, 7, 8, 9, 11 and 12. Two have date-typed cells (Excel 1900 serials, h:mm format; raw_json '1900-01-13T12:00:00' etc.): AVR!32 = 13.5 to 15.5 and JUN!31 = 11.5 to 13.0. They are multiples of 0.25, so they stay outside P whether or not they are read as numbers. All 43 hours cells in P are end-minus-start formulas whose cached values equal the stored hours.\n\n4) Some XML values carry binary noise (18.149999999999999, 16.600000000000001). Use the shortest repr or round; truncating the frac misclassifies them.\n\n5) Stored hours carry float noise (0.8000000000000007 etc.). Every nonzero delta is at least 0.033 h, so any tolerance from 1e-9 to 0.01 gives 28.\n\n6) R1 (corr.xlsx, a6f6b7ef) differs from the original only in 33 date cells of column B. No start, end or hours cell differs. All 43 P rows come from batches of the original file (c93c610c). The two R1 batches (42 entries) contribute none.\n\n7) No corrections after import exist in this copy:\n- entry_changes is empty and there are no entry_* audit events;\n- entries.hours equals the cell value for all 2247 entries;\n- every numeric pair's start_time/end_time equals the decimal reading.\nckpt.db and A/snap.db are identical for the 43 rows. A/premandats.db has the same entries but all 24 projects active, so an 'active' figure computed on it would be -1.0320 over 43.\n\n8) Declared hours differ from the decimal clock only at JUN!13 (entry 2187: 9 to 12, declared 4 h), which is outside P. Inside P, declared hours equal the decimal duration. Entry 1358's stored clock 12:15 to 13:00 (0.75) is 0.0013 h off its stored 0.7487.\n\n9) No value lands on a half hundredth, so Python's half-even round versus half-up changes nothing.\n\nFiles: the main script is /tmp/tb-g4-1405/a03-b/a03_hmm.py; the cross-checks are a03_dbonly.py, a03_variants.py, a03_hypotheses.py and a03_cellcheck.py in the same folder. Outputs are in /tmp/tb-g4-1405/a03-b/out/ (a03_rows.csv with all 43 rows, a03_result.json, a03_checks.txt). openpyxl 3.1.5 was copied from the local docker image layer into /tmp/tb-g4-1405/a03-b/lib because the host python3 does not have it. Nothing under /root, /opt or the repo was modified."
+ }
+}

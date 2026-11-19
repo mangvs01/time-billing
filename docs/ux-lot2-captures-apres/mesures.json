@@ -1,0 +1,194 @@
+[
+ {
+  "vp": "desktop",
+  "name": "dashboard",
+  "height": 2244,
+  "overflowX": false,
+  "smallTargets": 15,
+  "firstSubmitY": null
+ },
+ {
+  "vp": "desktop",
+  "name": "time",
+  "height": 1865,
+  "overflowX": false,
+  "smallTargets": 32,
+  "firstSubmitY": 544
+ },
+ {
+  "vp": "desktop",
+  "name": "mandates",
+  "height": 3446,
+  "overflowX": false,
+  "smallTargets": 7,
+  "firstSubmitY": 3317
+ },
+ {
+  "vp": "desktop",
+  "name": "billing",
+  "height": 1124,
+  "overflowX": false,
+  "smallTargets": 4,
+  "firstSubmitY": 912
+ },
+ {
+  "vp": "desktop",
+  "name": "archive",
+  "height": 1333,
+  "overflowX": false,
+  "smallTargets": 24,
+  "firstSubmitY": null
+ },
+ {
+  "vp": "desktop",
+  "name": "entries",
+  "height": 4338,
+  "overflowX": false,
+  "smallTargets": 104,
+  "firstSubmitY": 225
+ },
+ {
+  "vp": "desktop",
+  "name": "issue-alpha",
+  "height": 2119,
+  "overflowX": false,
+  "smallTargets": 3,
+  "firstSubmitY": 1778
+ },
+ {
+  "vp": "desktop",
+  "name": "issue-gamma",
+  "height": 1777,
+  "overflowX": false,
+  "smallTargets": 1,
+  "firstSubmitY": 1475
+ },
+ {
+  "vp": "desktop",
+  "name": "project-edit",
+  "height": 1418,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 1045
+ },
+ {
+  "vp": "desktop",
+  "name": "ecart",
+  "height": 1669,
+  "overflowX": false,
+  "smallTargets": 1,
+  "firstSubmitY": 1541
+ },
+ {
+  "vp": "desktop",
+  "name": "credit",
+  "height": 1999,
+  "overflowX": false,
+  "smallTargets": 1,
+  "firstSubmitY": 1113
+ },
+ {
+  "vp": "desktop",
+  "name": "billing-calc",
+  "height": 1848,
+  "overflowX": false,
+  "smallTargets": 5,
+  "firstSubmitY": 1635
+ },
+ {
+  "vp": "mobile",
+  "name": "dashboard",
+  "height": 3884,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": null
+ },
+ {
+  "vp": "mobile",
+  "name": "time",
+  "height": 5429,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 706
+ },
+ {
+  "vp": "mobile",
+  "name": "mandates",
+  "height": 5864,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 5687
+ },
+ {
+  "vp": "mobile",
+  "name": "billing",
+  "height": 2175,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 1365
+ },
+ {
+  "vp": "mobile",
+  "name": "archive",
+  "height": 2726,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": null
+ },
+ {
+  "vp": "mobile",
+  "name": "entries",
+  "height": 7134,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 444
+ },
+ {
+  "vp": "mobile",
+  "name": "issue-alpha",
+  "height": 3173,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 2727
+ },
+ {
+  "vp": "mobile",
+  "name": "issue-gamma",
+  "height": 2773,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 2366
+ },
+ {
+  "vp": "mobile",
+  "name": "project-edit",
+  "height": 2289,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 1748
+ },
+ {
+  "vp": "mobile",
+  "name": "ecart",
+  "height": 2715,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 2526
+ },
+ {
+  "vp": "mobile",
+  "name": "credit",
+  "height": 2722,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 1654
+ },
+ {
+  "vp": "mobile",
+  "name": "billing-calc",
+  "height": 2754,
+  "overflowX": false,
+  "smallTargets": 0,
+  "firstSubmitY": 1908
+ }
+]

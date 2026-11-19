@@ -1,0 +1,26 @@
+PASS [bureau 1 page Factures historiques] explication « Corriger » / « Ajouter » affichée
+PASS [bureau 1 page Factures historiques] un lien « Corriger » par ligne non remplacée
+PASS [bureau 1 page Factures historiques] pas de débordement horizontal (registre)
+PASS [bureau 2 corriger une ligne (M15)] formulaire prérempli avec les valeurs enregistrées
+PASS [bureau 2 corriger une ligne (M15)] pas de débordement horizontal (correction)
+PASS [bureau 2 corriger une ligne (M15)] motif vide : le navigateur bloque l'envoi (champ obligatoire), rien d'écrit
+PASS [bureau 2 corriger une ligne (M15)] message : ligne remplacée par la nouvelle, validée
+PASS [bureau 2 corriger une ligne (M15)] base : ligne d'origine rejetée, ligne « M15 (correction 1) » validée à 4 600, valeurs du classeur conservées
+PASS [bureau 2 corriger une ligne (M15)] journal d'audit : historical_invoice_corrected
+PASS [bureau 2 corriger une ligne (M15)] registre : « remplacée par la ligne n° … (validée) » sur l'origine
+PASS [bureau 2 corriger une ligne (M15)] registre : provenance « SUIVI 2026!M15 (correction 1) » affichée
+PASS [bureau 2 corriger une ligne (M15)] pas de débordement horizontal (registre après correction)
+PASS [mobile 1 page Factures historiques] explication « Corriger » / « Ajouter » affichée
+PASS [mobile 1 page Factures historiques] un lien « Corriger » par ligne non remplacée
+PASS [mobile 1 page Factures historiques] pas de débordement horizontal (registre)
+PASS [mobile 2 correction refusée (date future)] pas de débordement horizontal (correction, mobile)
+PASS [mobile 2 correction refusée (date future)] refus affiché, saisie conservée, rien d'écrit
+PASS [mobile 3 ajouter une facture manquante] pas de débordement horizontal (ajout)
+PASS [mobile 3 ajouter une facture manquante] message : facture ajoutée, validée
+PASS [mobile 3 ajouter une facture manquante] base : « ajout manuel » « n° 1 », validée, 1 j, 650
+PASS [mobile 3 ajouter une facture manquante] journal d'audit : historical_invoice_added
+PASS [mobile 3 ajouter une facture manquante] même facture ajoutée deux fois : refusée (jamais comptée deux fois)
+PASS [mobile 3 ajouter une facture manquante] registre : « ajout manuel n° 1 » affiché
+PASS [mobile 3 ajouter une facture manquante] pas de débordement horizontal (registre, mobile)
+PASS [global] aucune erreur JavaScript ni violation CSP dans la console
+RÉSULTAT rc23 navigateur : 25/25 OK, 0 KO

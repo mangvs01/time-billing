@@ -1,0 +1,7 @@
+OK    ajout : bloc présent avec request_buffers 64KB
+OK    Caddyfile résultant valide
+OK    autre site conservé
+OK    second ajout refusé
+OK    retrait : Caddyfile d'origine à l'octet (SHA-256)
+OK    rechargement en échec : origine remise (SHA-256)
+RÉPÉTITION 80 : GO

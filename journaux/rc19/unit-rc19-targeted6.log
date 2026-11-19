@@ -1,0 +1,13 @@
+...................E
+======================================================================
+ERROR: test_shared_check_is_clean_after_migration_and_catches_a_broken_trigger (tests.test_rc19.SchemaChecks.test_shared_check_is_clean_after_migration_and_catches_a_broken_trigger)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_rc19.py", line 470, in test_shared_check_is_clean_after_migration_and_catches_a_broken_trigger
+    c.execute("INSERT INTO entry_changes(entry_id,action,before_json,after_json,changed_at) VALUES(?,?,?,?,?)",
+sqlite3.IntegrityError: NOT NULL constraint failed: entry_changes.entry_id
+
+----------------------------------------------------------------------
+Ran 20 tests in 16.110s
+
+FAILED (errors=1)

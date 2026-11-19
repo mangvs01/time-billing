@@ -1,0 +1,18 @@
+# Time Billing V9 — STAGING (RC8). Aucun secret ici : valeurs dans .env (mode 600). Écoute locale uniquement.
+services:
+  time-billing-v9-staging:
+    build: .
+    container_name: time-billing-v9-staging
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8092:8000"
+    environment:
+      DB_PATH: /data/timebilling.db
+      APP_USER: ${APP_USER:-admin}
+      APP_PASSWORD_HASH: ${APP_PASSWORD_HASH:?APP_PASSWORD_HASH manquant dans .env}
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY manquant dans .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-1}
+      TRUST_PROXY: ${TRUST_PROXY:-0}
+      SESSION_HOURS: ${SESSION_HOURS:-8}
+    volumes:
+      - ./data:/data

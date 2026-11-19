@@ -1,0 +1,24 @@
+TUÉE      M1 verrou annexe ignoré
+TUÉE      M2 verrou import ignoré
+TUÉE      M3 verrou mandat clôturé ignoré
+TUÉE      M4 historique de correction omis
+TUÉE      M5 copie de suppression omise
+SURVIVANTE M6 NaN accepté
+TUÉE      M7 plafond 24 h supprimé
+MUTATION M8 redirection ouverte (return_to) : motif introuvable (mutation invalide)
+TUÉE      M9 échappement LIKE supprimé
+TUÉE      M10 neutralisation CSV retirée
+TUÉE      M11 restauration : comparaison complète retirée
+TUÉE      M12 session non révocable
+TUÉE      M13 durée absolue de session retirée
+TUÉE      M14 limitation par /64 retirée
+SURVIVANTE M15 Origin null accepté
+TUÉE      M16 HSTS toujours absent
+TUÉE      M17 bornes mandat retirées
+TUÉE      M18 contrôle de pixels du logo retiré
+TUÉE      M19 |int retiré sur le compteur de lot
+TUÉE      M20 archive : contrôle d empreinte retiré
+TUÉE      M21 archive : brouillons inclus
+TUÉE      M22 limite de lignes du classeur retirée
+TUÉE      M23 gestionnaire d erreur affiche le détail
+RÉSULTAT : 20/23 mutations détectées

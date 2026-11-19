@@ -1,0 +1,4 @@
+Empreinte de la production relevée par la session interactive le 04.10.2026 21:54 WITA (lecture seule) :
+bd31f410305d6623dbf2237158ad8820cd3cbbfba20a37df0f17c54af7b0f6d6  /opt/time-billing-v9/data/timebilling.db
+conteneur prod: id=0b25a3430633017ad07aea017655aa0300e39abf7890065a57003117ecc0df3d démarré=2026-10-02T12:50:00.886505111Z image=sha256:2e19479df57e03dc056bee9f0c9f20c965aedd47d5f4ba27fd98907cfd07c9fa
+Présente dans audit/prod-fp-avant.txt : 1 occurrence(s)

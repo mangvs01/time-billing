@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquette 2 — Émission en trois temps — Time Billing lot 2</title>
+<!-- MAQUETTE STATIQUE (UX lot 2, proposition n° 2). Aucun script, aucune requête, aucun envoi possible ; données fictives
+     (brouillon Alpha 01.09 → 31.10.2026 de l'instance jetable). Jetons repris de app/templates/_ds.html. Ne fait pas partie du code produit. -->
+<style>
+:root{--ink:#0e1621;--ink-2:#4a5565;--ink-3:#667085;--line:rgba(14,22,33,.09);--line-strong:rgba(14,22,33,.16);
+--blue:#0f62fe;--blue-soft:rgba(15,98,254,.10);--blue-glow:rgba(15,98,254,.35);--ok:#0f7b53;--ok-soft:rgba(15,123,83,.11);
+--warn:#9a5b00;--warn-soft:rgba(224,148,0,.14);--err:#c3332b;--err-soft:rgba(224,64,50,.09);--titanium:#e9edf2;--track:rgba(14,22,33,.08);
+--glass:rgba(255,255,255,.66);--glass-strong:rgba(255,255,255,.8);--glass-border:rgba(255,255,255,.78);
+--shadow-1:0 1px 2px rgba(14,22,33,.04),0 10px 28px -12px rgba(14,22,33,.14);--shadow-2:0 2px 6px rgba(14,22,33,.05),0 28px 56px -20px rgba(15,60,140,.26);
+--hl:inset 0 1px 0 rgba(255,255,255,.95);--r-panel:24px;--r-ctl:14px;
+--f:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}html{background:linear-gradient(180deg,#fbfcfd 0,#f1f3f7 1100px) no-repeat #f1f3f7}
+body{margin:0;font-family:var(--f);color:var(--ink);-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1}
+a{color:var(--blue);text-underline-offset:3px}
+.mq-banner{background:#1d2a35;color:#fff;font-size:12.5px;padding:8px 16px;text-align:center}.mq-banner b{color:#ffd27a}
+.shell{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:16px;align-self:start;margin:16px 0 16px 16px;padding:22px 14px 16px;background:var(--glass-strong);border:1px solid var(--glass-border);border-radius:28px;box-shadow:var(--shadow-1),var(--hl);display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;gap:12px;align-items:center;padding:2px 8px}.logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(150deg,#5b9bff,#0b54e6)}
+.brand b{font-size:15px}.envtag{display:inline-block;margin-top:4px;padding:2px 10px;border-radius:99px;background:var(--blue-soft);color:var(--blue);font-size:11px;font-weight:650;letter-spacing:.06em}
+.nav{display:flex;flex-direction:column;gap:3px}.nav span{padding:11px 12px;border-radius:14px;font-size:14px;font-weight:550;color:var(--ink-2)}
+.nav span.on{background:#fff;color:var(--blue);box-shadow:0 8px 20px -10px var(--blue-glow);border:1px solid rgba(15,98,254,.16)}
+.main{padding:28px 28px 56px;max-width:1240px;width:100%}
+h1.page{font-size:22px;letter-spacing:-.02em;margin:4px 2px 6px}
+h2{font-size:17px;font-weight:600;letter-spacing:-.015em;margin:0 0 12px}
+.panel{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r-panel);box-shadow:var(--shadow-1),var(--hl);padding:22px;margin:0 0 18px}
+.hint{color:var(--ink-3);font-size:12.5px;line-height:1.55}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 14px;border-radius:99px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;border:1px solid var(--line);background:#fff;color:var(--ink);box-shadow:var(--hl),0 1px 2px rgba(14,22,33,.05)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap;background:var(--titanium);color:var(--ink-2)}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.b-err{background:var(--err-soft);color:var(--err)}.b-blue{background:var(--blue-soft);color:var(--blue)}.b-warn{background:var(--warn-soft);color:var(--warn)}.b-ok{background:var(--ok-soft);color:var(--ok)}
+.ann{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#ffb020;color:#1d2a35;font-size:12px;font-weight:800;vertical-align:middle;margin:0 6px;box-shadow:0 0 0 3px rgba(255,176,32,.25)}
+.notes{background:#fffaf0;border:1px dashed #e0a000;border-radius:18px;padding:16px 20px;margin:0 0 20px;font-size:13.5px;line-height:1.55}
+.notes h2{font-size:15px;margin:0 0 8px}.notes ol{margin:0;padding-left:20px}.notes li{margin:4px 0}
+.back{display:inline-flex;padding:8px 14px;border-radius:99px;background:var(--glass-strong);border:1px solid var(--glass-border);box-shadow:var(--shadow-1);color:var(--ink-2);font-size:13px;font-weight:600;text-decoration:none;margin:0 0 14px}
+/* ---- proposition n° 2 ---- */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+.recap{position:sticky;top:20px;padding:20px 22px;border-radius:var(--r-panel);background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(232,241,255,.75));border:1px solid rgba(15,98,254,.16);box-shadow:var(--shadow-2),var(--hl)}
+.recap dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:12px 0 0;font-size:13px}.recap dt{color:var(--ink-3)}.recap dd{margin:0;text-align:right;font-weight:600}
+.recap .total{font-size:28px;font-weight:650;letter-spacing:-.02em;color:var(--blue);margin:2px 0}
+.recap .state{margin-top:14px;padding:10px 12px;border-radius:14px;background:var(--err-soft);color:#7a1d17;font-size:13px}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;align-items:center;gap:8px;padding:7px 14px 7px 8px;border-radius:99px;background:rgba(255,255,255,.7);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--ink-2)}
+.steps li::before{content:counter(s);display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--titanium);font-size:12px}
+.steps li.cur{color:var(--blue);border-color:rgba(15,98,254,.3)}.steps li.cur::before{background:var(--blue);color:#fff}
+.chk{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.6)}
+.chk>li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:8px 14px;border-top:1px solid var(--line);font-size:13px}
+.chk>li:first-child{border-top:0}.chk .n{color:var(--ink-3);font-weight:600}.chk .r{font-size:12.5px;font-weight:600;color:var(--ok);white-space:nowrap}
+.chk>li.fail{background:var(--err-soft);grid-template-columns:30px minmax(0,1fr);padding:12px 14px}.chk>li.fail .r{color:var(--err)}
+.chk .anom{grid-column:2;font-size:12.5px;color:#7a1d17;margin:4px 0 0}
+.chk .derog{grid-column:2;margin:8px 0 2px}.chk .fixline{grid-column:2}
+.chk label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 5px}
+textarea,input[type=text]{width:100%;font:inherit;font-size:14px;padding:10px 12px;border-radius:12px;border:1px solid var(--line-strong);background:#fff;color:var(--ink)}
+textarea{min-height:58px;resize:vertical}
+.fixline{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:6px;font-size:12.5px}
+.radio{display:flex;flex-direction:column;gap:6px;margin:4px 0 0}.radio label{display:flex;align-items:center;gap:10px;font-size:14px;min-height:36px}
+.go{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.go button{flex:1 1 320px;min-height:50px;border:0;border-radius:var(--r-ctl);font:inherit;font-size:15px;font-weight:650;color:#fff;background:linear-gradient(180deg,#3b82ff,#0f62fe);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 20px -10px var(--blue-glow);opacity:.5;cursor:not-allowed}
+details.pos summary{cursor:pointer;font-weight:600;font-size:15px}
+details.pos table{width:100%;border-collapse:collapse;margin-top:10px}details.pos th{text-align:left;font-weight:600;color:var(--ink-3);font-size:12.5px;padding:8px 6px;border-bottom:1px solid var(--line);width:55%}details.pos td{font-size:13px;padding:8px 6px;border-bottom:1px solid var(--line)}
+@media (max-width:1100px){.shell{grid-template-columns:84px minmax(0,1fr)}.nav span{font-size:0;height:44px;width:48px}.brand b,.envtag{display:none}.layout{grid-template-columns:1fr}.recap{position:static;order:-1}}
+@media (max-width:760px){
+ .shell{grid-template-columns:1fr}.sidebar{position:static;margin:8px 8px 0;padding:10px 12px;border-radius:22px;flex-direction:row;align-items:center;gap:10px;overflow:hidden}
+ .brand b,.envtag{display:inline-block}.nav{flex-direction:row;overflow:hidden;gap:6px}.nav span{font-size:13px;width:auto;height:auto;white-space:nowrap;padding:9px 12px;background:rgba(14,22,33,.04)}
+ .main{padding:14px 12px 40px}.panel{padding:16px;border-radius:20px}
+ .recap{padding:14px 16px}.recap dl{grid-template-columns:auto 1fr;font-size:12.5px}.recap .total{font-size:24px}.recap .more{display:none}
+ .chk>li{grid-template-columns:24px minmax(0,1fr) auto;padding:8px 10px;font-size:12.5px}.chk>li.fail{grid-template-columns:24px minmax(0,1fr)}
+ .chk .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chk>li.fail .t{white-space:normal}
+ .steps li{font-size:12px}
+}
+</style></head>
+<body>
+<div class="mq-banner"><b>MAQUETTE STATIQUE</b> — UX lot 2, proposition n° 2 · données fictives · le bouton d'émission est inactif · ne fait pas partie de l'application</div>
+<div class="shell">
+<aside class="sidebar"><div class="brand"><span class="logo"></span><div><b>Time Billing V9.2</b><br><span class="envtag">MAQUETTE</span></div></div>
+<nav class="nav"><span>Tableau de bord</span><span>Saisie des heures</span><span>Mandats &amp; prévisionnel</span><span>Édition des factures</span><span class="on">Factures et brouillons</span></nav></aside>
+<main class="main">
+
+<section class="notes" aria-label="Notes de maquette"><h2>Ce qui change (proposition n° 2)</h2><ol>
+<li><span class="ann">1</span>Récapitulatif toujours visible : numéro, date imprimée, total, reliquat, solde PO, état des dérogations (aujourd'hui dispersés dans un tableau de 13 lignes).</li>
+<li><span class="ann">2</span>Les 14 contrôles restent visibles <b>dans leur ordre</b> (décision lot 1, n° 2), en lignes compactes ; une ligne en échec s'ouvre en place avec <b>son</b> champ de motif. Techniquement : <code>&lt;textarea form="issueForm" name="derogation_12"&gt;</code>, mêmes noms de champs qu'aujourd'hui.</li>
+<li><span class="ann">3</span>« Corriger le brouillon » à côté de l'anomalie : l'alternative à la dérogation est proposée au bon endroit.</li>
+<li><span class="ann">4</span>Décisions (reliquat, antidatage) regroupées, puis le bouton, qui rappelle numéro et montant. Sur mobile, le bouton passe de 4 296 px (mesuré sur l'application) à environ 2 000 px (mesuré sur cette maquette, notes exclues).</li>
+<li><span class="ann">5</span>Position détaillée du mandat repliée (R-3, à valider) ; ouverte d'office si dépassement de PO, émission hors ordre ou écart post-facturation.</li>
+</ol><p class="hint" style="margin:8px 0 0">Aucun contrôle, aucune dérogation, aucun champ posté ne change : seule la disposition de <code>issue_confirm.html</code> est concernée.</p></section>
+
+<a class="back" href="#" aria-disabled="true">← Factures et brouillons</a>
+<h1 class="page">Émettre la facture 2026-10 — Mandat Alpha — Mission AMO</h1>
+<ol class="steps" aria-label="Étapes"><li class="cur">Contrôles · 2 à motiver</li><li>Décisions</li><li>Émission</li></ol>
+
+<div class="layout">
+<div>
+<section class="panel" id="issueChecks" aria-labelledby="h-chk"><h2 id="h-chk">1. Contrôles avant émission <span class="badge b-err">2 en échec</span> <span class="badge b-ok">12 conformes</span><span class="ann">2</span></h2>
+<ol class="chk">
+<li><span class="n">1</span><span class="t">Feuilles détaillées de la période</span><span class="r">conforme</span></li>
+<li><span class="n">2</span><span class="t">Saisies du bon mandat</span><span class="r">conforme</span></li>
+<li><span class="n">3</span><span class="t">Montant = quantité × tarif</span><span class="r">conforme</span></li>
+<li><span class="n">4</span><span class="t">TVA correcte (8,1 %)</span><span class="r">conforme</span></li>
+<li><span class="n">5</span><span class="t">Jours historiques du registre validé</span><span class="r">conforme</span></li>
+<li><span class="n">6</span><span class="t">Cumul calculé jusqu'à la date de coupure</span><span class="r">conforme</span></li>
+<li><span class="n">7</span><span class="t">Notes de crédit prises en compte</span><span class="r">conforme</span></li>
+<li><span class="n">8</span><span class="t">Solde contractuel correct</span><span class="r">conforme</span></li>
+<li><span class="n">9</span><span class="t">Aucun placeholder</span><span class="r">conforme</span></li>
+<li><span class="n">10</span><span class="t">Aucune donnée de test</span><span class="r">conforme</span></li>
+<li><span class="n">11</span><span class="t">Gabarit validé</span><span class="r">conforme</span></li>
+<li class="fail" id="chk12"><span class="n">12</span><span class="t"><b>La facture, l'annexe et la position racontent la même histoire</b> <span class="r">✕ ANOMALIE</span></span>
+ <p class="anom">Sur-facturation : quantité facturée 7 j pour 6,9688 j réalisés dans la période (tolérance de sur-facturation : 0 j).</p>
+ <div class="fixline"><a class="btn" href="#" aria-disabled="true">Corriger le brouillon (quantité)</a><span class="ann">3</span><span class="hint">ou motiver une dérogation :</span></div>
+ <div class="derog"><label for="d12">Motif de la dérogation au contrôle 12 (10 caractères au moins)</label><textarea id="d12" placeholder="Ex. forfait convenu avec le client pour la période" disabled></textarea></div></li>
+<li class="fail" id="chk13"><span class="n">13</span><span class="t"><b>La période se termine au plus tard à la date de la facture</b> <span class="r">✕ ANOMALIE</span></span>
+ <p class="anom">Fin de période 31.10.2026 postérieure à la date de facture 23.10.2026 (date d'émission = aujourd'hui).</p>
+ <div class="fixline"><a class="btn" href="#" aria-disabled="true">Corriger le brouillon (période ou date)</a><span class="hint">ou motiver une dérogation :</span></div>
+ <div class="derog"><label for="d13">Motif de la dérogation au contrôle 13 (10 caractères au moins)</label><textarea id="d13" placeholder="Ex. facturation anticipée demandée par le client" disabled></textarea></div></li>
+<li><span class="n">14</span><span class="t">Facturé net cumulé ≤ réalisé cumulé</span><span class="r">conforme</span></li>
+</ol>
+<p class="hint">Seuls les contrôles 12 et 13 admettent une dérogation. Motif, auteur, date et anomalie sont conservés dans le journal d'audit ; ils ne sont imprimés nulle part.</p>
+</section>
+
+<section class="panel" aria-labelledby="h-dec"><h2 id="h-dec">2. Décisions <span class="ann">4</span></h2>
+<p style="margin:0 0 6px;font-size:14px"><b>Reliquat après cette facture : 0 j</b> — aucune décision de reliquat à prendre.</p>
+<p class="hint" style="margin:0">Exemple d'un autre brouillon (reliquat de 4 j) : la décision s'afficherait ici.</p>
+<div class="radio" aria-label="exemple"><label><input type="radio" disabled> Offert au client</label><label><input type="radio" disabled> Reporté sur une prochaine facture</label><label><input type="radio" disabled> Autre traitement (préciser)</label></div>
+<p class="hint" style="margin-top:10px">Facture non antidatée : date imprimée = date réelle d'émission (23.10.2026). Une date antérieure ferait apparaître ici la case de confirmation d'antidatage.</p>
+</section>
+
+<section class="panel" aria-labelledby="h-go"><h2 id="h-go">3. Émission</h2>
+<p class="hint" style="margin-top:0">Définitive : numéro attribué, PDF, date et annexe figés. Une correction ultérieure passera par une note de crédit.</p>
+<div class="go"><button type="button" disabled>Émettre définitivement la facture 2026-10 — 6 930,30 CHF</button><a class="btn" href="#" aria-disabled="true">Aperçu PDF (brouillon)</a></div>
+<p class="hint">Comme aujourd'hui, l'envoi est bloqué tant que chaque motif n'a pas 10 caractères (attributs <code>required</code> et <code>minlength</code>) et le serveur revérifie ; le récapitulatif rappelle seulement ce qui manque.</p>
+</section>
+
+<section class="panel"><details class="pos"><summary>Position détaillée du mandat (13 lignes) <span class="ann">5</span></summary>
+<table>
+<tr><th>Jours réalisés cumulés au 31.10.2026</th><td>22,75 j</td></tr>
+<tr><th>Jours facturés (factures Time Billing émises, avant celle-ci)</th><td>15,75 j</td></tr>
+<tr><th>Jours facturés historiques (émises hors Time Billing, validées)</th><td>0 j</td></tr>
+<tr><th>Jours annulés par notes de crédit</th><td>0 j</td></tr>
+<tr><th>Jours facturés nets / offerts</th><td>15,75 j / 0 j</td></tr>
+<tr><th>Dont jusqu'au 31.10.2026 (base du reliquat)</th><td>15,75 j / 0 j</td></tr>
+<tr><th>Solde contractuel</th><td>40 j commandés · solde après émission 17,25 j</td></tr>
+</table></details></section>
+</div>
+
+<aside class="recap" aria-label="Récapitulatif de la facture"><span class="ann" style="float:right">1</span>
+<span class="hint">Total TTC</span><div class="total">6 930,30 CHF</div><span class="hint">HT 6 300,00 · TVA 510,30 · Autres 120,00 (hors TVA)</span>
+<dl><dt>Numéro attribué</dt><dd>2026-10</dd><dt>Date imprimée</dt><dd>23.10.2026</dd><dt>Période</dt><dd>01.09 → 31.10.2026</dd><dt>Quantité</dt><dd>7,00 j × 900,00</dd><dt>Reliquat</dt><dd>0 j</dd><dt class="more">Solde PO après</dt><dd class="more">17,25 j / 40 j</dd></dl>
+<div class="state"><b>2 dérogations à motiver</b> (n° 12, 13) avant de pouvoir émettre.</div>
+</aside>
+</div>
+</main></div>
+</body></html>

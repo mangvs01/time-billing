@@ -1,0 +1,14 @@
+options reverse_proxy : (aucune : bloc actuel de 80-site-caddy.sh)
+cible :8473 /login Content-Length 100000
+avant : 265 ms
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+après : 11 ms
+options reverse_proxy : request_buffers 64KB
+cible :8473 /login Content-Length 100000
+avant : 74 ms
+pendant (24 connexions lentes) : 5 ms
+pendant (24 connexions lentes) : 5 ms
+pendant (24 connexions lentes) : 3 ms
+après : 4 ms

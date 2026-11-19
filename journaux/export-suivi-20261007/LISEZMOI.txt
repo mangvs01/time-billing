@@ -1,0 +1,27 @@
+Export .xlsx — option B (Decision Center billing-gsheet-export-scope = B, résolue le 2026-10-07 08:39 UTC) — mesure du 2026-10-07 (~09:00 UTC)
+
+Ce qui est mesuré : app/gsheet_export.py de l'arbre de travail (onglets SUIVI reconstruits depuis Billing), sur une COPIE JETABLE de la copie locale
+du staging recette/reprise-2025/source/staging-958c76ed.db (06.10), dans un conteneur sans réseau (image tb-g4-cand:0a07ff7, app/ et outils/
+montés en lecture seule). Sur la copie : chargement des 24 lignes D1/D2 par outils/charger_factures_historiques.py (fonctions read_cells + insert),
+puis validation SIMULÉE des 24 (la vraie validation reste à faire par l'utilisateur sur le staging), export, comparaison.
+Aucune écriture hors de la copie temporaire ; le staging et /opt ne sont pas touchés.
+
+Commande :
+  docker run --rm --network none -v $W/app:/app/app:ro -v $W/outils:/app/outils:ro -v $W/journaux/export-suivi-20261007/mesure_suivi.py:/m.py:ro \
+    -v <copie du classeur>:/src/classeur.xlsx:ro -v $W/recette/reprise-2025/source:/base:ro -v $W/journaux/export-suivi-20261007/sortie:/out \
+    -e PYTHONPATH=/app -e INVOICE_CHECK_WORDS= -w /app tb-g4-cand:0a07ff7 python -W ignore /m.py /src/classeur.xlsx /base/staging-958c76ed.db /out
+
+Résultats (sortie/mesure-suivi.json, sortie/export-copie-apres-validation.xlsx) :
+- Onglets : les 23 du classeur, dans le même ordre (JAN … DEC, SUIVI 2025, JAN 26 … SEPT 26, SUIVI 2026).
+- Les 24 cellules chargées se retrouvent à l'identique dans l'export (même mandat, même colonne « Facture jj/mm », même montant HT) : 0 écart.
+- CA reconstruit = « Facturé » de Billing (prévisions) au centime : 2025 = 67 236,00 CHF ; 2026 = 70 973,50 CHF.
+  Avant validation (état actuel du staging : 24 lignes « à valider », aucune facture TB émise) : SUIVI 2026 seul, sans aucun montant.
+- Recalcul par LibreOffice (soffice --convert-to xlsx) : 0 erreur de formule ; chaque total de colonne « Facture » = celui du classeur
+  (2025 converti en CHF : jours × 650 ; ex. 09/04 = 11,8 j = 7 670 CHF ; 2026 : 16/02 6 753,50 · 31/03 9 100 · 03/04 9 750 · 27/04 9 100 ·
+  11/05 11 700 · 16/06 11 245 · 16/07 8 125 · 01/10 5 200).
+- Écarts de CA avec le classeur, tous issus de décisions déjà prises :
+  2025 : classeur 86 636 = 67 236 + 19 400 (AL Jan-Mar, D3 = NON, non chargé).
+  2026 : classeur 93 473,50 = 70 973,50 + 22 500 (le TOTAL du classeur est un montant PRÉVU pour PCR LV 2026 5 850, NHAF 2026 10 400 et
+         STC GEM Oct 10 800 dont 4 550 facturés ; l'export ne montre que le facturé : TOTAL = somme des colonnes « Facture »).
+- Lignes : SUIVI 2025 = 10 mandats (tous TERMINE) ; SUIVI 2026 = 14 (10 avec facture + 4 mandats ouverts sans facture : EUROPCR 2027 (D5),
+  MSD, NHAF 2026, PCR LV 2026). « ECIO 2025 » (jamais facturé, C3) et « ERA 2026 » (pas de mandat) n'apparaissent pas.

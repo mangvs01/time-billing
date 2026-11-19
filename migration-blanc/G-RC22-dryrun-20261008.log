@@ -1,0 +1,179 @@
+OK    copie de publication 9.2-rc21-51b7c1b intacte
+OK    copie de publication 9.2-rc22-2282419 intacte
+
+=== 0. faux staging rc21 : code = copie figée 9.2-rc21-51b7c1b, base = pre-rc21-20261007T130853Z (SHA vérifié), secrets de test
+OK    sauvegarde pre-rc21 intacte
+ Container tbmb-grc22 Started 
+santé : {"status":"ok","version":"9.2-rc21"}
+OK    faux staging en rc21
+INFO  état : 2247 saisies / 1934.4987 h ; historiques [('proposed', 24)] ; brouillon n°1 en échec : ['3', '10', '12', '13']
+OK    export .xlsx téléchargé (200, 144009 octets)
+
+=== 1. déploiement rc22 : 10 → 20 → 30 → 40 → 50 (comme le staging : .env conservé)
+2026-10-07T22:30:40Z  cible /root/time-billing-v9-rc10-20261004/migration-blanc/G-RC22/opt/time-billing-v9-staging (projet tbmb-grc22, conteneur tbmb-grc22) — santé : {"status":"ok","version":"9.2-rc21"}
+2026-10-07T22:30:40Z  Dockerfile identique : oui
+2026-10-07T22:30:40Z  requirements identiques : oui
+2026-10-07T22:30:40Z  propriétaire du dossier de données : 10001 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-07T22:30:40Z  préparation conforme
+ Container tbmb-grc22 Stopping 
+ Container tbmb-grc22 Stopped 
+2026-10-07T22:30:44Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/G-RC22/backups/pre-rc22-20261007T223040Z conforme (service arrêté ; relancer l'ancienne version : docker compose -p tbmb-grc22 start)
+OK   integrity_check
+OK   foreign_key_check vide
+OK   projects : 24 ligne(s), colonnes d origine inchangées
+OK   entries : 2247 ligne(s), colonnes d origine inchangées
+OK   invoices : 1 ligne(s), colonnes d origine inchangées
+OK   credit_notes : 0 ligne(s), colonnes d origine inchangées
+OK   audit : 189 ligne(s), colonnes d origine inchangées
+OK   aucune facture émise sans copie figée
+OK   empreintes des PDF figés valides
+OK   PDF figés servis
+OK   42 déclencheurs d immuabilité présents
+OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (0)
+OK   rc19 : 15 ligne(s) d historique des corrections identiques
+OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+OK   migration idempotente (2e passage sans erreur)
+OK   rc19 : schéma toujours conforme après le 2e passage
+GO
+ Image tbmb-grc22-time-billing-v9-staging Building 
+ Image tbmb-grc22-time-billing-v9-staging Built 
+ Container tbmb-grc22 Recreate 
+ Container tbmb-grc22 Recreated 
+ Container tbmb-grc22 Starting 
+ Container tbmb-grc22 Started 
+2026-10-07T22:30:52Z  déployé — santé : {"status":"ok","version":"9.2-rc22"}
+2026-10-07T22:30:52Z  OK    santé 9.2-rc22
+2026-10-07T22:30:52Z  OK    page de connexion 200
+2026-10-07T22:30:52Z  OK    en-têtes de sécurité
+2026-10-07T22:30:52Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-07T22:30:52Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-07T22:30:52Z  OK    archive ZIP protégée
+2026-10-07T22:30:52Z  OK    service non privilégié (uid 10001)
+2026-10-07T22:30:53Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-07T22:30:53Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-07T22:30:53Z  OK    écoute locale uniquement
+2026-10-07T22:30:53Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-07T22:30:53Z  OK    secrets absents des journaux du conteneur
+2026-10-07T22:30:56Z  après redémarrage :
+2026-10-07T22:30:56Z  OK    santé 9.2-rc22
+2026-10-07T22:30:56Z  OK    page de connexion 200
+2026-10-07T22:30:56Z  OK    en-têtes de sécurité
+2026-10-07T22:30:56Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-07T22:30:56Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-07T22:30:56Z  OK    archive ZIP protégée
+2026-10-07T22:30:57Z  OK    service non privilégié (uid 10001)
+2026-10-07T22:30:57Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-07T22:30:57Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-07T22:30:57Z  OK    écoute locale uniquement
+2026-10-07T22:30:58Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-07T22:30:58Z  OK    secrets absents des journaux du conteneur
+2026-10-07T22:30:58Z  VÉRIFICATIONS CONFORMES
+OK    empreinte du code noté par 20 = copie figée rc22
+
+=== 2. contrôles rc22 : mêmes données métier que rc21, brouillon n°1, export, correctifs de la revue rc19
+OK    rc22 : toutes les tables métier identiques à rc21 (outils/empreinte_metier.py) — IDENTIQUES : toutes les tables métier (mêmes colonnes, mêmes lignes)
+INFO  état : 2247 saisies / 1934.4987 h ; historiques [('proposed', 24)] ; brouillon n°1 en échec : ['3', '10', '12', '13']
+OK    rc22 : saisies, heures, historiques, contrôles du brouillon n°1 et chiffres de l'accueil identiques à rc21
+OK    export .xlsx téléchargé (200, 144009 octets)
+OK    export .xlsx : mêmes onglets qu'en rc21 (22 onglets)
+OK    /entries?project=² : 200 (rc21 : erreur 500)
+OK    libellé « Motif (facultatif, sauf rattachement à un mandat clôturé) »
+
+=== 3. retour arrière (aucune donnée métier écrite depuis la sauvegarde) : accepté → rc21
+2026-10-07T22:31:06Z  base vivante copiée avant retour : /root/time-billing-v9-rc10-20261004/migration-blanc/G-RC22/backups/ecarte-20261007T223040Z-retour-20261007T223105Z/timebilling-avant-retour.db (sha 2e26b3119c1a)
+2026-10-07T22:31:10Z  sauvegarde migrée par l'image déployée (656cc93327a3) : référence des tables et colonnes ajoutées
+ Container tbmb-grc22 Stopping 
+ Container tbmb-grc22 Stopped 
+2026-10-07T22:31:15Z  .env d'origine restauré
+2026-10-07T22:31:15Z  requirements.lock d'origine restauré
+2026-10-07T22:31:16Z  .dockerignore d'origine restauré
+ Container tbmb-grc22 Creating 
+ Container tbmb-grc22 Created 
+ Container tbmb-grc22 Starting 
+ Container tbmb-grc22 Started 
+2026-10-07T22:31:20Z  retour arrière effectué — santé : {"status":"ok","version":"9.2-rc21"} ; base = sauvegarde 20261007T223040Z (SHA-256 identique)
+OK    90-rollback accepté
+OK    base restaurée = sauvegarde d'avant déploiement (SHA-256 vérifié par 90-rollback)
+OK    version rc21 de retour
+OK    après retour : toutes les tables métier identiques à rc21 — IDENTIQUES : toutes les tables métier (mêmes colonnes, mêmes lignes)
+INFO  état : 2247 saisies / 1934.4987 h ; historiques [('proposed', 24)] ; brouillon n°1 en échec : ['3', '10', '12', '13']
+OK    après retour : état rc21 identique (pages)
+
+=== 4. redéploiement rc22 : 10 → 50
+2026-10-07T22:31:25Z  cible /root/time-billing-v9-rc10-20261004/migration-blanc/G-RC22/opt/time-billing-v9-staging (projet tbmb-grc22, conteneur tbmb-grc22) — santé : {"status":"ok","version":"9.2-rc21"}
+2026-10-07T22:31:25Z  Dockerfile identique : oui
+2026-10-07T22:31:25Z  requirements identiques : oui
+2026-10-07T22:31:25Z  propriétaire du dossier de données : 10001 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-07T22:31:25Z  préparation conforme
+ Container tbmb-grc22 Stopping 
+ Container tbmb-grc22 Stopped 
+2026-10-07T22:31:30Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/G-RC22/backups/pre-rc22-20261007T223125Z conforme (service arrêté ; relancer l'ancienne version : docker compose -p tbmb-grc22 start)
+OK   integrity_check
+OK   foreign_key_check vide
+OK   projects : 24 ligne(s), colonnes d origine inchangées
+OK   entries : 2247 ligne(s), colonnes d origine inchangées
+OK   invoices : 1 ligne(s), colonnes d origine inchangées
+OK   credit_notes : 0 ligne(s), colonnes d origine inchangées
+OK   audit : 190 ligne(s), colonnes d origine inchangées
+OK   aucune facture émise sans copie figée
+OK   empreintes des PDF figés valides
+OK   PDF figés servis
+OK   42 déclencheurs d immuabilité présents
+OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (0)
+OK   rc19 : 15 ligne(s) d historique des corrections identiques
+OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+OK   migration idempotente (2e passage sans erreur)
+OK   rc19 : schéma toujours conforme après le 2e passage
+GO
+ Image tbmb-grc22-time-billing-v9-staging Building 
+ Image tbmb-grc22-time-billing-v9-staging Built 
+ Container tbmb-grc22 Recreate 
+ Container tbmb-grc22 Recreated 
+ Container tbmb-grc22 Starting 
+ Container tbmb-grc22 Started 
+2026-10-07T22:31:38Z  déployé — santé : {"status":"ok","version":"9.2-rc22"}
+2026-10-07T22:31:38Z  OK    santé 9.2-rc22
+2026-10-07T22:31:38Z  OK    page de connexion 200
+2026-10-07T22:31:39Z  OK    en-têtes de sécurité
+2026-10-07T22:31:39Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-07T22:31:39Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-07T22:31:39Z  OK    archive ZIP protégée
+2026-10-07T22:31:39Z  OK    service non privilégié (uid 10001)
+2026-10-07T22:31:39Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-07T22:31:39Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-07T22:31:39Z  OK    écoute locale uniquement
+2026-10-07T22:31:40Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-07T22:31:40Z  OK    secrets absents des journaux du conteneur
+2026-10-07T22:31:42Z  après redémarrage :
+2026-10-07T22:31:42Z  OK    santé 9.2-rc22
+2026-10-07T22:31:42Z  OK    page de connexion 200
+2026-10-07T22:31:43Z  OK    en-têtes de sécurité
+2026-10-07T22:31:43Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-07T22:31:43Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-07T22:31:43Z  OK    archive ZIP protégée
+2026-10-07T22:31:43Z  OK    service non privilégié (uid 10001)
+2026-10-07T22:31:43Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-07T22:31:44Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-07T22:31:44Z  OK    écoute locale uniquement
+2026-10-07T22:31:44Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-07T22:31:44Z  OK    secrets absents des journaux du conteneur
+2026-10-07T22:31:44Z  VÉRIFICATIONS CONFORMES
+OK    après redéploiement : tables métier identiques à rc21 — IDENTIQUES : toutes les tables métier (mêmes colonnes, mêmes lignes)
+
+=== 5. parcours utilisateur sur rc22 : validation des 24 historiques, puis export
+OK    24 historiques validées par la page : [('validated', 24)]
+OK    export .xlsx téléchargé (200, 147577 octets)
+OK    CA des onglets SUIVI = « Facturé » de Billing (2025 67 236,00 ; 2026 70 973,50, comme la répétition E en rc21) : {'2025': '67236.00', '2026': '70973.50'}
+
+=== 6. retour arrière après validation des historiques : doit être REFUSÉ
+2026-10-07T22:31:51Z  base vivante copiée avant retour : /root/time-billing-v9-rc10-20261004/migration-blanc/G-RC22/backups/ecarte-20261007T223125Z-retour-20261007T223150Z/timebilling-avant-retour.db (sha 1d4e97e521fb)
+2026-10-07T22:31:54Z  sauvegarde migrée par l'image déployée (e7f9103c073a) : référence des tables et colonnes ajoutées
+2026-10-07T22:31:55Z  ARRÊT : des données écrites depuis la sauvegarde du déploiement (2026-10-07T22:31:25) seraient écartées par le retour arrière : historical_invoices : 24 ligne(s) modifiée(s). Copie conservée : /root/time-billing-v9-rc10-20261004/migration-blanc/G-RC22/backups/ecarte-20261007T223125Z-retour-20261007T223150Z/timebilling-avant-retour.db. Les exporter (sauvegarde JSON) puis relancer avec ABANDONNER_CORRECTIONS=OUI.
+OK    retour arrière refusé (validations écrites depuis la sauvegarde)
+OK    service rc22 toujours en marche
+OK    base inchangée par la tentative — IDENTIQUES : toutes les tables métier (mêmes colonnes, mêmes lignes)
+OK    motif du refus : historical_invoices : 24 ligne(s) modifiée(s)
+
+=== 7. nettoyage
+images du bac à sable supprimées
+RÉPÉTITION G : GO

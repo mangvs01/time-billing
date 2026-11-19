@@ -1,0 +1,40 @@
+
+=== 0. bac à sable
+OK    sauvegarde source intacte
+OK    production fictive en 9.2-rc23
+
+=== 1. première sauvegarde à chaud (service en marche)
+2026-10-08T08:54:22Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/K-SAUV/backups/quotidiennes/timebilling-20261008T085421Z.db (8077312 octets) — intégrité ok — sha256 11cf74054b5384b2…
+OK    sauvegarde 1
+OK    sauvegarde 1 : 2 247 saisies
+OK    fichier temporaire retiré de /data
+OK    droits 600 / 700
+
+=== 2. écriture entre deux sauvegardes, puis seconde sauvegarde
+2026-10-08T08:54:24Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/K-SAUV/backups/quotidiennes/timebilling-20261008T085423Z.db (8077312 octets) — intégrité ok — sha256 3087e3a09c14f7a9…
+OK    sauvegarde 2
+OK    sauvegarde 2 contient l'écriture faite après la 1
+OK    SHA256SUMS : 2 lignes d'origine
+
+=== 3. vérification de restaurabilité (conteneur jetable sans réseau)
+OK    integrity_check
+OK    foreign_key_check vide
+effectifs {"projects": 24, "entries": 2247, "invoices": 1, "credit_notes": 0, "invoice_snapshots": 0, "credit_note_snapshots": 0}
+OK    toute facture émise a sa copie figée
+OK    toute note émise a sa copie figée
+OK    empreintes des PDF de factures
+OK    empreintes des PDF de notes de crédit
+OK    empreintes des PDF d annulation
+OK    schéma rc19 (déclencheurs, clé, écritures compilables, liens d annexe, identifiants)
+OK    annexes = copie figée (nombre de lignes)
+OK    42 déclencheurs d immuabilité
+OK    numéros de facture uniques
+SAUVEGARDE EXPLOITABLE
+OK    sauvegarde 2 restaurable
+
+=== 4. sauvegarde 1 altérée après coup : la sauvegarde suivante doit s'arrêter en le signalant
+OK    altération détectée (code 1)
+
+=== 5. nettoyage
+OK    conteneur retiré (bac à sable conservé : /root/time-billing-v9-rc10-20261004/migration-blanc/K-SAUV)
+RÉPÉTITION K : GO

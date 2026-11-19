@@ -1,0 +1,16 @@
+2026-10-08T09:11:51Z  OK    DNS billing.hudd-l.com A = 147.93.55.171 (résolveur 1.1.1.1)
+2026-10-08T09:11:51Z  OK    DNS billing.hudd-l.com A = 147.93.55.171 (résolveur 8.8.8.8)
+2026-10-08T09:11:51Z  OK    DNS billing.hudd-l.com : aucun AAAA (certificat obtenu en IPv4)
+2026-10-08T09:11:51Z  OK    prod.conf et staging.conf désignent la même copie (/root/time-billing-releases/9.2-rc23-50492d4/app)
+2026-10-08T09:11:51Z  OK    même image de répétition (tb-g4-cand:50492d4)
+2026-10-08T09:11:51Z  OK    copie de publication 9.2-rc23-50492d4 intacte (SHA256SUMS)
+2026-10-08T09:11:51Z  OK    image tb-g4-cand:50492d4 présente
+2026-10-08T09:11:51Z  OK    staging en marche en 9.2-rc23 = version de la copie
+2026-10-08T09:11:52Z  OK    Caddyfile candidat (site billing.hudd-l.com → 127.0.0.1:8091) valide
+2026-10-08T09:11:52Z  OK    billing-g5-bascule-production : statut resolved, décision PLAN_OK
+2026-10-08T09:11:52Z  OK    billing-g4-correction-historiques : statut resolved, décision A_CORRIGER_PAR_REMPLACEMENT
+2026-10-08T09:11:52Z  OK    place libre /root/backups/time-billing-v9-prod : 50154 Mo
+2026-10-08T09:11:52Z  OK    place libre /root/backups/time-billing-v9-staging : 50154 Mo
+2026-10-08T09:11:52Z  INFO  dernière sauvegarde du staging (pre-rc23-20261008T091053Z, 2026-10-08 06:12 UTC) : factures historiques {'proposed': 24} ; brouillons 1
+2026-10-08T09:11:52Z  INFO  recette : 24 facture(s) historique(s) encore « à valider » à cette date
+2026-10-08T09:11:52Z  PRÉREQUIS REMPLIS — bascule possible à la date et l'heure écrites par l'utilisateur (G5)

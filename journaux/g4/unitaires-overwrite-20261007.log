@@ -1,0 +1,23 @@
+................................................................................................s...................................................................................................[2026-10-07 07:34:56,674] ERROR in app: erreur interne
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/app.py", line 295, in inner
+    return fn(*a,**k)
+           ^^^^^^^^^^
+  File "/app/app/app.py", line 450, in index
+    fc=forecast_mod.build(c,rules.local_today())
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/tests/test_rc10_security.py", line 182, in boom
+    def boom(*a, **k): raise RuntimeError('SELECT secret FROM hidden_table')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: SELECT secret FROM hidden_table
+...........................................................................................................................................................................................................................................................................................
+----------------------------------------------------------------------
+Ran 479 tests in 180.088s
+
+OK (skipped=1)

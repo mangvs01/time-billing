@@ -1,0 +1,11 @@
+{% extends "_page.html" %}{% block title %}Changer mon mot de passe{% endblock %}{% block backlink %}/?tab=settings{% endblock %}{% block body %}
+<h1>Changer mon mot de passe</h1>
+<section class="panel pwpanel"><p class="hint">Saisissez votre mot de passe actuel, puis le nouveau mot de passe deux fois. Le nouveau mot de passe compte <b>{{min_len}} caractères au moins</b> (une phrase fait très bien l'affaire) et doit être différent de l'actuel.</p>
+<form method="post" action="/compte/mot-de-passe" class="pwform" autocomplete="off">
+<div class="field"><label for="pwCurrent">Mot de passe actuel</label><input id="pwCurrent" type="password" name="current_password" autocomplete="current-password" required></div>
+<div class="field"><label for="pwNew">Nouveau mot de passe</label><input id="pwNew" type="password" name="new_password" autocomplete="new-password" minlength="{{min_len}}" required aria-describedby="pwNewHint"><div class="hint" id="pwNewHint">{{min_len}} caractères au moins.</div></div>
+<div class="field"><label for="pwConfirm">Nouveau mot de passe, une seconde fois</label><input id="pwConfirm" type="password" name="confirm_password" autocomplete="new-password" minlength="{{min_len}}" required></div>
+<button type="submit">Changer mon mot de passe</button></form>
+<p class="hint">Après le changement, cet appareil reste connecté ; tous les autres appareils sont déconnectés. Le mot de passe n'est jamais conservé en clair, ni dans les journaux. Si vous oubliez le nouveau mot de passe, la personne qui gère le serveur peut revenir à l'ancien mot de passe en quelques minutes ; vos données ne sont pas touchées.</p></section>
+<style>.pwpanel{max-width:560px}.pwform{display:grid;gap:12px;margin:14px 0}.pwform .field{margin:0}</style>
+{% endblock %}

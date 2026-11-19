@@ -1,0 +1,78 @@
+.....................................F.............................................s.F.F..............................................................................................[2026-10-07 02:29:49,676] ERROR in app: erreur interne
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/app.py", line 295, in inner
+    return fn(*a,**k)
+           ^^^^^^^^^^
+  File "/app/app/app.py", line 444, in index
+    fc=forecast_mod.build(c,rules.local_today())
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/tests/test_rc10_security.py", line 182, in boom
+    def boom(*a, **k): raise RuntimeError('SELECT secret FROM hidden_table')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: SELECT secret FROM hidden_table
+.................................................................................................................................................................................................................F.........................................................................
+======================================================================
+FAIL: test_earlier_timebilling_invoices_count_only_up_to_the_cutoff (tests.test_g4.Annex.test_earlier_timebilling_invoices_count_only_up_to_the_cutoff)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4.py", line 225, in test_earlier_timebilling_invoices_count_only_up_to_the_cutoff
+    self.assertEqual((h['position']['previous'], h['position']['current'], h['position']['later']), (0, 1.0, 2.0))
+AssertionError: Tuples differ: (2.0, 1.0, 0) != (0, 1.0, 2.0)
+
+First differing element 0:
+2.0
+0
+
+- (2.0, 1.0, 0)
+?  --
+
++ (0, 1.0, 2.0)
+?          ++
+
+
+======================================================================
+FAIL: test_E7_the_summary_says_which_earlier_invoices_are_counted (tests.test_g4_fidelite.LayoutD6.test_E7_the_summary_says_which_earlier_invoices_are_counted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_fidelite.py", line 332, in test_E7_the_summary_says_which_earlier_invoices_are_counted
+    self.assertIn('factures Time Billing émises dont la période se termine au plus tard le 30.09.2026', t)
+AssertionError: 'factures Time Billing émises dont la période se termine au plus tard le 30.09.2026' not found in "[Logo à fournir — Paramètres] FACTURE — BROUILLON Date : (date d'émission) N° Facture : (attribué à l'émission) PO: PO-TEST-001 Émetteur Fictif Sàrl Rue de Test 2 1200 Genève Adresse de facturation : Client Fictif SA Rue Imaginaire 1 9999 Nulle-Part N° d'identification : CHE-000.000.001 DESCRIPTION JOUR COUT JOURNALIER MONTANT Mandat G4 Période : 01.09.2026 – 30.09.2026 2,00 650,00 CHF 1 300,00 CHF SOUS-TOTAL 1 300,00 CHF TAUX TVA 0,00% TVA - CHF AUTRES - CHF TOTAL 1 300,00 CHF Paiement à 30 jours sur le compte: Titulaire: Émetteur Fictif Sàrl IBAN: CH00 0000 0000 0000 0000 0 [À COMPLÉTER : BIC] N° TVA: CHE-000.000.000 TVA (fictif) IBAN: CH00 0000 0000 0000 0000 0 [À COMPLÉTER : N° registre du commerce (pied de page)] BROUILLON — document non émis, sans valeur comptable Feuille de temps août-26 Historique cumulatif — antérieur à la période facturée (information) Total des heures de travail du mois 8,00 Date(s) Motif Projet Numéro de projet Heure début Heure fin Heures de travail 10/08/2026 août Mandat G4 NP-TEST 8,00 Total 8,00 Page 1 of 3 Feuille de temps sept-26 Prestations de la période facturée Total des heures de travail du mois 16,00 Date(s) Motif Projet Numéro de projet Heure début Heure fin Heures de travail 10/09/2026 septembre Mandat G4 NP-TEST 16,00 Total 16,00 Page 2 of 3 2026 Période facturée : du 01.09.2026 au 30.09.2026 · Historique cumulatif des prestations jusqu'au 30.09.2026 PROJET Dates Client Num projet PO NB J PO Jours réalisés cumulés Mandat G4 01-05 Sept 2026 Client Fictif SA NP-TEST PO-TEST-001 12 3 Position contractuelle en jours au 07.10.2026 Jours commandés (PO) Jours réalisés cumulés Jours facturés historiques (hors Time Billing) Jours facturés Time Billing antérieurs Jours facturés par cette facture Jours annulés par notes de crédit Solde contractuel 12 3 0 0 2 0 10 Jours réalisés cumulés : temps enregistré du début du mandat au 30.09.2026 (fin de la période facturée). Les factures sont comptées à leur date : jours facturés historiques = factures émises hors Time Billing, validées dans le registre, datées au plus tard du 07.10.2026 (date de cette facture). Jours facturés Time Billing antérieurs : factures Time Billing émises datées au plus tard du 07.10.2026. Jours annulés : notes de crédit émises à cette date et non annulées, sur ces factures antérieures, créditées en jours (un crédit en montant seul ne modifie pas les jours). Solde contractuel = jours commandés − (historiques + antérieurs + cette facture − jours annulés par notes de crédit). Page 3 of 3"
+
+======================================================================
+FAIL: test_R_E7_1_a_credit_note_on_a_later_invoice_is_not_cancelled_at_this_cutoff (tests.test_g4_fidelite.LayoutD6.test_R_E7_1_a_credit_note_on_a_later_invoice_is_not_cancelled_at_this_cutoff)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_g4_fidelite.py", line 312, in test_R_E7_1_a_credit_note_on_a_later_invoice_is_not_cancelled_at_this_cutoff
+    self.assertEqual((pos['previous'], pos['current'], pos['credited'], pos['balance'], pos['later']), (1.0, 2.0, 0, 9.0, 2.0))   # 12 − (1 + 2) at 30.09
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (0, 2.0, 0, 10.0, 3.0) != (1.0, 2.0, 0, 9.0, 2.0)
+
+First differing element 0:
+0
+1.0
+
+- (0, 2.0, 0, 10.0, 3.0)
+?             ^^    ^
+
++ (1.0, 2.0, 0, 9.0, 2.0)
+?  ++           ^    ^
+
+
+======================================================================
+FAIL: test_renamed_and_kept_apart_on_the_pdf (tests.test_rc7.A4Days.test_renamed_and_kept_apart_on_the_pdf)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_rc7.py", line 143, in test_renamed_and_kept_apart_on_the_pdf
+    self.assertIn(label, one)
+AssertionError: 'Position contractuelle en jours au 31.10.2026' not found in 'PROJET Dates Client Num projet PO NB J PO Jours réalisés cumulés Mandat NC2 01-05 Sept 2026 Client Fictif SA NP-TEST PO-TEST-001 12 3,50 Position contractuelle en jours au 07.10.2026 Jours commandés (PO) Jours réalisés cumulés Jours facturés historiques (hors Time Billing) Jours facturés Time Billing antérieurs Jours facturés par cette facture Jours annulés par notes de crédit Solde contractuel 12 3,50 0 2 1,50 0,50 9 Jours réalisés cumulés : temps enregistré du début du mandat au 31.10.2026 (fin de la période facturée). Les factures sont comptées à leur date : jours facturés historiques = factures émises hors Time Billing, validées dans le registre, datées au plus tard du 07.10.2026 (date de cette facture). Jours facturés Time Billing antérieurs : factures Time Billing émises datées au plus tard du 07.10.2026. Jours annulés : notes de crédit émises à cette date et non annulées, sur ces factures antérieures, créditées en jours (un crédit en montant seul ne modifie pas les jours). Solde contractuel = jours commandés − (historiques + antérieurs + cette facture − jours annulés par notes de crédit). Page 3 of 3'
+
+----------------------------------------------------------------------
+Ran 465 tests in 156.074s
+
+FAILED (failures=4, skipped=1)

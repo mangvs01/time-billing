@@ -1,0 +1,14 @@
+....F...............................................................................
+======================================================================
+FAIL: test_rc18_schema_is_migrated_once_without_touching_any_row (tests.test_rc19.Migration.test_rc18_schema_is_migrated_once_without_touching_any_row)
+A database still carrying the rc18 schema (foreign key annex -> entries, two blocking triggers) is migrated at start-up:
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_rc19.py", line 303, in test_rc18_schema_is_migrated_once_without_touching_any_row
+    self.assertEqual(c.execute("SELECT COUNT(*) FROM audit WHERE event='schema_rc19_annex_rebuilt'").fetchone()[0], 1)
+AssertionError: 2 != 1
+
+----------------------------------------------------------------------
+Ran 84 tests in 35.857s
+
+FAILED (failures=1)

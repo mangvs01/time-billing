@@ -1,0 +1,6 @@
+2026-10-08T09:10:44Z  cible /opt/time-billing-v9-staging (projet time-billing-v9-staging, conteneur time-billing-v9-staging) — santé : {"status":"ok","version":"9.2-rc22"}
+2026-10-08T09:10:45Z  Dockerfile identique : oui
+2026-10-08T09:10:45Z  requirements identiques : oui
+2026-10-08T09:10:45Z  propriétaire du dossier de données : 10001 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-08T09:10:45Z  secrets de rc23 : .env.rc23 présent (mode 600)
+2026-10-08T09:10:45Z  préparation conforme

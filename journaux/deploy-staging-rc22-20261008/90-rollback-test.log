@@ -1,0 +1,12 @@
+2026-10-07T23:38:15Z  base vivante copiée avant retour : /root/backups/time-billing-v9-staging/ecarte-20261007T233730Z-retour-20261007T233814Z/timebilling-avant-retour.db (sha cfd6dc609467)
+2026-10-07T23:38:18Z  sauvegarde migrée par l'image déployée (c4c01fc6920d) : référence des tables et colonnes ajoutées
+ Container time-billing-v9-staging Stopping 
+ Container time-billing-v9-staging Stopped 
+2026-10-07T23:38:21Z  .env d'origine restauré
+2026-10-07T23:38:22Z  requirements.lock d'origine restauré
+2026-10-07T23:38:22Z  .dockerignore d'origine restauré
+ Container time-billing-v9-staging Creating 
+ Container time-billing-v9-staging Created 
+ Container time-billing-v9-staging Starting 
+ Container time-billing-v9-staging Started 
+2026-10-07T23:38:24Z  retour arrière effectué — santé : {"status":"ok","version":"9.2-rc21"} ; base = sauvegarde 20261007T233730Z (SHA-256 identique)

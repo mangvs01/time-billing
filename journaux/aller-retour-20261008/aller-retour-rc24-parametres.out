@@ -1,0 +1,5 @@
+image sha256:c70a0c304d2d37e02a1be4525f05be0dc35ee8c588b2b017016dfccefd85361e ; version {"status":"ok","version":"9.2-rc24"} ; source /root/backups/time-billing-v9-staging/pre-rc23-20261008T061057Z/timebilling.db (857c9a4d84703efbfae5ec2350685b25f2ae23e7426be08c70e028f7ae81e91e)
+formulaires {'saisie': 2247, 'mandat': 24, 'brouillon': 1, 'paramètres': 1} ; refus 0 ; tables modifiées [] ; lignes réécrites à l'identique (horodatage seul, vues « modifiées » par 90-rollback) {}
+empreinte_metier (16 tables métier de 90-rollback, toutes colonnes, horodatages compris) :
+IDENTIQUES : toutes les tables métier (mêmes colonnes, mêmes lignes)
+base source inchangée

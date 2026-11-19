@@ -1,0 +1,1230 @@
+{
+ "n_entries": 2247,
+ "n_linked_rows": 2247,
+ "n_entry_changes": 0,
+ "P": 43,
+ "D": 12,
+ "H": 31,
+ "H_nonzero": 28,
+ "H_nonzero_below_0_00005": 0,
+ "sum_delta": -1.032,
+ "sum_delta_exact": "-61922000000000237/60000000000000000",
+ "sum_delta_of_rounded_rows": -1.0321,
+ "active_sum_delta": -0.632,
+ "active_n": 14,
+ "active_H": 11,
+ "active_H_nonzero": 11,
+ "P_by_source": {
+  "orig": 43
+ },
+ "H_by_source": {
+  "orig": 31
+ },
+ "Hnz_by_source": {
+  "orig": 28
+ },
+ "sum_negative": -2.7987,
+ "sum_positive": 1.7667,
+ "per_mandate": [
+  {
+   "name": "EUROPCR 2025",
+   "active": false,
+   "n": 5,
+   "n_D": 1,
+   "n_H": 4,
+   "n_H_nonzero": 3,
+   "sum_delta": 0.0333
+  },
+  {
+   "name": "EHRA 2026",
+   "active": false,
+   "n": 2,
+   "n_D": 1,
+   "n_H": 1,
+   "n_H_nonzero": 1,
+   "sum_delta": 0.1333
+  },
+  {
+   "name": "EUROPCR 2026",
+   "active": false,
+   "n": 3,
+   "n_D": 1,
+   "n_H": 2,
+   "n_H_nonzero": 2,
+   "sum_delta": 0.0333
+  },
+  {
+   "name": "Endovascular Summit",
+   "active": false,
+   "n": 2,
+   "n_D": 0,
+   "n_H": 2,
+   "n_H_nonzero": 0,
+   "sum_delta": 0.0
+  },
+  {
+   "name": "EULAR 2026",
+   "active": false,
+   "n": 2,
+   "n_D": 2,
+   "n_H": 0,
+   "n_H_nonzero": 0,
+   "sum_delta": 0.0
+  },
+  {
+   "name": "EAU 2026",
+   "active": false,
+   "n": 2,
+   "n_D": 0,
+   "n_H": 2,
+   "n_H_nonzero": 2,
+   "sum_delta": -0.2333
+  },
+  {
+   "name": "SMART Y90",
+   "active": false,
+   "n": 1,
+   "n_D": 0,
+   "n_H": 1,
+   "n_H_nonzero": 1,
+   "sum_delta": 0.1333
+  },
+  {
+   "name": "CIRSE 2025",
+   "active": false,
+   "n": 3,
+   "n_D": 0,
+   "n_H": 3,
+   "n_H_nonzero": 3,
+   "sum_delta": -0.2333
+  },
+  {
+   "name": "ASN 2025",
+   "active": false,
+   "n": 1,
+   "n_D": 1,
+   "n_H": 0,
+   "n_H_nonzero": 0,
+   "sum_delta": 0.0
+  },
+  {
+   "name": "CIRSE 2026",
+   "active": false,
+   "n": 2,
+   "n_D": 2,
+   "n_H": 0,
+   "n_H_nonzero": 0,
+   "sum_delta": 0.0
+  },
+  {
+   "name": "NHAF 2026",
+   "active": true,
+   "n": 7,
+   "n_D": 2,
+   "n_H": 5,
+   "n_H_nonzero": 5,
+   "sum_delta": -0.232
+  },
+  {
+   "name": "ECIO 2025",
+   "active": false,
+   "n": 1,
+   "n_D": 0,
+   "n_H": 1,
+   "n_H_nonzero": 1,
+   "sum_delta": -0.1333
+  },
+  {
+   "name": "SMM 2026",
+   "active": false,
+   "n": 3,
+   "n_D": 0,
+   "n_H": 3,
+   "n_H_nonzero": 3,
+   "sum_delta": -0.1667
+  },
+  {
+   "name": "NC STC June",
+   "active": false,
+   "n": 1,
+   "n_D": 0,
+   "n_H": 1,
+   "n_H_nonzero": 1,
+   "sum_delta": 0.0333
+  },
+  {
+   "name": "STC GEM Avril",
+   "active": false,
+   "n": 1,
+   "n_D": 1,
+   "n_H": 0,
+   "n_H_nonzero": 0,
+   "sum_delta": 0.0
+  },
+  {
+   "name": "STC GEM Oct - DM job",
+   "active": true,
+   "n": 7,
+   "n_D": 1,
+   "n_H": 6,
+   "n_H_nonzero": 6,
+   "sum_delta": -0.4
+  }
+ ],
+ "rows": [
+  {
+   "cell": "JAN!15",
+   "entry_id": 5,
+   "mandate": "ECIO 2025",
+   "active": 0,
+   "raw_start": "9.5",
+   "raw_end": "10.3",
+   "stored_hours": 0.8000000000000007,
+   "declared": "0.8000000000000007",
+   "duration_hmm": 0.6667,
+   "delta": -0.1333,
+   "decimal_clock": 0.8,
+   "stored_clock": "09:30-10:18",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "AVR!134",
+   "entry_id": 275,
+   "mandate": "EUROPCR 2025",
+   "active": 0,
+   "raw_start": "18.15",
+   "raw_end": "19.5",
+   "stored_hours": 1.3500000000000014,
+   "declared": "1.3500000000000014",
+   "duration_hmm": 1.5833,
+   "delta": 0.2333,
+   "decimal_clock": 1.35,
+   "stored_clock": "18:09-19:30",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "MAY!43",
+   "entry_id": 320,
+   "mandate": "EUROPCR 2025",
+   "active": 0,
+   "raw_start": "11",
+   "raw_end": "11.15",
+   "stored_hours": 0.15000000000000036,
+   "declared": "0.15000000000000036",
+   "duration_hmm": 0.25,
+   "delta": 0.1,
+   "decimal_clock": 0.15,
+   "stored_clock": "11:00-11:09",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "MAY!68",
+   "entry_id": 339,
+   "mandate": "EUROPCR 2025",
+   "active": 0,
+   "raw_start": "17.45",
+   "raw_end": "21",
+   "stored_hours": 3.5500000000000007,
+   "declared": "3.5500000000000007",
+   "duration_hmm": 3.25,
+   "delta": -0.3,
+   "decimal_clock": 3.55,
+   "stored_clock": "17:27-21:00",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "JUN!25",
+   "entry_id": 416,
+   "mandate": "CIRSE 2025",
+   "active": 0,
+   "raw_start": "13.5",
+   "raw_end": "14.3",
+   "stored_hours": 0.8000000000000007,
+   "declared": "0.8000000000000007",
+   "duration_hmm": 0.6667,
+   "delta": -0.1333,
+   "decimal_clock": 0.8,
+   "stored_clock": "13:30-14:18",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "JUN!26",
+   "entry_id": 417,
+   "mandate": "SMART Y90",
+   "active": 0,
+   "raw_start": "14.3",
+   "raw_end": "15.5",
+   "stored_hours": 1.1999999999999993,
+   "declared": "1.1999999999999993",
+   "duration_hmm": 1.3333,
+   "delta": 0.1333,
+   "decimal_clock": 1.2,
+   "stored_clock": "14:18-15:30",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "AUG!119",
+   "entry_id": 541,
+   "mandate": "CIRSE 2025",
+   "active": 0,
+   "raw_start": "14.45",
+   "raw_end": "15",
+   "stored_hours": 0.5500000000000007,
+   "declared": "0.5500000000000007",
+   "duration_hmm": 0.25,
+   "delta": -0.3,
+   "decimal_clock": 0.55,
+   "stored_clock": "14:27-15:00",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "AUG!152",
+   "entry_id": 562,
+   "mandate": "CIRSE 2025",
+   "active": 0,
+   "raw_start": "15",
+   "raw_end": "15.3",
+   "stored_hours": 0.3000000000000007,
+   "declared": "0.3000000000000007",
+   "duration_hmm": 0.5,
+   "delta": 0.2,
+   "decimal_clock": 0.3,
+   "stored_clock": "15:00-15:18",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "MAR 26!9",
+   "entry_id": 961,
+   "mandate": "EUROPCR 2026",
+   "active": 0,
+   "raw_start": "13.5",
+   "raw_end": "14.2",
+   "stored_hours": 0.6999999999999993,
+   "declared": "0.6999999999999993",
+   "duration_hmm": 0.5,
+   "delta": -0.2,
+   "decimal_clock": 0.7,
+   "stored_clock": "13:30-14:12",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "MAR 26!101",
+   "entry_id": 1029,
+   "mandate": "EHRA 2026",
+   "active": 0,
+   "raw_start": "17.3",
+   "raw_end": "19.5",
+   "stored_hours": 2.1999999999999993,
+   "declared": "2.1999999999999993",
+   "duration_hmm": 2.3333,
+   "delta": 0.1333,
+   "decimal_clock": 2.2,
+   "stored_clock": "17:18-19:30",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "SEPT 26!82",
+   "entry_id": 1358,
+   "mandate": "NHAF 2026",
+   "active": 1,
+   "raw_start": "12.2513",
+   "raw_end": "13",
+   "stored_hours": 0.7486999999999995,
+   "declared": "0.7486999999999995",
+   "duration_hmm": 0.5833,
+   "delta": -0.1654,
+   "decimal_clock": 0.7487,
+   "stored_clock": "12:15-13:00",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "FEB 26!52",
+   "entry_id": 1467,
+   "mandate": "EAU 2026",
+   "active": 0,
+   "raw_start": "12.45",
+   "raw_end": "13",
+   "stored_hours": 0.5500000000000007,
+   "declared": "0.5500000000000007",
+   "duration_hmm": 0.25,
+   "delta": -0.3,
+   "decimal_clock": 0.55,
+   "stored_clock": "12:27-13:00",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "FEB 26!68",
+   "entry_id": 1476,
+   "mandate": "EAU 2026",
+   "active": 0,
+   "raw_start": "13.4",
+   "raw_end": "13.5",
+   "stored_hours": 0.09999999999999964,
+   "declared": "0.09999999999999964",
+   "duration_hmm": 0.1667,
+   "delta": 0.0667,
+   "decimal_clock": 0.1,
+   "stored_clock": "13:24-13:30",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "FEB 26!75",
+   "entry_id": 1483,
+   "mandate": "EUROPCR 2026",
+   "active": 0,
+   "raw_start": "11",
+   "raw_end": "11.35",
+   "stored_hours": 0.34999999999999964,
+   "declared": "0.34999999999999964",
+   "duration_hmm": 0.5833,
+   "delta": 0.2333,
+   "decimal_clock": 0.35,
+   "stored_clock": "11:00-11:21",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "JUN 26!60",
+   "entry_id": 1577,
+   "mandate": "NHAF 2026",
+   "active": 1,
+   "raw_start": "12.3",
+   "raw_end": "15",
+   "stored_hours": 2.6999999999999993,
+   "declared": "2.6999999999999993",
+   "duration_hmm": 2.5,
+   "delta": -0.2,
+   "decimal_clock": 2.7,
+   "stored_clock": "12:18-15:00",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "JUL 26!50",
+   "entry_id": 1598,
+   "mandate": "NHAF 2026",
+   "active": 1,
+   "raw_start": "12.2",
+   "raw_end": "12.5",
+   "stored_hours": 0.3000000000000007,
+   "declared": "0.3000000000000007",
+   "duration_hmm": 0.5,
+   "delta": 0.2,
+   "decimal_clock": 0.3,
+   "stored_clock": "12:12-12:30",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "AUG 26!61",
+   "entry_id": 1610,
+   "mandate": "NHAF 2026",
+   "active": 1,
+   "raw_start": "17.25",
+   "raw_end": "17.3",
+   "stored_hours": 0.05000000000000071,
+   "declared": "0.05000000000000071",
+   "duration_hmm": 0.0833,
+   "delta": 0.0333,
+   "decimal_clock": 0.05,
+   "stored_clock": "17:15-17:18",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "MAY!46",
+   "entry_id": 1661,
+   "mandate": "NC STC June",
+   "active": 0,
+   "raw_start": "13.45",
+   "raw_end": "15.5",
+   "stored_hours": 2.0500000000000007,
+   "declared": "2.0500000000000007",
+   "duration_hmm": 2.0833,
+   "delta": 0.0333,
+   "decimal_clock": 2.05,
+   "stored_clock": "13:27-15:30",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "AUG!153",
+   "entry_id": 1705,
+   "mandate": "SMM 2026",
+   "active": 0,
+   "raw_start": "15.3",
+   "raw_end": "16",
+   "stored_hours": 0.6999999999999993,
+   "declared": "0.6999999999999993",
+   "duration_hmm": 0.5,
+   "delta": -0.2,
+   "decimal_clock": 0.7,
+   "stored_clock": "15:18-16:00",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "SEPT!129",
+   "entry_id": 1724,
+   "mandate": "SMM 2026",
+   "active": 0,
+   "raw_start": "12.15",
+   "raw_end": "12.5",
+   "stored_hours": 0.34999999999999964,
+   "declared": "0.34999999999999964",
+   "duration_hmm": 0.5833,
+   "delta": 0.2333,
+   "decimal_clock": 0.35,
+   "stored_clock": "12:09-12:30",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "FEB 26!40",
+   "entry_id": 1838,
+   "mandate": "SMM 2026",
+   "active": 0,
+   "raw_start": "20.3",
+   "raw_end": "21",
+   "stored_hours": 0.6999999999999993,
+   "declared": "0.6999999999999993",
+   "duration_hmm": 0.5,
+   "delta": -0.2,
+   "decimal_clock": 0.7,
+   "stored_clock": "20:18-21:00",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "SEPT 26!115",
+   "entry_id": 2071,
+   "mandate": "STC GEM Oct - DM job",
+   "active": 1,
+   "raw_start": "13.45",
+   "raw_end": "15.25",
+   "stored_hours": 1.8000000000000007,
+   "declared": "1.8000000000000007",
+   "duration_hmm": 1.6667,
+   "delta": -0.1333,
+   "decimal_clock": 1.8,
+   "stored_clock": "13:27-15:15",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "SEPT 26!127",
+   "entry_id": 2080,
+   "mandate": "STC GEM Oct - DM job",
+   "active": 1,
+   "raw_start": "14.15",
+   "raw_end": "15.25",
+   "stored_hours": 1.0999999999999996,
+   "declared": "1.0999999999999996",
+   "duration_hmm": 1.1667,
+   "delta": 0.0667,
+   "decimal_clock": 1.1,
+   "stored_clock": "14:09-15:15",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "APR 26!103",
+   "entry_id": 2155,
+   "mandate": "NHAF 2026",
+   "active": 1,
+   "raw_start": "11.4",
+   "raw_end": "12.25",
+   "stored_hours": 0.8499999999999996,
+   "declared": "0.8499999999999996",
+   "duration_hmm": 0.75,
+   "delta": -0.1,
+   "decimal_clock": 0.85,
+   "stored_clock": "11:24-12:15",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "JUN 26!71",
+   "entry_id": 2213,
+   "mandate": "STC GEM Oct - DM job",
+   "active": 1,
+   "raw_start": "14.45",
+   "raw_end": "16.25",
+   "stored_hours": 1.8000000000000007,
+   "declared": "1.8000000000000007",
+   "duration_hmm": 1.6667,
+   "delta": -0.1333,
+   "decimal_clock": 1.8,
+   "stored_clock": "14:27-16:15",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "JUN 26!83",
+   "entry_id": 2217,
+   "mandate": "STC GEM Oct - DM job",
+   "active": 1,
+   "raw_start": "19.2",
+   "raw_end": "20",
+   "stored_hours": 0.8000000000000007,
+   "declared": "0.8000000000000007",
+   "duration_hmm": 0.6667,
+   "delta": -0.1333,
+   "decimal_clock": 0.8,
+   "stored_clock": "19:12-20:00",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "JUN 26!94",
+   "entry_id": 2220,
+   "mandate": "STC GEM Oct - DM job",
+   "active": 1,
+   "raw_start": "15",
+   "raw_end": "15.15",
+   "stored_hours": 0.15000000000000036,
+   "declared": "0.15000000000000036",
+   "duration_hmm": 0.25,
+   "delta": 0.1,
+   "decimal_clock": 0.15,
+   "stored_clock": "15:00-15:09",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  },
+  {
+   "cell": "JUL 26!49",
+   "entry_id": 2237,
+   "mandate": "STC GEM Oct - DM job",
+   "active": 1,
+   "raw_start": "11.45",
+   "raw_end": "12.2",
+   "stored_hours": 0.75,
+   "declared": "0.75",
+   "duration_hmm": 0.5833,
+   "delta": -0.1667,
+   "decimal_clock": 0.75,
+   "stored_clock": "11:27-12:12",
+   "source": "orig",
+   "cell_types": [
+    "number",
+    "number"
+   ]
+  }
+ ],
+ "D_rows": [
+  {
+   "cell": "MAY!69",
+   "entry_id": 340,
+   "raw_start": "7.15",
+   "raw_end": "7.75",
+   "frac": [
+    15,
+    75
+   ],
+   "stored_hours": 0.5999999999999996,
+   "decimal_clock": 0.6
+  },
+  {
+   "cell": "AUG!163",
+   "entry_id": 564,
+   "raw_start": "11.75",
+   "raw_end": "12.15",
+   "frac": [
+    75,
+    15
+   ],
+   "stored_hours": 0.40000000000000036,
+   "decimal_clock": 0.4
+  },
+  {
+   "cell": "MAR 26!99",
+   "entry_id": 1027,
+   "raw_start": "16.25",
+   "raw_end": "16.6",
+   "frac": [
+    25,
+    60
+   ],
+   "stored_hours": 0.3500000000000014,
+   "decimal_clock": 0.35
+  },
+  {
+   "cell": "MAR 26!100",
+   "entry_id": 1028,
+   "raw_start": "16.6",
+   "raw_end": "17.3",
+   "frac": [
+    60,
+    30
+   ],
+   "stored_hours": 0.6999999999999993,
+   "decimal_clock": 0.7
+  },
+  {
+   "cell": "MAY 26!18",
+   "entry_id": 1183,
+   "raw_start": "14.5",
+   "raw_end": "14.9",
+   "frac": [
+    50,
+    90
+   ],
+   "stored_hours": 0.40000000000000036,
+   "decimal_clock": 0.4
+  },
+  {
+   "cell": "JUN 26!62",
+   "entry_id": 1275,
+   "raw_start": "16",
+   "raw_end": "16.6",
+   "frac": [
+    0,
+    60
+   ],
+   "stored_hours": 0.6000000000000014,
+   "decimal_clock": 0.6
+  },
+  {
+   "cell": "JUN 26!95",
+   "entry_id": 1288,
+   "raw_start": "15.15",
+   "raw_end": "15.75",
+   "frac": [
+    15,
+    75
+   ],
+   "stored_hours": 0.5999999999999996,
+   "decimal_clock": 0.6
+  },
+  {
+   "cell": "SEPT 26!53",
+   "entry_id": 1346,
+   "raw_start": "14.25",
+   "raw_end": "15.6",
+   "frac": [
+    25,
+    60
+   ],
+   "stored_hours": 1.3499999999999996,
+   "decimal_clock": 1.35
+  },
+  {
+   "cell": "FEB 26!24",
+   "entry_id": 1453,
+   "raw_start": "14.7",
+   "raw_end": "15.25",
+   "frac": [
+    70,
+    25
+   ],
+   "stored_hours": 0.5500000000000007,
+   "decimal_clock": 0.55
+  },
+  {
+   "cell": "JUL 26!48",
+   "entry_id": 1597,
+   "raw_start": "10.75",
+   "raw_end": "11.45",
+   "frac": [
+    75,
+    45
+   ],
+   "stored_hours": 0.6999999999999993,
+   "decimal_clock": 0.7
+  },
+  {
+   "cell": "FEB 26!23",
+   "entry_id": 1829,
+   "raw_start": "21.75",
+   "raw_end": "22.15",
+   "frac": [
+    75,
+    15
+   ],
+   "stored_hours": 0.3999999999999986,
+   "decimal_clock": 0.4
+  },
+  {
+   "cell": "SEPT 26!54",
+   "entry_id": 2038,
+   "raw_start": "15.6",
+   "raw_end": "16",
+   "frac": [
+    60,
+    0
+   ],
+   "stored_hours": 0.40000000000000036,
+   "decimal_clock": 0.4
+  }
+ ],
+ "H_zero_rows": [
+  {
+   "cell": "JAN!27",
+   "entry_id": 15,
+   "raw_start": "12.3",
+   "raw_end": "13.3",
+   "stored_hours": 1.0
+  },
+  {
+   "cell": "MAY!44",
+   "entry_id": 321,
+   "raw_start": "11.45",
+   "raw_end": "12.45",
+   "stored_hours": 1.0
+  },
+  {
+   "cell": "MAY!45",
+   "entry_id": 322,
+   "raw_start": "12.45",
+   "raw_end": "13.45",
+   "stored_hours": 1.0
+  }
+ ],
+ "P_cell_types": {
+  "('number', 'number')": 43
+ },
+ "quirks": {
+  "clock_cell_date_formatted": {
+   "n": 4,
+   "examples": [
+    [
+     "AVR!32",
+     "start",
+     "1900-01-13T12:00:00",
+     "13.5"
+    ],
+    [
+     "AVR!32",
+     "end",
+     "1900-01-15T12:00:00",
+     "15.5"
+    ],
+    [
+     "JUN!31",
+     "start",
+     "1900-01-11T12:00:00",
+     "11.5"
+    ],
+    [
+     "JUN!31",
+     "end",
+     "1900-01-13T00:00:00",
+     "13"
+    ]
+   ]
+  },
+  "declared_hours_float_noise": {
+   "n": 39,
+   "examples": [
+    [
+     "JAN!15",
+     "0.8000000000000007",
+     0.8000000000000007
+    ],
+    [
+     "AVR!134",
+     "1.3500000000000014",
+     1.3500000000000014
+    ],
+    [
+     "MAY!43",
+     "0.15000000000000036",
+     0.15000000000000036
+    ],
+    [
+     "MAY!68",
+     "3.5500000000000007",
+     3.5500000000000007
+    ],
+    [
+     "MAY!69",
+     "0.5999999999999996",
+     0.5999999999999996
+    ],
+    [
+     "JUN!25",
+     "0.8000000000000007",
+     0.8000000000000007
+    ],
+    [
+     "JUN!26",
+     "1.1999999999999993",
+     1.1999999999999993
+    ],
+    [
+     "AUG!119",
+     "0.5500000000000007",
+     0.5500000000000007
+    ],
+    [
+     "AUG!152",
+     "0.3000000000000007",
+     0.3000000000000007
+    ],
+    [
+     "AUG!163",
+     "0.40000000000000036",
+     0.40000000000000036
+    ],
+    [
+     "MAR 26!9",
+     "0.6999999999999993",
+     0.6999999999999993
+    ],
+    [
+     "MAR 26!99",
+     "0.3500000000000014",
+     0.3500000000000014
+    ]
+   ]
+  },
+  "declared_ne_decimal_clock_D": {
+   "n": 12,
+   "examples": [
+    [
+     "MAY!69",
+     340,
+     "7.15",
+     "7.75",
+     "0.5999999999999996",
+     0.5999999999999996,
+     0.6
+    ],
+    [
+     "AUG!163",
+     564,
+     "11.75",
+     "12.15",
+     "0.40000000000000036",
+     0.40000000000000036,
+     0.4
+    ],
+    [
+     "MAR 26!99",
+     1027,
+     "16.25",
+     "16.6",
+     "0.3500000000000014",
+     0.3500000000000014,
+     0.35
+    ],
+    [
+     "MAR 26!100",
+     1028,
+     "16.6",
+     "17.3",
+     "0.6999999999999993",
+     0.6999999999999993,
+     0.7
+    ],
+    [
+     "MAY 26!18",
+     1183,
+     "14.5",
+     "14.9",
+     "0.40000000000000036",
+     0.40000000000000036,
+     0.4
+    ],
+    [
+     "JUN 26!62",
+     1275,
+     "16",
+     "16.6",
+     "0.6000000000000014",
+     0.6000000000000014,
+     0.6
+    ],
+    [
+     "JUN 26!95",
+     1288,
+     "15.15",
+     "15.75",
+     "0.5999999999999996",
+     0.5999999999999996,
+     0.6
+    ],
+    [
+     "SEPT 26!53",
+     1346,
+     "14.25",
+     "15.6",
+     "1.3499999999999996",
+     1.3499999999999996,
+     1.35
+    ],
+    [
+     "FEB 26!24",
+     1453,
+     "14.7",
+     "15.25",
+     "0.5500000000000007",
+     0.5500000000000007,
+     0.55
+    ],
+    [
+     "JUL 26!48",
+     1597,
+     "10.75",
+     "11.45",
+     "0.6999999999999993",
+     0.6999999999999993,
+     0.7
+    ],
+    [
+     "FEB 26!23",
+     1829,
+     "21.75",
+     "22.15",
+     "0.3999999999999986",
+     0.3999999999999986,
+     0.4
+    ],
+    [
+     "SEPT 26!54",
+     2038,
+     "15.6",
+     "16",
+     "0.40000000000000036",
+     0.40000000000000036,
+     0.4
+    ]
+   ]
+  },
+  "declared_ne_decimal_clock_H": {
+   "n": 27,
+   "examples": [
+    [
+     "JAN!15",
+     5,
+     "9.5",
+     "10.3",
+     "0.8000000000000007",
+     0.8000000000000007,
+     0.8
+    ],
+    [
+     "AVR!134",
+     275,
+     "18.15",
+     "19.5",
+     "1.3500000000000014",
+     1.3500000000000014,
+     1.35
+    ],
+    [
+     "MAY!43",
+     320,
+     "11",
+     "11.15",
+     "0.15000000000000036",
+     0.15000000000000036,
+     0.15
+    ],
+    [
+     "MAY!68",
+     339,
+     "17.45",
+     "21",
+     "3.5500000000000007",
+     3.5500000000000007,
+     3.55
+    ],
+    [
+     "JUN!25",
+     416,
+     "13.5",
+     "14.3",
+     "0.8000000000000007",
+     0.8000000000000007,
+     0.8
+    ],
+    [
+     "JUN!26",
+     417,
+     "14.3",
+     "15.5",
+     "1.1999999999999993",
+     1.1999999999999993,
+     1.2
+    ],
+    [
+     "AUG!119",
+     541,
+     "14.45",
+     "15",
+     "0.5500000000000007",
+     0.5500000000000007,
+     0.55
+    ],
+    [
+     "AUG!152",
+     562,
+     "15",
+     "15.3",
+     "0.3000000000000007",
+     0.3000000000000007,
+     0.3
+    ],
+    [
+     "MAR 26!9",
+     961,
+     "13.5",
+     "14.2",
+     "0.6999999999999993",
+     0.6999999999999993,
+     0.7
+    ],
+    [
+     "MAR 26!101",
+     1029,
+     "17.3",
+     "19.5",
+     "2.1999999999999993",
+     2.1999999999999993,
+     2.2
+    ],
+    [
+     "SEPT 26!82",
+     1358,
+     "12.2513",
+     "13",
+     "0.7486999999999995",
+     0.7486999999999995,
+     0.7487
+    ],
+    [
+     "FEB 26!52",
+     1467,
+     "12.45",
+     "13",
+     "0.5500000000000007",
+     0.5500000000000007,
+     0.55
+    ]
+   ]
+  },
+  "hours_is_formula": {
+   "n": 2240,
+   "examples": [
+    "JAN!6",
+    "JAN!7",
+    "JAN!8",
+    "JAN!14",
+    "JAN!15",
+    "JAN!16",
+    "JAN!17",
+    "JAN!18",
+    "JAN!19",
+    "JAN!22",
+    "JAN!23",
+    "JAN!24"
+   ]
+  },
+  "more_than_2_decimals": {
+   "n": 1,
+   "examples": [
+    [
+     "SEPT 26!82",
+     "start",
+     "12.2513",
+     "25.1300"
+    ]
+   ]
+  }
+ }
+}

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquette 3 — Brouillon guidé — Time Billing lot 2</title>
+<!-- MAQUETTE STATIQUE (UX lot 2, proposition n° 3). Aucun script, aucune requête, aucun envoi possible ; données fictives
+     (mandat Alpha de l'instance jetable : 55,75 h du 01.09 au 23.10.2026, 900 CHF/j, 8 h/j). Jetons repris de app/templates/_ds.html. -->
+<style>
+:root{--ink:#0e1621;--ink-2:#4a5565;--ink-3:#667085;--line:rgba(14,22,33,.09);--line-strong:rgba(14,22,33,.16);
+--blue:#0f62fe;--blue-soft:rgba(15,98,254,.10);--blue-glow:rgba(15,98,254,.35);--ok:#0f7b53;--ok-soft:rgba(15,123,83,.11);
+--warn:#9a5b00;--warn-soft:rgba(224,148,0,.14);--err:#c3332b;--err-soft:rgba(224,64,50,.09);--titanium:#e9edf2;--track:rgba(14,22,33,.08);
+--glass:rgba(255,255,255,.66);--glass-strong:rgba(255,255,255,.8);--glass-border:rgba(255,255,255,.78);
+--shadow-1:0 1px 2px rgba(14,22,33,.04),0 10px 28px -12px rgba(14,22,33,.14);--shadow-2:0 2px 6px rgba(14,22,33,.05),0 28px 56px -20px rgba(15,60,140,.26);
+--hl:inset 0 1px 0 rgba(255,255,255,.95);--r-panel:24px;--r-ctl:14px;
+--f:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}html{background:linear-gradient(180deg,#fbfcfd 0,#f1f3f7 1100px) no-repeat #f1f3f7}
+body{margin:0;font-family:var(--f);color:var(--ink);-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1}
+a{color:var(--blue);text-underline-offset:3px}
+.mq-banner{background:#1d2a35;color:#fff;font-size:12.5px;padding:8px 16px;text-align:center}.mq-banner b{color:#ffd27a}
+.shell{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:16px;align-self:start;margin:16px 0 16px 16px;padding:22px 14px 16px;background:var(--glass-strong);border:1px solid var(--glass-border);border-radius:28px;box-shadow:var(--shadow-1),var(--hl);display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;gap:12px;align-items:center;padding:2px 8px}.logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(150deg,#5b9bff,#0b54e6)}
+.brand b{font-size:15px}.envtag{display:inline-block;margin-top:4px;padding:2px 10px;border-radius:99px;background:var(--blue-soft);color:var(--blue);font-size:11px;font-weight:650;letter-spacing:.06em}
+.nav{display:flex;flex-direction:column;gap:3px}.nav span{padding:11px 12px;border-radius:14px;font-size:14px;font-weight:550;color:var(--ink-2)}
+.nav span.on{background:#fff;color:var(--blue);box-shadow:0 8px 20px -10px var(--blue-glow);border:1px solid rgba(15,98,254,.16)}
+.main{padding:28px 28px 56px;max-width:1240px;width:100%}
+h1.page{font-size:22px;letter-spacing:-.02em;margin:4px 2px 14px}
+h2{font-size:17px;font-weight:600;letter-spacing:-.015em;margin:0 0 12px}
+.panel{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r-panel);box-shadow:var(--shadow-1),var(--hl);padding:22px;margin:0 0 18px}
+.hint{color:var(--ink-3);font-size:12.5px;line-height:1.55}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 14px;border-radius:99px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;border:1px solid var(--line);background:#fff;color:var(--ink);box-shadow:var(--hl),0 1px 2px rgba(14,22,33,.05)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap;background:var(--titanium);color:var(--ink-2)}
+.ann{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#ffb020;color:#1d2a35;font-size:12px;font-weight:800;vertical-align:middle;margin:0 6px;box-shadow:0 0 0 3px rgba(255,176,32,.25)}
+.notes{background:#fffaf0;border:1px dashed #e0a000;border-radius:18px;padding:16px 20px;margin:0 0 20px;font-size:13.5px;line-height:1.55}
+.notes h2{font-size:15px;margin:0 0 8px}.notes ol{margin:0;padding-left:20px}.notes li{margin:4px 0}
+/* ---- proposition n° 3 ---- */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.wide{grid-column:1/-1}
+label.l{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}
+.ctl{display:flex;align-items:center;min-height:46px;padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--line-strong);background:rgba(255,255,255,.85);font-size:14.5px}
+.ctl.sel::after{content:"⌄";margin-left:auto;color:var(--ink-3)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
+.chip{display:inline-flex;align-items:center;min-height:34px;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:#fff;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.chip.on{background:var(--blue-soft);color:var(--blue);border-color:rgba(15,98,254,.3)}
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.6);border:1px solid var(--line);margin-top:14px}
+.calc span{display:block;font-size:12px;color:var(--ink-3)}.calc strong{font-size:22px;font-weight:620;letter-spacing:-.02em}
+.calc .live{grid-column:1/-1;font-size:12px;color:var(--ok)}.calc .ann{display:inline-grid}
+.alerts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.al{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.5}
+.al b{display:block}.al.warn{background:#fffaf0;border:1px solid rgba(224,148,0,.35);border-left:4px solid #e09400;color:#5f3a00}
+.al.ok{background:var(--ok-soft);border:1px solid rgba(15,123,83,.2);border-left:4px solid var(--ok);color:#0b4f36}
+.al .btn{margin-left:auto;flex:none}
+.opts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.opt{position:relative;display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:#fff;font-size:12.5px;color:var(--ink-3)}
+.opt b{font-size:13.5px;color:var(--ink)}.opt strong{font-size:20px;font-weight:620;color:var(--ink);letter-spacing:-.02em}
+.opt.on{border:2px solid var(--blue);box-shadow:0 0 0 4px rgba(15,98,254,.12)}
+.opt .w{color:var(--warn);font-weight:600}.opt .k{color:var(--ok);font-weight:600}
+.qty{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:14px}
+details.more summary{cursor:pointer;font-weight:600;font-size:15px}
+details.more .fields{margin-top:12px}
+.create{width:100%;min-height:52px;border:0;border-radius:var(--r-ctl);font:inherit;font-size:15.5px;font-weight:650;color:#fff;background:linear-gradient(180deg,#3b82ff,#0f62fe);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 20px -10px var(--blue-glow);opacity:.6;cursor:not-allowed}
+.pos{padding:20px;border-radius:var(--r-panel);background:var(--glass);border:1px solid var(--glass-border);box-shadow:var(--shadow-1),var(--hl)}
+.pos .bbar{display:flex;height:10px;border-radius:99px;background:var(--track);overflow:hidden;margin:10px 0}.pos .bbar i{display:block}.s-bill{background:var(--blue)}.s-unb{background:#9cc2ff}.s-new{background:repeating-linear-gradient(45deg,#0f62fe 0 4px,#7fb0ff 4px 8px)}
+.pos dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:0;font-size:13px}.pos dt{color:var(--ink-3)}.pos dd{margin:0;text-align:right;font-weight:600}
+@media (max-width:1100px){.shell{grid-template-columns:84px minmax(0,1fr)}.nav span{font-size:0;height:44px;width:48px}.brand b,.envtag{display:none}.layout{grid-template-columns:1fr}.opts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){
+ .shell{grid-template-columns:1fr}.sidebar{position:static;margin:8px 8px 0;padding:10px 12px;border-radius:22px;flex-direction:row;align-items:center;gap:10px;overflow:hidden}
+ .brand b,.envtag{display:inline-block}.nav{flex-direction:row;overflow:hidden;gap:6px}.nav span{font-size:13px;width:auto;height:auto;white-space:nowrap;padding:9px 12px;background:rgba(14,22,33,.04)}
+ .main{padding:14px 12px 40px}.panel{padding:16px;border-radius:20px}
+ .fields,.qty{grid-template-columns:1fr}.calc{grid-template-columns:1fr 1fr}.calc strong{font-size:19px}
+ .al{flex-wrap:wrap}.al .btn{margin-left:0;min-height:44px}.chip{min-height:44px}
+ .create{position:sticky;bottom:10px}
+}
+</style></head>
+<body>
+<div class="mq-banner"><b>MAQUETTE STATIQUE</b> — UX lot 2, proposition n° 3 · données fictives · aucun envoi possible · ne fait pas partie de l'application</div>
+<div class="shell">
+<aside class="sidebar"><div class="brand"><span class="logo"></span><div><b>Time Billing V9.2</b><br><span class="envtag">MAQUETTE</span></div></div>
+<nav class="nav"><span>Tableau de bord</span><span>Saisie des heures</span><span>Mandats &amp; prévisionnel</span><span class="on">Édition des factures</span><span>Factures et brouillons</span></nav></aside>
+<main class="main">
+
+<section class="notes" aria-label="Notes de maquette"><h2>Ce qui change (proposition n° 3)</h2><ol>
+<li><span class="ann">1</span>Raccourcis de période (R-5) : ils remplissent les deux dates, toujours modifiables. « Depuis la dernière facture » part du lendemain de la dernière période émise du mandat.</li>
+<li><span class="ann">2</span>Calcul automatique dès que mandat et période sont complets (route <code>/suggest</code> existante, inchangée) : plus de bouton « Calculer », plus de résultat périmé.</li>
+<li><span class="ann">3</span>Pré-alertes <b>avant</b> la création : brouillon chevauchant (aujourd'hui signalé après coup), contrôle 13 (déjà au lot 1).</li>
+<li><span class="ann">4</span>Chaque règle d'arrondi montre la quantité et le montant qu'elle produit, et prévient quand la quantité dépasse le réalisé de la période (contrôle 12, tolérance 0 j : R-1 et R-2 à valider). Calcul fait par le serveur, jamais recopié en JavaScript.</li>
+<li><span class="ann">5</span>Options rares repliées ; le bouton rappelle ce qui sera créé. La position du mandat montre la part que ce brouillon ajoutera.</li>
+</ol><p class="hint" style="margin:8px 0 0">Aucune règle n'est modifiée : arrondi par défaut, contrôles, émission et numérotation restent identiques. Le brouillon reste une proposition ; l'émission reste une action distincte.</p></section>
+
+<h1 class="page">Édition des factures</h1>
+<div class="layout">
+<div>
+<section class="panel" aria-labelledby="h1"><h2 id="h1">1. Mandat et période</h2>
+<div class="fields">
+<div class="wide"><label class="l">Projet à facturer *</label><div class="ctl sel">Mandat Alpha — Mission AMO</div></div>
+<div class="wide"><span class="l" style="font-size:12px;font-weight:600;color:var(--ink-2)">Période <span class="ann">1</span></span>
+ <div class="chips"><span class="chip on">Depuis la dernière facture</span><span class="chip">Mois dernier (septembre)</span><span class="chip">Ce mois (octobre)</span><span class="chip">Autre période…</span></div></div>
+<div><label class="l">Début de la période *</label><div class="ctl">01.09.2026</div></div>
+<div><label class="l">Date d'arrêté / fin de période *</label><div class="ctl">23.10.2026</div></div>
+</div>
+<div class="calc" aria-live="polite"><div><span>Temps enregistré</span><strong>55,75 h</strong></div><div><span>Jours exacts, avant arrondi</span><strong>6,96875 j</strong></div><div><span>Saisies</span><strong>9</strong></div><span class="live">● calculé automatiquement pour cette période <span class="ann">2</span></span></div>
+<div class="alerts"><span class="ann" style="margin:0">3</span>
+<div class="al warn"><div><b>Un brouillon couvre déjà cette période</b>Brouillon Mandat Alpha du 01.09.2026 au 31.10.2026 (7,00 j). Un seul des deux pourra être émis.</div><a class="btn" href="#" aria-disabled="true">Ouvrir ce brouillon</a></div>
+<div class="al ok"><div><b>Période close au plus tard aujourd'hui</b>Le contrôle 13 ne demandera pas de dérogation.</div></div>
+</div>
+</section>
+
+<section class="panel" aria-labelledby="h2"><h2 id="h2">2. Quantité à facturer <span class="ann">4</span></h2>
+<p class="hint" style="margin-top:0">Pas d'arrondi : <b>quart de jour (0,25 j)</b> · <a href="#" aria-disabled="true">changer</a></p>
+<div class="opts" role="radiogroup" aria-label="Règle d'arrondi">
+<div class="opt"><b>Sans arrondi</b><strong>6,96875 j</strong>6 271,88 CHF HT<span class="k">✓ conforme au réalisé</span></div>
+<div class="opt"><b>Au plus proche</b><strong>7,00 j</strong>6 300,00 CHF HT<span class="w">⚠ +0,03 j au-delà du réalisé : contrôle 12, dérogation à l'émission</span></div>
+<div class="opt on"><b>À l'inférieur</b><strong>6,75 j</strong>6 075,00 CHF HT<span class="k">✓ −0,22 j, dans la tolérance (0,5 j)</span></div>
+<div class="opt"><b>Au supérieur</b><strong>7,00 j</strong>6 300,00 CHF HT<span class="w">⚠ +0,03 j au-delà du réalisé : contrôle 12, dérogation à l'émission</span></div>
+</div>
+<div class="qty"><div><label class="l">Quantité à facturer (jours) *</label><div class="ctl">6,75</div><p class="hint">Modifiable à la main ; l'alerte suit la valeur saisie.</p></div><div><label class="l">Montant HT proposé</label><div class="ctl" style="font-weight:650;font-size:18px">6 075,00 CHF</div><p class="hint">TVA 8,1 % appliquée à l'émission (contrôle 4).</p></div></div>
+</section>
+
+<section class="panel"><details class="more"><summary>3. Options de la facture (facultatif) — description, « AUTRES », date de facture, note</summary>
+<div class="fields"><div class="wide"><label class="l">Description de la ligne</label><div class="ctl" style="color:var(--ink-3)">Par défaut : nom du projet</div></div>
+<div><label class="l">Montant « AUTRES » HT (CHF)</label><div class="ctl">0</div></div><div><label class="l">Libellé « AUTRES »</label><div class="ctl" style="color:var(--ink-3)">Ex. frais de déplacement</div></div>
+<div><label class="l">Date de facture</label><div class="ctl" style="color:var(--ink-3)">vide = date réelle d'émission</div></div><div><label class="l">Note de facture</label><div class="ctl" style="color:var(--ink-3)">une ligne, ≈ 90 caractères</div></div></div>
+</details></section>
+
+<button class="create" type="button" disabled>Créer le brouillon — 6,75 j · 6 075,00 CHF HT <span class="ann">5</span></button>
+<p class="hint">Le calcul est une proposition : vérifier la période, la quantité et le temps réel. L'émission reste une action distincte, précédée des 14 contrôles.</p>
+</div>
+
+<aside class="pos" aria-label="Position du mandat"><b>Mandat Alpha — Mission AMO</b><br><span class="hint">Société Fictive SA · PO-FICTIF-A · 900,00 CHF/j</span>
+<div class="bbar"><i class="s-bill" style="width:39.4%"></i><i class="s-new" style="width:16.9%"></i><i class="s-unb" style="width:0.6%"></i></div>
+<dl><dt>Facturé net</dt><dd>15,75 j</dd><dt>Ce brouillon</dt><dd>+ 6,75 j</dd><dt>Réalisé non facturé après</dt><dd>0,25 j</dd><dt>Solde PO après</dt><dd>17,50 j / 40 j</dd></dl>
+<p class="hint" style="margin-bottom:0">Valeurs indicatives calculées par le serveur ; l'émission recalcule tout.</p></aside>
+</div>
+</main></div>
+</body></html>

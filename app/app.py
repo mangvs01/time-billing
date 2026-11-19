@@ -17,7 +17,7 @@ if SEC["trust_proxy"]:
  APP.wsgi_app=ProxyFix(APP.wsgi_app,x_for=1,x_proto=1,x_host=1)
 APP.config["MAX_CONTENT_LENGTH"]=15*1024*1024
 # Calendrier : rc36 CANDIDATE (tests only; not built, not deployed) — rc35 = thème sombre (autre mission)
-VERSION="9.2-rc46"
+VERSION="9.2-rc47"
 # Optional label shown in the page title (e.g. "STAGING" on the test instance); empty in production.
 ENV_LABEL=(os.environ.get("ENV_LABEL") or "").strip()[:30]
 DB=os.environ.get("DB_PATH","/data/timebilling.db")
@@ -131,6 +131,8 @@ def init(path=None):
   CREATE TABLE IF NOT EXISTS kept_forms(sid TEXT PRIMARY KEY, path TEXT NOT NULL, data_json TEXT NOT NULL, created_at TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS login_failures(id INTEGER PRIMARY KEY, ip TEXT NOT NULL, at TEXT NOT NULL);
   CREATE INDEX IF NOT EXISTS idx_login_failures ON login_failures(ip, at);
+  -- BMDP1: password changed from the application (additive; empty = the environment's password applies, as before). Operational state, like web_sessions: not in backups.
+  CREATE TABLE IF NOT EXISTS auth_credentials(id INTEGER PRIMARY KEY CHECK(id=1), pw_hash TEXT NOT NULL CHECK(pw_hash LIKE 'scrypt:%'), version INTEGER NOT NULL DEFAULT 1, changed_at TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS credit_notes(id INTEGER PRIMARY KEY, reference TEXT UNIQUE, invoice_id INTEGER NOT NULL REFERENCES invoices(id), amount REAL NOT NULL, reason TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP);
   """)
   ensure_column(c, "entries", "import_batch_id", "import_batch_id TEXT REFERENCES import_batches(id)")
@@ -390,7 +392,7 @@ APP.jinja_env.globals["manual_lines_blocked"]=lambda:rules.MANUAL_LINES_ISSUANCE
 # --- UX lot 2 (2026-10-23, owner decision « tout le lot 2 », R-1 to R-7): DISPLAY ONLY, like lot 1. No billing, check, issuance, VAT, rounding or
 # numbering rule changes; nothing below writes to the database.
 DASH_CHECKS_MAX=5   # R-4: the dashboard runs the 14 existing checks of each draft only while there are at most this many drafts (else « à contrôler »)
-def dashboard_todo(c,ins,cnotes,open_variances,settings_missing,backup_advice,today):
+def dashboard_todo(c,ins,cnotes,open_variances,settings_missing,today):
  """n° 1: the « À traiter » list, most urgent first (decision required, to do, advice). Each line links to the page where the action is taken;
  nothing is executed from the dashboard. Figures come from what the dashboard already reads, and, for at most DASH_CHECKS_MAX drafts, from
  invoice_checks.run_checks (read-only, the same checks as the issue page)."""
@@ -405,8 +407,7 @@ def dashboard_todo(c,ins,cnotes,open_variances,settings_missing,backup_advice,to
  for d in drafts:
   out.append(dict(kind="draft",level="todo",i=d,failed=[k["n"] for k in invoice_checks.failures(invoice_checks.run_checks(c,d["id"]))] if run else None))
  if settings_missing: out.append(dict(kind="settings",level="todo",missing=settings_missing))
- if backup_advice: out.append(dict(kind="backup",level="advice"))
- rank={"err":0,"todo":1,"advice":2}
+ rank={"err":0,"todo":1,"advice":2}   # BSAV1: no advice line any more (backup reminder = monthly pop-up), the level is kept
  return sorted(out,key=lambda t:rank[t["level"]])   # stable: within a level, the order above
 TABS=("dashboard","time","mandates","billing","archive","migration","settings")
 def back(tab): return redirect(url_for("index",tab=tab))
@@ -498,7 +499,7 @@ def login():
     if not security.throttle_logged(c,ip): c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("login_throttled",f"ip={ip}"))  # one row per client and window
     flash(f"Trop de tentatives de connexion : réessayer dans {security.WINDOW_MIN} minutes.")
     return render_template("login.html",env_label=ENV_LABEL),429
-   if security.credentials_ok(SEC,request.form.get("username",""),request.form.get("password","")):
+   if security.credentials_ok(SEC,request.form.get("username",""),request.form.get("password",""),c):
     security.clear_failures(c,ip)
     c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("login_ok",f"ip={ip}"))
     nxt=request.args.get("next") or "/"
@@ -518,6 +519,16 @@ def login():
       c.execute("INSERT INTO settings(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP",(qr_bill.REMINDER_KEY,now_))
       c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("qr_rappel_affiche",f"{len(_gaps)} point(s) à compléter"))
       session["qr_popup_pending"]=True
+    # BSAV1: monthly backup pop-up, decided here too (a page view writes nothing). Only when issued documents exist and the last JSON backup is missing or
+    # older than 30 days; at most once per calendar month; never on the same login as the QR-bill pop-up (that one wins, this one waits for the next login).
+    if not session.get("qr_popup_pending") and c.execute("SELECT 1 FROM invoices WHERE status='issued' LIMIT 1").fetchone():
+     from app import sauvegarde_rappel as sv
+     _lb=c.execute("SELECT MAX(created_at) FROM audit WHERE event='json_backup_exported'").fetchone()[0]; _now=rules.utc_now()
+     _r=c.execute("SELECT value FROM settings WHERE key=?",(sv.REMINDER_KEY,)).fetchone()
+     if sv.backup_stale(_lb,_now) and sv.reminder_due(_r[0] if _r else None,_now):
+      c.execute("INSERT INTO settings(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP",(sv.REMINDER_KEY,now_))
+      c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("sauvegarde_rappel_affiche","dernière sauvegarde : "+(_lb or "aucune")))
+      session["backup_popup_pending"]=True
     return redirect(nxt)
    # neither the typed name nor the password is ever recorded
    security.record_failure(c,ip); c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("login_failed",f"ip={ip}"))
@@ -530,6 +541,40 @@ def logout():
  if sid:
   with db() as c: c.execute("DELETE FROM web_sessions WHERE sid=?",(sid,))
  session.clear();return redirect("/login")
+@APP.route("/compte/mot-de-passe",methods=["GET","POST"])
+@login_required
+def password_change():
+ """BMDP1: « Changer mon mot de passe ». Current password checked first, with the same throttling as the login (5 failures / 15 minutes per client);
+ then the new one (12 characters minimum, typed twice, different from the current one). Only a scrypt hash is stored (auth_credentials) and it takes
+ precedence over APP_PASSWORD_HASH. The audit says « mot de passe changé », never a password. The current session stays open (new identifier);
+ every other session is revoked. Same-site check: security.cross_site (before_request), like every other form."""
+ if request.method=="POST":
+  request.max_content_length=LOGIN_MAX_BODY
+  ip=request.remote_addr or "?"
+  with db() as c:
+   if security.locked(c,ip):
+    if not security.throttle_logged(c,ip,event="password_change_throttled"): c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("password_change_throttled",f"ip={ip}"))
+    flash(f"Trop de tentatives : réessayer dans {security.WINDOW_MIN} minutes.")
+    return render_template("mot_de_passe.html",active_tab="settings",min_len=security.NEW_PASSWORD_MIN),429
+   current=request.form.get("current_password","")
+   if not security.password_ok(SEC,current,c):
+    security.record_failure(c,ip); c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("password_change_failed",f"ip={ip}"))   # no password is recorded
+    flash("Mot de passe actuel incorrect : le mot de passe n'a pas été modifié.")
+    return render_template("mot_de_passe.html",active_tab="settings",min_len=security.NEW_PASSWORD_MIN)
+   problem=security.password_problem(SEC,c,current,request.form.get("new_password",""),request.form.get("confirm_password",""))
+   if problem:
+    flash(problem)
+    return render_template("mot_de_passe.html",active_tab="settings",min_len=security.NEW_PASSWORD_MIN)
+   now_=rules.utc_now_iso(); version=security.set_password(c,request.form["new_password"],now_)
+   security.clear_failures(c,ip)
+   c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("password_changed",f"mot de passe changé le {now_} (version {version})"))
+   sid=secrets.token_urlsafe(24)
+   c.execute("DELETE FROM web_sessions"); c.execute("DELETE FROM kept_forms")          # every session, the current one included, then the current one is re-created
+   c.execute("INSERT INTO web_sessions(sid,created_at,last_seen) VALUES(?,?,?)",(sid,now_,now_))
+   session["sid"]=sid
+  flash("Mot de passe changé. Les autres appareils connectés ont été déconnectés ; utilisez le nouveau mot de passe à la prochaine connexion.")
+  return redirect(url_for("password_change"))
+ return render_template("mot_de_passe.html",active_tab="settings",min_len=security.NEW_PASSWORD_MIN)
 @APP.route("/imports/rollback/<batch_id>",methods=["POST"])
 @login_required
 def rollback_batch_route(batch_id):
@@ -586,7 +631,7 @@ def index():
   entry_pid=r[0] if r and r[0] in active_ids else None
  entry_date=saved.get("date") if isinstance(saved,dict) and re.fullmatch(r"\d{4}-\d{2}-\d{2}",str(saved.get("date") or "")) else _today.isoformat()
  backup_stale=(not last_backup) or last_backup<(rules.utc_now()-timedelta(days=30)).isoformat(timespec="seconds")
- with db() as _c: todo=dashboard_todo(_c,ins,cnotes,open_variances,missing,has_docs and backup_stale,_today)
+ with db() as _c: todo=dashboard_todo(_c,ins,cnotes,open_variances,missing,_today)
  with db() as _c: cal_resume=cal.resume_tableau_de_bord(_c,_today,settings)   # candidat rc36 : encart « Calendrier et alertes », lecture seule
  draft_done=None; did=session.pop("draft_created",None) if session.get("draft_created") else None
  if isinstance(did,int):
@@ -597,7 +642,8 @@ def index():
  if session.pop("qr_popup_pending",None):
   from app import qr_bill
   qr_popup=qr_bill.setup_gaps(settings,ps) or None
- return render_template("index.html",month_hours=month_hours,month_label=month_label,qr_popup=qr_popup,cnotes=cnotes,projects=ps,active=[p for p in ps if p["active"]],closed=[p for p in ps if not p["active"]],positions=positions,recent=es,invoices=ins,
+ backup_popup=bool(session.pop("backup_popup_pending",None))
+ return render_template("index.html",month_hours=month_hours,month_label=month_label,qr_popup=qr_popup,backup_popup=backup_popup,cnotes=cnotes,projects=ps,active=[p for p in ps if p["active"]],closed=[p for p in ps if not p["active"]],positions=positions,recent=es,invoices=ins,
   fc=fc,batches=batches,tab=tab,settings=settings,fields=rules.ISSUER_FIELDS,qr_fields=rules.ISSUER_QR_FIELDS,settings_missing=missing,treatments=rules.TREATMENTS,options=rules.OPTION_FIELDS,other_vat_modes=rules.OTHER_VAT_MODES,fonts_used=FONTS_USED,version=VERSION,env_label=ENV_LABEL,no_mandate=not ps,current_year=rules.local_today().year,
   last_backup=last_backup,backup_stale=backup_stale,has_docs=has_docs,todo=todo,
   cal_resume=cal_resume,cal_cfg=cal.reglages(settings),cal_reglages=cal.REGLAGES,cal_tva=cal.TVA_PERIODICITES,retour="settings",

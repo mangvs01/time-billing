@@ -1,0 +1,44 @@
+PASS [durée 25 h] formulaire envoyé et correction enregistrée
+PASS [durée 25 h] aucun message « Avertissements non calculés »
+PASS [durée 25 h] valeurs attendues en base (valeurs non modifiées conservées)
+PASS [durée 25 h] une seule correction tracée
+PASS [durée 0,005 h] formulaire envoyé et correction enregistrée
+PASS [durée 0,005 h] aucun message « Avertissements non calculés »
+PASS [durée 0,005 h] valeurs attendues en base (valeurs non modifiées conservées)
+PASS [durée 0,005 h] une seule correction tracée
+PASS [horaires avec secondes] formulaire envoyé et correction enregistrée
+PASS [horaires avec secondes] aucun message « Avertissements non calculés »
+PASS [horaires avec secondes] valeurs attendues en base (valeurs non modifiées conservées)
+PASS [horaires avec secondes] une seule correction tracée
+PASS [début = fin] formulaire envoyé et correction enregistrée
+PASS [début = fin] aucun message « Avertissements non calculés »
+PASS [début = fin] valeurs attendues en base (valeurs non modifiées conservées)
+PASS [début = fin] une seule correction tracée
+PASS [horaire seul] formulaire envoyé et correction enregistrée
+PASS [horaire seul] aucun message « Avertissements non calculés »
+PASS [horaire seul] valeurs attendues en base (valeurs non modifiées conservées)
+PASS [horaire seul] une seule correction tracée
+PASS [description sur 2 lignes] formulaire envoyé et correction enregistrée
+PASS [description sur 2 lignes] aucun message « Avertissements non calculés »
+PASS [description sur 2 lignes] valeurs attendues en base (valeurs non modifiées conservées)
+PASS [description sur 2 lignes] une seule correction tracée
+PASS [description de 1 109 caractères] formulaire envoyé et correction enregistrée
+PASS [description de 1 109 caractères] aucun message « Avertissements non calculés »
+PASS [description de 1 109 caractères] valeurs attendues en base (valeurs non modifiées conservées)
+PASS [description de 1 109 caractères] description longue conservée
+PASS [description de 1 109 caractères] une seule correction tracée
+PASS [horaires avec secondes ramenés à la minute] formulaire envoyé et correction enregistrée
+PASS [horaires avec secondes ramenés à la minute] aucun message « Avertissements non calculés »
+PASS [horaires avec secondes ramenés à la minute] valeurs attendues en base (valeurs non modifiées conservées)
+PASS [horaires avec secondes ramenés à la minute] une seule correction tracée
+PASS [début = fin à la minute près] formulaire envoyé et correction enregistrée
+PASS [début = fin à la minute près] aucun message « Avertissements non calculés »
+PASS [début = fin à la minute près] valeurs attendues en base (valeurs non modifiées conservées)
+PASS [début = fin à la minute près] une seule correction tracée
+PASS [durée 0,00005 h] formulaire envoyé et correction enregistrée
+PASS [durée 0,00005 h] aucun message « Avertissements non calculés »
+PASS [durée 0,00005 h] valeurs attendues en base (valeurs non modifiées conservées)
+PASS [durée 0,00005 h] une seule correction tracée
+PASS [nouvelle valeur hors limites] 26 h bloqué par le navigateur (max = valeur enregistrée), rien d'écrit
+PASS [page] aucune erreur JavaScript / CSP
+43/43

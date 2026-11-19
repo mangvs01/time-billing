@@ -1,0 +1,47 @@
+> **Voir d'abord `RUNBOOK-CLONE-ISOLE-RC25.md`** : séquence exécutable sur le clone isolé `billing-rc25-isolated` (8093), avec sauvegarde/rollback et critères GO/NO-GO. Le présent dossier reste la référence pour le staging réel.
+
+# Dossier de recette sur le VRAI staging — RC25 (procédure préparée, NON exécutée)
+
+**Statut : aucune des recettes ci-dessous n'a été rejouée sur le vrai staging.** Cette session n'a ni VPS, ni démon Docker (le client `docker` est présent, pas le démon),
+ni `/opt/time-billing-v9-staging`, ni `/root/time-billing-v9-rc10-20261004`, ni classeur réel, ni facture de référence.
+Les résultats « synthétiques » du `RAPPORT-RC25.md` (bases jetables fictives) **ne valent pas** recette du staging et ne doivent pas être présentés comme tels.
+Rien n'est inventé ici : les commandes reprennent les scripts du dépôt (`journaux/fonc/*.sh`, `tests/recette_fonctionnelle/*.py`).
+
+## 0. Principe d'isolation (déjà dans les scripts de référence)
+Toutes les recettes tournent dans un **conteneur jetable sur une COPIE** de `/opt/time-billing-v9-staging/data/timebilling.db` (`journaux/fonc/launch_fonc.sh` : copie via l'API de sauvegarde SQLite ouverte en lecture seule `mode=ro`, secrets aléatoires, port local 127.0.0.1) et
+vérifient en fin de lot que le SHA-256 de la base staging est inchangé (`run_http_suites.sh`, `run_mandats_premiere_facture.sh`). **Avant tout lancement** : relever `sha256sum` de la base staging, le noter dans le dossier de preuves, le comparer à la fin. Aucune recette ne doit viser `/opt/time-billing-v9` (production).
+
+## 1. Prérequis communs — à fournir par le propriétaire
+| Prérequis | Existe dans cette session ? | Remarque |
+|---|---|---|
+| Accès au serveur du staging et démon Docker | **Non** | indispensable |
+| Copie du staging (2 247 saisies, 24 mandats, 19 clôturés, ~0 facture émise) | **Non** | sha de référence de la chaîne rc24 : `958c76ed…703b4` (journaux/verrou-import-20261008/chaine-p14-rc24.out, ligne 1) — à comparer, il a pu changer |
+| Image **RC25** | **Non** | décision propriétaire : copie figée de la version (`git archive`), construction de l'image, puis `IMG_REF=<image rc25>` ; le défaut des scripts est l'image du staging **rc23** (donc pas RC25) |
+| Dépôt de travail au chemin codé en dur `/root/time-billing-v9-rc10-20261004` | **Non** (les scripts le codent en dur : `run_hij.py`, `run_rc19.py` pour VERSION, `*.sh`) | soit y placer le code RC25, soit adapter les chemins *dans une copie* ; `TB_EXPECT_VERSION=9.2-rc25` pour `run_rc19.py` |
+| Python 3, `pdftotext` (poppler), `xxd`, Node + Playwright/Chromium (recettes navigateur) | Python oui, Playwright/Chromium oui, `xxd` non ici | sur le serveur |
+
+## 2. Fiches par recette
+Ordre recommandé (celui de la chaîne rc24) : R (`run_rc19.py` + navigateur) → ab, cg, dg, extra, hij → forecast → entites_vides → (mandats appliqués) M, N, L → navigateur → e2e/concurrence.
+
+| Recette | (1) Données / fichiers / conteneurs requis | (2) Existe ici ? | (3) Commande exacte | (4) Effets sur les données | (5) Résultat attendu / preuve à conserver |
+|---|---|---|---|---|---|
+| `run_ab.py` | copie staging + conteneur `launch_fonc.sh` | script oui ; copie **non** | `journaux/fonc/run_http_suites.sh <tag> <IMG_REF>` (lance ab, cg, dg, extra, hij) ou `launch_fonc.sh tb-fonc-x 8310 <dossier>` puis `python3 tests/recette_fonctionnelle/run_ab.py 8310 <dossier>` | écrit dans la **copie** uniquement (saisies/mandats fictifs) | Référence rc24 : 57/57. Mon substitut synthétique : 54 PASS / 3 FAIL — les 3 échecs sont des comptes de la vraie copie (2 247 saisies, 24 mandats, brouillon n°1) : **attendu**, à rejouer. Conserver `run_ab.log`, ligne `RÉSULTAT`, sha de la base staging avant/après |
+| `run_dg.py` | suite de `run_cg.py` (même instance, `state-cg.json`), `CTN=<conteneur>` (réellement `docker exec` ici) | script oui ; conteneur **non** | via `run_http_suites.sh` (ordre ab, cg, dg, extra, hij) | copie : SQL direct pour tester triggers d'immutabilité | Réf. 53/53. Synthétique : 51 PASS / 2 FAIL (DH5, DH9 : empreinte des 2 247 saisies, échouaient déjà avant les correctifs). Conserver `run_dg.log` |
+| `run_forecast.py` | **copie FRAÎCHE** (aucune facture émise : calcul indépendant) | script oui ; copie **non** | `launch_fonc.sh tb-fonc-k 8312 <dossier>` ; `python3 tests/recette_fonctionnelle/run_forecast.py 8312 <dossier>` | modifie des paramètres de mandats **en SQL sur la copie** | Réf. 21/21. Synthétique : 12 PASS / 9 FAIL, **identiques avant et après RC25** → dépendent des valeurs réelles. Écart RC25 possible : aucun (la prévision n'est pas modifiée) — tout échec sur la vraie copie est à analyser |
+| `run_mandats.py` | copie + `mandats_appliquer.py --level certain --close-termine --apply` (**sur la copie**) | script oui ; copie **non** ; `import/MANDATS-A-COMPLETER.csv` **absent** | `journaux/fonc/run_mandats_premiere_facture.sh <IMG_REF>` | copie : clôture 19 mandats | Réf. M 10/10. Synthétique : 6 PASS / 4 FAIL identiques avant/après (19 clôtures et 2 247 saisies attendues). Conserver `run_mandats.log` |
+| `run_entites_vides.py` | **copie FRAÎCHE** post-C1/C2 : mandats réels « PCR LV 2026 », « STC GEM Oct - DM job », « MSD » à adresse volontairement vide | script oui ; mandats **non** | `launch_fonc.sh tb-fonc-q 8313 <dossier>` ; `python3 tests/recette_fonctionnelle/run_entites_vides.py 8313 <dossier>` | crée puis supprime des brouillons sur la copie (décale les numéros → copie dédiée) | Réf. Q 18/18. Synthétique : `IndexError` avant et après (mandats absents). **Point d'attention RC25 (hypothèse à vérifier, non constatée)** : le script émet `2.66 j` sur 2025-01→04 (mandat à identifier dans le script, ligne 30) ; avec le contrôle 14 non dérogeable et tolérance zéro, un refus *pour surfacturation* au lieu d'un refus *pour entité* est possible → à analyser, ne pas forcer |
+| `run_rc19.py` (python) | copie fraîche, identifiants de saisies importées réels, `TB_EXPECT_VERSION=9.2-rc25` | script oui ; données **non** | `TB_EXPECT_VERSION=9.2-rc25 python3 tests/recette_fonctionnelle/run_rc19.py <port> <dossier>` | copie : corrections de saisies, avoirs | Réf. R 49/49. Synthétique : `IndexError` dès le premier `entries where id=?`, 2 échecs de comptage identiques avant/après. Écart RC25 possible sur R6a (facture 0,625 j sur NHAF 2026, 5 h) : cohérente avec contrôle 14 si ≥ 5 h réalisées |
+| `run_hij.py` | 2 conteneurs supplémentaires (restauration 8301, import 8302), `/root/Time sheet CP.xlsx` (classeur réel), `import/final/copie-D/…`, `launch_fonc.sh` | script oui ; **tout le reste non** | `CTN=tb-fonc-x python3 tests/recette_fonctionnelle/run_hij.py 8310 <dossier>` après `run_http_suites.sh` | **restauration** sur conteneur dédié : exige isolation (jamais `tb-fonc-restore` pointant vers un volume staging) ; `docker rm -f` en fin | Réf. H-I-J 37/37. Aucun résultat synthétique valable. Conserver `run_hij.log` + preuve que les volumes utilisés sont des copies |
+| `run_premiere_facture.py` | copie + `mandats_appliquer.py --level certain` déjà appliqué ; `Facture-reelle-reference-2026-09.pdf` ; `pdftotext` | script oui ; PDF et copie **non** | `journaux/fonc/run_mandats_premiere_facture.sh <IMG_REF>` | copie : émission d'une facture NHAF 2026 | Réf. L 19/19. Aucun résultat synthétique. **Écart RC25 à surveiller (hypothèse)** : le script facture `q_exp` avec arrondi « nearest 0,25 » ; avec tolérance zéro, un arrondi au-dessus des jours réalisés est refusé (check 14) — ne pas assouplir sans décision |
+| `journaux/recette_navigateur_final.sh` | orchestrateur Docker : image `IMG_REF`, copie staging, `RUN`, `PFX`, ports 8194+ | script oui ; Docker/serveur **non** | `IMG_REF=<image rc25> RUN=rc25 PFX=tb-rc25 PB=8194 journaux/recette_navigateur_final.sh` | copie par conteneur ; sha staging contrôlé au début/fin (`STG0`) | Réf. rc24 : métier 107+15, saisies 36+8, responsive 33, rc12 22, rc14 56, nuit 34, minuit 15, rc19 37, e2e 30+18, rc13 5, concurrence 11. Les versions adaptées de `recette-saisies/nuit/rc14.js` sont dans le dépôt (RC25). Conserver `$RUN/journaux/*.log` |
+
+## 3. Écarts attendus RC25 par rapport à la référence rc24 (à classer, pas à masquer)
+1. Le total de `run_cg.py` passe de 96 à 101 (recette adaptée, RC25) ; `recette-saisies.js` reste à 36+8 = 44 mais avec une quantité facturée modifiée : comparer en détail, pas par total.
+2. Toute facture émise par une recette doit désormais respecter le contrôle 14 (quantité nette cumulée ≤ jours réalisés) : un refus sur la vraie copie n'est pas un défaut de l'application mais peut révéler une hypothèse de recette obsolète → décision à documenter, jamais d'assouplissement du contrôle.
+3. Si un échec subsiste sur la vraie copie : ne pas modifier le script pour le faire passer ; l'attribuer (donnée réelle / recette obsolète / défaut applicatif) avec preuve.
+
+## 4. Preuves à conserver par lot
+Version testée (`/health`), identifiant d'image, sha de la base staging avant/après, journal complet de chaque `run_*.log`, code de sortie, heure UTC, commit RC25 testé, liste des conteneurs créés et supprimés.
+
+## 5. Ce que je n'ai pas fait
+Aucun accès au staging ; aucune écriture hors du dépôt ; aucune modification des scripts de recette pour cette fiche ; aucune base réelle lue. Les chiffres « Réf. » viennent de `journaux/verrou-import-20261008/chaine-p14-rc24.out` (journal du dépôt, observé), les chiffres « synthétique » de `RAPPORT-RC25.md` (exécutés dans cette session).

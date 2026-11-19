@@ -1,0 +1,31 @@
+PASS login
+PASS aperçu lot1.xlsx créé
+PASS validation lot1.xlsx
+PASS lot 1 : 3 lignes distinctes (répétition conservée)
+PASS durées 15/30 min conservées
+PASS brouillon créé via la route
+PASS PDF brouillon
+PASS page de confirmation avec numéro
+PASS facture émise (2025-03)
+PASS PDF émis = PDF figé
+PASS PDF émis inchangé après nouvelle saisie dans la période
+PASS rollback refusé (lot couvert par facture émise)
+PASS aperçu lot2.xlsx créé
+PASS validation lot2.xlsx
+PASS rollback lot 2 accepté
+PASS aperçu lot3.xlsx créé
+PASS validation lot3.xlsx
+PASS brouillon modifié
+PASS clôture refusée avec brouillon en cours
+PASS brouillon supprimé
+PASS note de crédit émise NC-2025-03
+PASS facture d'origine inchangée après NC
+PASS PDF note de crédit
+PASS remboursement partiel enregistré
+PASS suivi : partiellement remboursée
+PASS crédit total du solde émis NC-2025-03.2
+PASS dépassement refusé
+PASS compensation partielle réservée sur brouillon
+PASS brouillon cible : PDF avec imputation
+PASS intégrité SQLite
+RESULT phase1: 30/30 passed

@@ -1,0 +1,130 @@
+
+=== 0. version d'origine (V9.0, image construite depuis l'arborescence de prod copiée)
+ Container tbmb-b21 Running 
+santé V9.0 : {"status":"ok","version":"9.0-rc1"}
+PDF facture 1 (v90) : 200, sha 995bf2ec5f60
+PDF facture 2 (v90) : 200, sha 172e2d32a8bf
+PDF facture 3 (v90) : 200, sha f3d4c85a31ee
+
+=== 1. 10-preflight
+2026-10-07T13:38:31Z  cible /root/time-billing-v9-rc10-20261004/migration-blanc/B21/opt/time-billing-v9 (projet tbmb-b21, conteneur tbmb-b21) — santé : {"status":"ok","version":"9.0-rc1"}
+2026-10-07T13:38:31Z  Dockerfile identique : NON
+2026-10-07T13:38:31Z  requirements identiques : non (copiés au déploiement)
+2026-10-07T13:38:31Z  propriétaire du dossier de données : 10001 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-07T13:38:31Z  préparation conforme
+
+=== 2. 20-backup
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+2026-10-07T13:38:33Z  sauvegarde /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/pre-rc21-20261007T133831Z conforme (service arrêté ; relancer l'ancienne version : docker compose -p tbmb-b21 start)
+
+=== 3. 30-rehearse
+OK   integrity_check
+OK   foreign_key_check vide
+OK   projects : 1 ligne(s), colonnes d origine inchangées
+OK   entries : 5 ligne(s), colonnes d origine inchangées
+OK   invoices : 3 ligne(s), colonnes d origine inchangées
+OK   credit_notes : 1 ligne(s), colonnes d origine inchangées
+OK   audit : 2 ligne(s), colonnes d origine inchangées
+OK   aucune facture émise sans copie figée
+OK   empreintes des PDF figés valides
+OK   PDF figés servis
+OK   42 déclencheurs d immuabilité présents
+OK   rc19 : 0 lien(s) d annexe conservés à l identique ; nouveaux liens uniquement pour les factures figées par cette migration (6)
+OK   rc19 : 0 ligne(s) d historique des corrections identiques
+OK   rc19 : schéma (déclencheurs, clé retirée, écritures compilables, liens d annexe)
+OK   migration idempotente (2e passage sans erreur)
+OK   rc19 : schéma toujours conforme après le 2e passage
+GO
+
+=== 4. rotate-secrets (mot de passe de test aléatoire, non interactif)
+2026-10-07T13:38:35Z  .env.rc21 écrit (mode 600) : hachage scrypt du mot de passe + secret de session de 64 caractères
+OK .env.rc21 : hachage seulement, mot de passe en clair absent, mode 600
+
+=== 5. 40-deploy
+ Image tbmb-b21-time-billing-v9 Building 
+ Image tbmb-b21-time-billing-v9 Built 
+ Container tbmb-b21 Recreate 
+ Container tbmb-b21 Recreated 
+ Container tbmb-b21 Starting 
+ Container tbmb-b21 Started 
+2026-10-07T13:38:38Z  déployé — santé : {"status":"ok","version":"9.2-rc21"}
+
+=== 6. 50-verify (dont redémarrage)
+2026-10-07T13:38:38Z  OK    santé 9.2-rc21
+2026-10-07T13:38:38Z  OK    page de connexion 200
+2026-10-07T13:38:38Z  OK    en-têtes de sécurité
+2026-10-07T13:38:38Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-07T13:38:38Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-07T13:38:38Z  OK    archive ZIP protégée
+2026-10-07T13:38:39Z  OK    service non privilégié (uid 10001)
+2026-10-07T13:38:39Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-07T13:38:39Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-07T13:38:39Z  OK    écoute locale uniquement
+2026-10-07T13:38:39Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-07T13:38:39Z  OK    secrets absents des journaux du conteneur
+2026-10-07T13:38:41Z  après redémarrage :
+2026-10-07T13:38:41Z  OK    santé 9.2-rc21
+2026-10-07T13:38:42Z  OK    page de connexion 200
+2026-10-07T13:38:42Z  OK    en-têtes de sécurité
+2026-10-07T13:38:42Z  OK    serveur gthread (pas de blocage par connexions lentes)
+2026-10-07T13:38:42Z  OK    page Saisies protégée (redirection vers la connexion)
+2026-10-07T13:38:42Z  OK    archive ZIP protégée
+2026-10-07T13:38:42Z  OK    service non privilégié (uid 10001)
+2026-10-07T13:38:42Z  OK    système de fichiers en lecture seule, aucune capacité, no-new-privileges
+2026-10-07T13:38:42Z  OK    CSP : scripts sans unsafe-inline, avec nonce
+2026-10-07T13:38:42Z  OK    écoute locale uniquement
+2026-10-07T13:38:42Z  OK    base : intégrité, effectifs, empreintes saisies/factures/mandats/paramètres, copies figées, schéma rc19+G4
+2026-10-07T13:38:42Z  OK    secrets absents des journaux du conteneur
+2026-10-07T13:38:42Z  VÉRIFICATIONS CONFORMES
+
+=== 7. contrôles complémentaires rc21
+OK compose : secrets uniquement par variables ${…}, aucune valeur
+OK hachage transmis intact au conteneur (comparaison d'empreintes, caractères $ préservés)
+ancien mot de passe refusé : 200 (200 = formulaire réaffiché)
+PDF facture 1 (rc21) : 200, sha fb97c7c6347b
+PDF facture 2 (rc21) : 200, sha a5e4e5cbb918
+PDF facture 3 (rc21) : 200, sha 5c87be32dfdf
+OK facture 1 : texte du PDF servi après migration = texte du PDF V9.0
+OK facture 2 : texte du PDF servi après migration = texte du PDF V9.0
+ÉCART facture 3 (texte)
+facture {'id': 1, 'number': '2026-001', 'status': 'issued', 'issued_at': '2026-07-01T08:15:00', 'invoice_date': None}
+facture {'id': 2, 'number': '2026-002', 'status': 'issued', 'issued_at': '2026-08-01T09:30:00', 'invoice_date': None}
+facture {'id': 3, 'number': None, 'status': 'draft', 'issued_at': None, 'invoice_date': None}
+copie figée 1 2026-001 migration-v9.2 (rendu V9.0) fb97c7c6347b
+copie figée 2 2026-002 migration-v9.2 (rendu V9.0) a5e4e5cbb918
+note (héritée V9.0) {'id': 1, 'reference': 'NC-2026-001', 'status': 'draft', 'treatment': None, 'amount': 100.0}
+audit migration [<sqlite3.Row object at 0x7eb672e02260>]
+OK facture 1 : PDF servi = copie figée (octet pour octet)
+OK facture 2 : PDF servi = copie figée (octet pour octet)
+
+=== 8. 90-rollback
+2026-10-07T13:38:43Z  base vivante copiée avant retour : /root/time-billing-v9-rc10-20261004/migration-blanc/B21/backups/ecarte-20261007T133831Z-retour-20261007T133843Z/timebilling-avant-retour.db (sha 2bf63456d6a4)
+2026-10-07T13:38:47Z  sauvegarde migrée par l'image déployée (4083c85beed8) : référence des tables et colonnes ajoutées
+colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+colonnes recalculées par la migration (lignes comparées, contenu non comparé) : invoice_snapshots(frozen_at,pdf,pdf_sha256)
+2026-10-07T13:38:49Z  .env d'origine restauré
+ Container tbmb-b21 Creating 
+ Container tbmb-b21 Created 
+ Container tbmb-b21 Starting 
+ Container tbmb-b21 Started 
+2026-10-07T13:38:51Z  retour arrière effectué — santé : {"status":"ok","version":"9.0-rc1"} ; base = sauvegarde 20261007T133831Z (SHA-256 identique)
+
+=== 9. contrôle du retour arrière
+santé : {"status":"ok","version":"9.0-rc1"}
+OK base = sauvegarde (SHA-256 identique)
+OK code = code V9.0 de production (identique)
+PDF facture 1 (retour) : 200, sha 9c47c3d33eff
+PDF facture 2 (retour) : 200, sha 5dc40a3f1e82
+PDF facture 3 (retour) : 200, sha cef2dff3b3b6
+OK facture 1 : identique à l'origine après retour arrière
+OK facture 2 : identique à l'origine après retour arrière
+OK facture 3 : identique à l'origine après retour arrière
+redémarrage V9.0 après retour : {"status":"ok","version":"9.0-rc1"}
+
+=== 10. nettoyage du bac à sable
+ Network tbmb-b21_default Removed 
+images du bac à sable supprimées
+FIN B21

@@ -1,0 +1,39 @@
+....................................................................................................s..............................................................................................................[2026-10-07 17:41:05,010] ERROR in app: erreur interne
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/app.py", line 295, in inner
+    return fn(*a,**k)
+           ^^^^^^^^^^
+  File "/app/app/app.py", line 450, in index
+    fc=forecast_mod.build(c,rules.local_today())
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/tests/test_rc10_security.py", line 182, in boom
+    def boom(*a, **k): raise RuntimeError('SELECT secret FROM hidden_table')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: SELECT secret FROM hidden_table
+...................................................................................................................................................................................................................................................................[2026-10-07 17:42:44,267] ERROR in app: avertissements après correction de la saisie 1
+Traceback (most recent call last):
+  File "/app/app/app.py", line 859, in entry_edit
+    draft_warning(c2,p["id"],work_date)
+  File "/app/tests/test_revue_rc19_restes.py", line 100, in boom
+    def boom(*a_, **k): raise RuntimeError('panne simulée')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: panne simulée
+[2026-10-07 17:42:44,277] ERROR in app: avertissements après suppression de la saisie 2
+Traceback (most recent call last):
+  File "/app/app/app.py", line 924, in entry_delete
+    draft_warning(c2,e["project_id"],e["work_date"])
+  File "/app/tests/test_revue_rc19_restes.py", line 100, in boom
+    def boom(*a_, **k): raise RuntimeError('panne simulée')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: panne simulée
+...............................
+----------------------------------------------------------------------
+Ran 501 tests in 187.110s
+
+OK (skipped=1)

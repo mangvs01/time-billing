@@ -1,0 +1,22 @@
+
+=== 0. version d'origine (V9.0, image construite depuis l'arborescence de prod copiée)
+ Container tbmb-b21 Started 
+santé V9.0 : {"status":"ok","version":"9.0-rc1"}
+PDF facture 1 (v90) : 200, sha f2cb800c7974
+PDF facture 2 (v90) : 200, sha 20a683aff597
+PDF facture 3 (v90) : 200, sha e2ac959161c9
+
+=== 1. 10-preflight
+2026-10-07T13:11:26Z  cible /root/time-billing-v9-rc10-20261004/migration-blanc/B21/opt/time-billing-v9 (projet tbmb-b21, conteneur tbmb-b21) — santé : {"status":"ok","version":"9.0-rc1"}
+2026-10-07T13:11:26Z  Dockerfile identique : NON
+2026-10-07T13:11:26Z  requirements identiques : non (copiés au déploiement)
+2026-10-07T13:11:26Z  propriétaire du dossier de données : 0 (le service RC11 s'exécute en uid 10001 : changé au déploiement)
+2026-10-07T13:11:26Z  préparation conforme
+
+=== 2. 20-backup
+ Container tbmb-b21 Stopping 
+ Container tbmb-b21 Stopped 
+Traceback (most recent call last):
+  File "<string>", line 10, in <module>
+  File "<string>", line 5, in digest
+sqlite3.OperationalError: no such table: settings

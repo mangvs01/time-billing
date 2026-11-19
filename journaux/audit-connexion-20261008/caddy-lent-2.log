@@ -1,0 +1,14 @@
+options reverse_proxy : request_buffers 64KB
+cible :8473 /login Content-Length 200000, 70000 octet(s) d emblée puis 1 octet / 5 s
+avant : 110 ms
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+pendant (24 connexions lentes) : ÉCHEC après 20.0 s (TimeoutError)
+après : 5 ms
+options reverse_proxy : request_buffers 64KB
+cible :8473 /entries Content-Length 200000, 70000 octet(s) d emblée puis 1 octet / 5 s
+avant : 29 ms
+pendant (24 connexions lentes) : 4 ms
+pendant (24 connexions lentes) : 4 ms
+pendant (24 connexions lentes) : 7 ms
+après : 7 ms

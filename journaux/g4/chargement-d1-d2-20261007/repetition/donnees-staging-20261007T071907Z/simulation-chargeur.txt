@@ -1,0 +1,45 @@
+{
+ "mode": "SIMULATION (copie temporaire supprimée ; base lue seulement)",
+ "classeur_sha256": "c93c610cdffe66d150fbb05d64513054d297f6170158effef99eb461eddac438",
+ "lignes": 24,
+ "jours": 213.21333,
+ "montant_ht_chf": 138209.5,
+ "par_annee_chf": {
+  "2025": 67236.0,
+  "2026": 70973.5
+ },
+ "exclues": {
+  "SUIVI 2025!H3": "D3 = NON : AL Jan-Mar, 19 400 CHF sans mandat, non chargé, écart documenté"
+ },
+ "notes_d4": [
+  "SUIVI 2025!K7",
+  "SUIVI 2025!M14",
+  "SUIVI 2025!N10",
+  "SUIVI 2025!N8",
+  "SUIVI 2026!J3"
+ ],
+ "d2": [
+  "SUIVI 2026!M15"
+ ],
+ "aucun_effet_tant_que_a_valider": true,
+ "clotures": {
+  "mandats": 19,
+  "facture_avant": 0,
+  "facture_apres": 0,
+  "non_facture_avant": 214.03125,
+  "non_facture_apres": 214.03125,
+  "solde_po_avant": 165.34,
+  "solde_po_apres": 165.34
+ },
+ "actifs": {
+  "mandats": 5,
+  "non_facture_avant": 27.78109,
+  "non_facture_apres": 27.78109,
+  "inchanges": true
+ },
+ "ca_historique_valide_chf": {
+  "2025": 0.0,
+  "2026": 0.0
+ },
+ "negatifs_apres": {}
+}

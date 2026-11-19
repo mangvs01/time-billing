@@ -1,0 +1,91 @@
+--- a/app/app.py	2026-10-04 10:29:40.000000000 +0000
++++ b/app/app.py	2026-10-04 10:51:06.997827653 +0000
+@@ -177,7 +177,9 @@
+  @wraps(fn)
+  def inner(*a,**k):
+   if not session_valid():
+-   session.clear(); return redirect(url_for("login",next=request.path))
++   session.clear()
++   if request.method!="GET": flash("Session expirée : l'opération n'a pas été enregistrée. Se reconnecter puis recommencer.")
++   return redirect(url_for("login",next=request.path if request.method=="GET" else "/"))
+   return fn(*a,**k)
+  return inner
+ # French number formatting on screen (rc4, R9): filters |nb |nbg |chf
+@@ -323,6 +325,7 @@
+   v=project_values(request.form)
+   with db() as c:c.execute(f"INSERT INTO projects({','.join(v)}) VALUES({','.join('?'*len(v))})",tuple(v.values()))
+   log("project_created",v["name"]);flash("Projet enregistré.")
++ except sqlite3.IntegrityError: flash("Projet non enregistré : un mandat porte déjà ce nom.")
+  except Exception as e:flash("Projet non enregistré : "+str(e))
+  return back("mandates")
+ @APP.route("/project/<int:pid>/edit",methods=["GET","POST"])
+@@ -410,7 +413,7 @@
+   mode=request.form.get("entry_mode","clock")
+   with db() as c:
+    p=active_project(c,int(request.form.get("project_id") or 0))
+-   c.execute("INSERT INTO entries(work_date,project_id,start_time,end_time,hours,description) VALUES(?,?,?,?,?,?)",(work_date,p["id"],start,end,h,desc))
++   c.execute("INSERT INTO entries(id,work_date,project_id,start_time,end_time,hours,description) VALUES(MAX(COALESCE((SELECT MAX(id) FROM entries),0),COALESCE((SELECT MAX(entry_id) FROM entry_changes),0))+1,?,?,?,?,?,?)",(work_date,p["id"],start,end,h,desc))
+    last=contract(c,p)["last_issued_to"]
+   log("time_entry_created",f"{work_date} / {h}h / {mode}");flash(f"Temps enregistré : {fr_g(h)} h.")
+   if last and work_date<=last:
+@@ -624,6 +627,7 @@
+    v=draft_values(c,request.form,p["id"])
+    v["unit_rate"]=p["rate"] if v["unit"]=="day" else p["rate"]/(p["day_hours"] or 8)
+    v["vat"]=p["vat"]; v["project_id"]=p["id"]; v["description"]=v["description"] or p["name"]
++   v["id"]=c.execute("SELECT MAX(COALESCE((SELECT MAX(id) FROM invoices),0),COALESCE((SELECT MAX(invoice_id) FROM invoice_date_changes),0),COALESCE((SELECT MAX(target_invoice_id) FROM credit_operations),0))+1").fetchone()[0]
+    new_id=c.execute(f"INSERT INTO invoices({','.join(v)}) VALUES({','.join('?'*len(v))})",tuple(v.values())).lastrowid
+    record_date_change(c,new_id,None,v["invoice_date"],"création du brouillon")
+    log_msg=f"project={p['id']};qty={v['qty']};invoice_date={v['invoice_date']}"
+@@ -642,7 +646,7 @@
+   if request.method=="POST":
+    try:
+     v=draft_values(c,request.form,i["project_id"])
+-    v["unit_rate"]=i["rate"] if v["unit"]=="day" else i["rate"]/(i["day_hours"] or 8)
++    v["unit_rate"]=float(i["unit_rate"]) if v["unit"]==i["unit"] else (i["rate"] if v["unit"]=="day" else i["rate"]/(i["day_hours"] or 8))
+     v["vat"]=num_field(request.form.get("vat"),"taux de TVA",0.0,100.0,default=float(i["vat"]))
+     v["description"]=v["description"] or i["project"]
+     off=credits.offsets_total_on(c,iid); new_ttc=rules.amounts(v["qty"],v["unit_rate"],v["vat"],v["other_amount"],v["other_vat_mode"])["ttc"]
+@@ -702,6 +706,8 @@
+   if i["status"]!="draft": raise ValueError("facture déjà émise")
+   if ctx["missing"]: raise ValueError("champs à compléter avant émission : "+", ".join(ctx["missing"]))
+   if ctx["date_problem"]: raise ValueError(ctx["date_problem"])
++  clash=c.execute("SELECT number FROM invoices WHERE project_id=? AND status='issued' AND id<>? AND period_from<=? AND period_to>=? LIMIT 1",(i["project_id"],iid,i["period_to"],i["period_from"])).fetchone()
++  if clash: raise ValueError(f"la période chevauche la facture déjà émise {clash['number']} : modifier la période ou supprimer ce brouillon")
+   seen=request.form.get("expected_reliquat")
+   if seen is not None and abs(float(seen)-ctx["reliquat"])>1e-6: raise ValueError("la position du mandat a changé depuis l'affichage ; vérifier le reliquat")
+   treatment=request.form.get("reliquat_treatment",""); note=(request.form.get("reliquat_note") or "").strip()
+@@ -1012,6 +1018,7 @@
+ @APP.route("/restore",methods=["POST"])
+ @login_required
+ def restore_upload():
++ request.max_content_length=1024*1024*1024  # a JSON backup holds every frozen PDF (base64): it outgrows the 15 MB default after ~80 invoices
+  f=request.files.get("backup")
+  if not f or not f.filename.lower().endswith(".json"): flash("Sélectionner un fichier de sauvegarde .json."); return back("settings")
+  raw=f.read()
+--- a/app/restore_service.py	2026-10-04 10:29:40.000000000 +0000
++++ b/app/restore_service.py	2026-10-04 10:51:06.998827644 +0000
+@@ -142,7 +142,7 @@
+     try:
+         c.execute("PRAGMA foreign_keys=OFF"); c.execute("BEGIN IMMEDIATE")
+         schema = _schema(c)
+-        for t in [t for t in schema if t not in ORDER] + [t for t in ORDER if t in schema]:
++        for t in [t for t in schema if t not in ORDER and t not in ("web_sessions", "login_failures")] + [t for t in ORDER if t in schema]:
+             c.execute(f"DELETE FROM {t}")  # init may seed rows (none today); the file is authoritative
+             for r in data["tables"].get(t, []):
+                 cols = list(r)
+--- a/app/forecast.py	2026-10-04 10:29:40.000000000 +0000
++++ b/app/forecast.py	2026-10-04 10:51:12.679775337 +0000
+@@ -39,10 +39,11 @@
+     for r in c.execute("SELECT substr(COALESCE(invoice_date,issued_at),1,4) y, qty, unit_rate, vat FROM invoices WHERE status='issued'"):
+         actual[r["y"]] = actual.get(r["y"], Decimal(0)) + rules.amounts(r["qty"], r["unit_rate"], 0)["ht"]
+     # service HT only, like invoices above; cancelled credit notes are neutralised by their cancellation document
+-    for r in c.execute("""SELECT substr(issued_at,1,4) y, qty, unit_rate, amount, other_amount FROM credit_notes WHERE status='issued'
++    for r in c.execute("""SELECT issued_at, qty, unit_rate, amount, other_amount FROM credit_notes WHERE status='issued'
+                           AND id NOT IN (SELECT credit_note_id FROM credit_note_cancellations)"""):
+         ht = rules.amounts(1, r["amount"], 0)["ht"]  # authoritative service HT of the note
+-        actual[r["y"]] = actual.get(r["y"], Decimal(0)) - ht
++        y = rules.local_date(r["issued_at"])[:4]  # Zurich calendar year of the document (UTC timestamp near New Year differs)
++        actual[y] = actual.get(y, Decimal(0)) - ht
+     years = sorted({m[:4] for m in months} | {str(today.year)} | set(actual))
+     out = []
+     for y in years:

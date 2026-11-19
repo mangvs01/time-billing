@@ -1,0 +1,266 @@
+{
+ "resume": {
+  "onglets": [
+   "JAN",
+   "FEV",
+   "MAR",
+   "AVR",
+   "MAY",
+   "JUN",
+   "JULY",
+   "AUG",
+   "SEPT",
+   "OCT",
+   "NOV",
+   "DEC",
+   "SUIVI 2025",
+   "JAN 26",
+   "FEB 26",
+   "MAR 26",
+   "APR 26",
+   "MAY 26",
+   "JUN 26",
+   "JUL 26",
+   "AUG 26",
+   "SEPT 26",
+   "SUIVI 2026"
+  ],
+  "factures_tb_emises_dans_la_copie": 0,
+  "suivi_avant_validation": {
+   "2026": "0"
+  },
+  "suivi_apres_validation": {
+   "2025": "67236.00",
+   "2026": "70973.50"
+  },
+  "facture_billing_previsions": {
+   "2025": "67236.00",
+   "2026": "70973.50"
+  },
+  "ca_identique_a_billing": true,
+  "cellules_comparees": 24,
+  "ecarts": [],
+  "lignes_par_onglet": {
+   "SUIVI 2025": 10,
+   "SUIVI 2026": 14
+  }
+ },
+ "lignes": [
+  {
+   "cellule": "SUIVI 2025!I4",
+   "mandat": "Endovascular Summit",
+   "valeur_classeur": 5.2,
+   "montant_ht": 3380.0,
+   "export": "SUIVI 2025!Facture 09/04",
+   "valeur_export": 3380,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!K4",
+   "mandat": "Endovascular Summit",
+   "valeur_classeur": 7.7,
+   "montant_ht": 5005.0,
+   "export": "SUIVI 2025!Facture 16/06",
+   "valeur_export": 5005,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!I5",
+   "mandat": "EUROPCR 2025",
+   "valeur_classeur": 6.6,
+   "montant_ht": 4290.0,
+   "export": "SUIVI 2025!Facture 09/04",
+   "valeur_export": 4290,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!J5",
+   "mandat": "EUROPCR 2025",
+   "valeur_classeur": 5.3,
+   "montant_ht": 3445.0,
+   "export": "SUIVI 2025!Facture 12/05",
+   "valeur_export": 3445,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!K5",
+   "mandat": "EUROPCR 2025",
+   "valeur_classeur": 7.5,
+   "montant_ht": 4875.0,
+   "export": "SUIVI 2025!Facture 16/06",
+   "valeur_export": 4875,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!K7",
+   "mandat": "NC STC June",
+   "valeur_classeur": 10.5,
+   "montant_ht": 6825.0,
+   "export": "SUIVI 2025!Facture 16/06",
+   "valeur_export": 6825,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!N8",
+   "mandat": "CIRSE 2025",
+   "valeur_classeur": 9.5,
+   "montant_ht": 6175.0,
+   "export": "SUIVI 2025!Facture 03/10",
+   "valeur_export": 6175,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!J9",
+   "mandat": "ERA 2025",
+   "valeur_classeur": 5.6,
+   "montant_ht": 3640.0,
+   "export": "SUIVI 2025!Facture 12/05",
+   "valeur_export": 3640,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!L9",
+   "mandat": "ERA 2025",
+   "valeur_classeur": 8.4,
+   "montant_ht": 5460.0,
+   "export": "SUIVI 2025!Facture 14/07",
+   "valeur_export": 5460,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!N10",
+   "mandat": "Rising stars Q3",
+   "valeur_classeur": 6,
+   "montant_ht": 3900.0,
+   "export": "SUIVI 2025!Facture 03/10",
+   "valeur_export": 3900,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!P11",
+   "mandat": "PCR LV 2025",
+   "valeur_classeur": 6.34,
+   "montant_ht": 4121.0,
+   "export": "SUIVI 2025!Facture 15/12",
+   "valeur_export": 4121,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!O12",
+   "mandat": "SMART Y90",
+   "valeur_classeur": 10,
+   "montant_ht": 6500.0,
+   "export": "SUIVI 2025!Facture 27/11",
+   "valeur_export": 6500,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!K13",
+   "mandat": "EAHAD",
+   "valeur_classeur": 1,
+   "montant_ht": 650.0,
+   "export": "SUIVI 2025!Facture 16/06",
+   "valeur_export": 650,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2025!M14",
+   "mandat": "NC STC Sept",
+   "valeur_classeur": 13.8,
+   "montant_ht": 8970.0,
+   "export": "SUIVI 2025!Facture 30/09",
+   "valeur_export": 8970,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2026!J3",
+   "mandat": "ASN 2025",
+   "valeur_classeur": 6389.5,
+   "montant_ht": 6389.5,
+   "export": "SUIVI 2026!Facture 16/02",
+   "valeur_export": 6389.5,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2026!J4",
+   "mandat": "ERA 2025",
+   "valeur_classeur": 364.00000000000006,
+   "montant_ht": 364.0,
+   "export": "SUIVI 2026!Facture 16/02",
+   "valeur_export": 364,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2026!L5",
+   "mandat": "SMM 2026",
+   "valeur_classeur": 9750,
+   "montant_ht": 9750.0,
+   "export": "SUIVI 2026!Facture 03/04",
+   "valeur_export": 9750,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2026!N6",
+   "mandat": "EHRA 2026",
+   "valeur_classeur": 11700,
+   "montant_ht": 11700.0,
+   "export": "SUIVI 2026!Facture 11/05",
+   "valeur_export": 11700,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2026!K7",
+   "mandat": "EAU 2026",
+   "valeur_classeur": 9100,
+   "montant_ht": 9100.0,
+   "export": "SUIVI 2026!Facture 31/03",
+   "valeur_export": 9100,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2026!M8",
+   "mandat": "STC GEM Avril",
+   "valeur_classeur": 4550,
+   "montant_ht": 4550.0,
+   "export": "SUIVI 2026!Facture 27/04",
+   "valeur_export": 4550,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2026!O9",
+   "mandat": "EUROPCR 2026",
+   "valeur_classeur": 11245,
+   "montant_ht": 11245.0,
+   "export": "SUIVI 2026!Facture 16/06",
+   "valeur_export": 11245,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2026!P10",
+   "mandat": "EULAR 2026",
+   "valeur_classeur": 8125,
+   "montant_ht": 8125.0,
+   "export": "SUIVI 2026!Facture 16/07",
+   "valeur_export": 8125,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2026!Q12",
+   "mandat": "CIRSE 2026",
+   "valeur_classeur": 5200,
+   "montant_ht": 5200.0,
+   "export": "SUIVI 2026!Facture 01/10",
+   "valeur_export": 5200,
+   "identique": true
+  },
+  {
+   "cellule": "SUIVI 2026!M15",
+   "mandat": "STC GEM Oct - DM job",
+   "valeur_classeur": 4550,
+   "montant_ht": 4550.0,
+   "export": "SUIVI 2026!Facture 27/04",
+   "valeur_export": 4550,
+   "identique": true
+  }
+ ]
+}
