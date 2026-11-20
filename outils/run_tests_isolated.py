@@ -5,6 +5,10 @@ Usage:  /root/venvs/rc25-test-venv/bin/python -I outils/run_tests_isolated.py [-
 The suites expect a COPY of the staging database (BASE_DB) and a /data directory. Here both are replaced by a synthetic, empty database created by
 app.init() and a private scratch directory created OUTSIDE the repository (system temporary directory, mode 0700, removed on exit).
 RC25_WORK may name another scratch directory: it must be absolute, outside the repository, and either new / empty or already marked by this runner.
+RC25_FAST=1 (opt-in; set by outils/run_tests_parallel.py): every SQLite connection of the process runs PRAGMA synchronous=OFF, i.e. no fsync at COMMIT. Nothing else changes (same locks, same
+transactions, same SQL, same results); only the durability against a power cut of the throw-away test databases is given up. See docs/TESTS-DUREE.md.
+RC25_RESULT_JSON=/absolute/path.json (opt-in; set by outils/run_tests_parallel.py): after the run, one record per test (id, status, seconds) is written there (outside the repository);
+the console output and the exit status are those of unittest, unchanged.
 Guards: DB_PATH / BASE_DB (if set in the environment) must lie inside the scratch directory, else the run is refused; every sqlite3.connect() of the
 process is refused outside the scratch directory (":memory:" aside); temporary files go to the scratch directory; no .pyc is written.
 No secret is read from the environment (the application key and password below are synthetic) and none is printed. Synthetic data only.
@@ -57,6 +61,7 @@ os.environ.update({"SECRET_KEY": "0" * 64, "COOKIE_SECURE": "0", "INVOICE_CHECK_
 for _k in ("APP_USER", "APP_PASSWORD_HASH", "TRUST_PROXY", "SESSION_HOURS", "EXTERNAL_INVOICE_NUMBERS", "LICENSED_FONT_DIR"): os.environ.pop(_k, None)
 
 _connect, _mkdtemp = sqlite3.connect, tempfile.mkdtemp
+FAST = os.environ.get("RC25_FAST") == "1"
 
 
 def _guarded_connect(database, *a, **k):
@@ -68,7 +73,11 @@ def _guarded_connect(database, *a, **k):
     if isinstance(checked, str) and checked.startswith("file:"):
         checked = unquote(checked[5:].split("?", 1)[0])
     if p != ":memory:" and not _inside(checked, WORK): raise sqlite3.OperationalError("refused by run_tests_isolated: database outside the synthetic scratch directory: " + p)
-    return _connect(database, *a, **k)
+    conn = _connect(database, *a, **k)
+    if FAST and p != ":memory:":
+        try: conn.execute("PRAGMA synchronous=OFF")      # no fsync on the throw-away databases (never changes what a test sees)
+        except sqlite3.Error: pass
+    return conn
 
 
 def _scratch_mkdtemp(*a, **k):
@@ -84,4 +93,30 @@ import app.app as m
 if not os.path.exists(os.environ["BASE_DB"]):
     m.DB = os.environ["BASE_DB"]; m.init()
 m.DB = os.environ["DB_PATH"]
-unittest.main(module=None, argv=["run_tests_isolated"] + sys.argv[1:])
+RESULT_JSON = os.environ.get("RC25_RESULT_JSON")
+if not RESULT_JSON:
+    unittest.main(module=None, argv=["run_tests_isolated"] + sys.argv[1:])
+else:
+    if not os.path.isabs(RESULT_JSON) or _inside(RESULT_JSON, ROOT): _refuse("RC25_RESULT_JSON must be an absolute path outside the repository")
+    import json, time
+
+    class _RecordingResult(unittest.TextTestResult):
+        """Same console behaviour as TextTestResult; additionally remembers (id, status, seconds) of every test and sub-test."""
+        records = []
+        def startTest(self, test): self._t0 = time.perf_counter(); super().startTest(test)
+        def _add(self, test, status): type(self).records.append({"id": test.id(), "status": status, "seconds": round(time.perf_counter() - getattr(self, "_t0", time.perf_counter()), 4)})
+        def addSuccess(self, test): super().addSuccess(test); self._add(test, "ok")
+        def addFailure(self, test, err): super().addFailure(test, err); self._add(test, "FAIL")
+        def addError(self, test, err): super().addError(test, err); self._add(test, "ERROR")
+        def addSkip(self, test, reason): super().addSkip(test, reason); self._add(test, "skipped")
+        def addExpectedFailure(self, test, err): super().addExpectedFailure(test, err); self._add(test, "expected failure")
+        def addUnexpectedSuccess(self, test): super().addUnexpectedSuccess(test); self._add(test, "unexpected success")
+        def addSubTest(self, test, subtest, err):
+            super().addSubTest(test, subtest, err)
+            if err is not None: type(self).records.append({"id": subtest.id(), "status": "SUBFAIL", "seconds": 0.0})
+
+    class _Runner(unittest.TextTestRunner): resultclass = _RecordingResult
+
+    prog = unittest.main(module=None, argv=["run_tests_isolated"] + sys.argv[1:], testRunner=_Runner, exit=False)
+    with open(RESULT_JSON, "w") as f: json.dump({"records": _RecordingResult.records, "ran": prog.result.testsRun, "ok": prog.result.wasSuccessful()}, f)
+    sys.exit(0 if prog.result.wasSuccessful() else 1)

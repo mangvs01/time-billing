@@ -133,6 +133,7 @@ def preview(conn, data):
     from app import historical_billing
     blocking += historical_billing.validation_conflicts(data["tables"].get("historical_invoices", []))
     blocking += annex_consistency(data)
+    blocking += address_label_conflicts(data)      # BILL-FA1FT (F_A1)
     blocking += lines_consistency(data)
     blocking += annex_trail(data)
     return {"counts": counts, "blocking": blocking, "generated_at": data["meta"].get("generated_at"), "app_version": data["meta"].get("app_version")}
@@ -206,6 +207,19 @@ def lines_consistency(data):
             have = sorted((int(x.get("invoice_line_id")), x.get("description"), str(Decimal(str(x.get("amount"))).quantize(Decimal("0.01"))), x.get("vat_mode")) for x in by_cn.get(r.get("credit_note_id"), []))
         except (ValueError, KeyError, TypeError, AttributeError, ArithmeticError): out.append(f"lignes créditées illisibles (note de crédit {r.get('reference')})"); continue
         if want != have: out.append(f"les lignes créditées de la note de crédit {r.get('reference')} ne correspondent pas à sa copie figée")
+    return out[:10]
+
+
+def address_label_conflicts(data):
+    """BILL-FA1FT (F_A1): the rebuilt database carries UNIQUE(client_key, label COLLATE NOCASE) on billing_addresses; a file holding two addresses of one client whose labels differ only by case
+    could not be loaded (the whole restore would fail half way): say it here, before anything is changed."""
+    seen, out = {}, []
+    for r in data["tables"].get("billing_addresses", []):
+        if not isinstance(r, dict) or not isinstance(r.get("label"), str): continue
+        k = (r.get("client_key"), "".join(ch.lower() if ch < "\x80" else ch for ch in r["label"]))      # same folding as SQLite NOCASE (ASCII letters only)
+        if k in seen and seen[k] != r["label"]: out.append(f"deux adresses de facturation du même client ne diffèrent que par les majuscules et minuscules : « {seen[k]} » et « {r['label']} » (client {r.get('client_key')}). "
+                                                  "Renommer l'une des deux dans l'écran Adresses de l'application d'où vient la sauvegarde, puis refaire la sauvegarde")
+        seen.setdefault(k, r["label"])
     return out[:10]
 
 

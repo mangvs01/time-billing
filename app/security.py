@@ -75,7 +75,7 @@ def password_ok(cfg, password, c=None):
 # never promoted from the staging (see restore_service.TRANSIENT). The clear password is never stored, logged or audited.
 CRED_SCHEMA = """CREATE TABLE IF NOT EXISTS auth_credentials(id INTEGER PRIMARY KEY CHECK(id=1), pw_hash TEXT NOT NULL CHECK(pw_hash LIKE 'scrypt:%'),
                  version INTEGER NOT NULL DEFAULT 1, changed_at TEXT NOT NULL)"""
-NEW_PASSWORD_MIN, NEW_PASSWORD_MAX = 12, 200
+NEW_PASSWORD_MIN, NEW_PASSWORD_MAX = 10, 200   # 20/11 : 10 au moins (demande du propriétaire)
 
 
 def stored_hash(c):

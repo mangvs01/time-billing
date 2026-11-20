@@ -260,7 +260,7 @@ class OtherMandatesUnchanged(World):
 
 class Version(World):
     def test_version_and_health(self):
-        self.assertEqual(m.VERSION, '9.2-rc47'); self.assertEqual(self.c.get('/health').get_json()['version'], '9.2-rc47')
+        self.assertEqual(m.VERSION, '9.2-rc48'); self.assertEqual(self.c.get('/health').get_json()['version'], '9.2-rc48')
         self.assertEqual(m.invoice_checks.DEROGABLE, (12, 13))
 
 

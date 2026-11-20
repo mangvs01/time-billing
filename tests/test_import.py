@@ -28,10 +28,32 @@ def workbook(sheets, header=True, title_rows=1):
     b = io.BytesIO(); wb.save(b); return b.getvalue()
 
 
+# Fast mode (RC25_FAST=1, set by outils/run_tests_parallel.py; never the default): the state reached at the end of Base.setUp (a copy of the base database, migrated by init(), logged in,
+# fictitious issuer saved, two projects) is the same for every test of a given kind, so it is built ONCE per process, by the very steps below, and then COPIED (file copy + the same
+# session cookie) instead of being rebuilt 970 times. The copy is private to each test (own directory), so tests cannot see one another; the template itself is never handed out.
+# Without RC25_FAST the steps below run in full for every test, exactly as before. Template key: what can change the result of these steps (credentials, issuer, project()).
+_TEMPLATES = {}
+_FILLED = {}
+
+
+def _template_key(case):
+    return (os.environ['BASE_DB'], m.SEC['user'], os.environ['APP_PASSWORD'], os.environ.get('SECRET_KEY'), tuple(sorted(FAKE_ISSUER.items())), type(case).project)
+
+
 class Base(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(dir='/data')
         self.db = os.path.join(self.tmp, 'timebilling.db')
+        fast = os.environ.get('RC25_FAST') == '1'
+        tpl = _TEMPLATES.get(_template_key(self)) if fast else None
+        if tpl:
+            shutil.copy(tpl['db'], self.db)       # the finished state of the steps below, copied (private to this test)
+            m.DB = self.db
+            m.APP.config['TESTING'] = True
+            self.c = m.APP.test_client()
+            for key, value in tpl['cookies']: self.c.set_cookie(key, value)
+            self.p1, self.p2 = tpl['p1'], tpl['p2']
+            return
         shutil.copy(os.environ['BASE_DB'], self.db)  # copy of the staging DB, never the original
         m.DB = self.db; m.init()
         m.APP.config['TESTING'] = True
@@ -40,6 +62,28 @@ class Base(unittest.TestCase):
         self.assertEqual(r.status_code, 302)
         self.c.post('/settings', data=FAKE_ISSUER)  # fictitious issuer, required before any issuance
         self.p1 = self.project('Projet Alpha'); self.p2 = self.project('Projet Beta')
+        if fast:                                    # first test of this kind in the process: keep a private copy of the state just built
+            cookies = [(ck.key, ck.value) for ck in self.c._cookies.values()]
+            if cookies:
+                keep = os.path.join(tempfile.mkdtemp(dir='/data'), 'template.db'); shutil.copy(self.db, keep)
+                _TEMPLATES[_template_key(self)] = {'db': keep, 'cookies': cookies, 'p1': self.p1, 'p2': self.p2}
+
+    def fill_once(self, name, fill):
+        """fill() puts data in this test's database through the application (e.g. 120 entries posted one by one). Normal mode: fill() runs for every test, as always. Fast mode
+        (RC25_FAST=1): the first test of the class runs it and keeps a private copy of the database and of the session cookie; the next ones get a copy of that state instead of
+        posting everything again. Same data, same session, each test on its own file."""
+        key = (_template_key(self), type(self), name)
+        if os.environ.get('RC25_FAST') != '1': return fill()
+        tpl = _FILLED.get(key)
+        if tpl:
+            shutil.copy(tpl['db'], self.db)
+            self.c = m.APP.test_client()
+            for k, v in tpl['cookies']: self.c.set_cookie(k, v)
+            return
+        fill()
+        cookies = [(ck.key, ck.value) for ck in self.c._cookies.values()]
+        keep = os.path.join(tempfile.mkdtemp(dir='/data'), 'filled.db'); shutil.copy(self.db, keep)
+        _FILLED[key] = {'db': keep, 'cookies': cookies}
 
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)

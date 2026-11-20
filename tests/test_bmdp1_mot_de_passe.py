@@ -46,7 +46,7 @@ class Screen(Pw):
     def test_page_content_and_links(self):
         r = self.c.get(URL); t = r.get_data(as_text=True)
         self.assertEqual(r.status_code, 200); self.assertEqual(r.headers['Cache-Control'], 'no-store')
-        for needle in ('Changer mon mot de passe', 'Mot de passe actuel', 'Nouveau mot de passe', 'seconde fois', '12 caractères au moins', 'name="current_password"',
+        for needle in ('Changer mon mot de passe', 'Mot de passe actuel', 'Nouveau mot de passe', 'seconde fois', '10 caractères au moins', 'name="current_password"',
                        'name="new_password"', 'name="confirm_password"', 'autocomplete="current-password"', 'autocomplete="new-password"', 'type="password"'):
             self.assertIn(needle, t)
         self.assertNotIn('value=', t.split('<form')[1].split('</form>')[0].replace('type="password"', ''))   # aucun champ prérempli
@@ -96,9 +96,9 @@ class Change(Pw):
         self.assert_refused(self.change(confirm=NEW + 'x'), 'pas identiques')
 
     def test_too_short_and_the_limit_itself(self):
-        self.assert_refused(self.change(new='Onze-chars1'), 'trop court')       # 11 caractères
+        self.assert_refused(self.change(new='Neuf-car9'), 'trop court')       # 9 caractères (minimum 10 depuis le 20/11)
         self.assert_refused(self.change(new=''), 'trop court')
-        self.assertEqual(self.change(new='Douze-chars12').status_code, 302)    # 12 caractères : accepté
+        self.assertEqual(self.change(new='Dix-chars1').status_code, 302)    # 10 caractères : accepté
         self.assertEqual(len(self.stored()), 1)
 
     def test_other_refusals(self):

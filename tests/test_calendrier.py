@@ -591,7 +591,7 @@ class DonneesIllisibles(Base3):
 
 class NonRegression(Base3):
     def test_version(self):
-        self.assertEqual(m.VERSION, '9.2-rc47'); self.assertEqual(self.c.get('/health').get_json()['version'], '9.2-rc47')
+        self.assertEqual(m.VERSION, '9.2-rc48'); self.assertEqual(self.c.get('/health').get_json()['version'], '9.2-rc48')
 
     def test_aucune_regle_de_facturation_touchee(self):
         """Le calendrier ne modifie pas la position d'un mandat : `contract` donne les mêmes chiffres avant et après l'affichage des pages."""

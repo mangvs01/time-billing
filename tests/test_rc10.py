@@ -226,6 +226,9 @@ class Locks(EntryCase):
 class ListAndExport(EntryCase):
     def setUp(self):
         super().setUp()
+        self.fill_once('list-and-export', self.fill)
+
+    def fill(self):
         for i in range(120):
             self.entry(self.pid if i % 2 else self.pid2, f'2026-0{1 + i % 9}-{1 + i % 27:02d}', 1 + (i % 4) * 0.25, f'saisie {i:03d}')
         self.entry(self.pid, '2026-05-05', 2, '100% sûr_ et "quoted"'); self.entry(self.pid, '2026-05-06', 2, '=HYPERLINK("http://x","y")')

@@ -12,6 +12,7 @@ from app import billing_rules as rules
 DDL = """CREATE TABLE IF NOT EXISTS billing_addresses(id INTEGER PRIMARY KEY AUTOINCREMENT, client_key TEXT NOT NULL CHECK(length(client_key)>0),
   label TEXT NOT NULL CHECK(length(trim(label))>0), contact TEXT NOT NULL DEFAULT '', address TEXT NOT NULL CHECK(length(trim(address))>0),
   active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)), sort_order INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT, UNIQUE(client_key,label))"""
+LABEL_INDEX = "idx_billing_addresses_label_nocase"       # BILL-FA1FT (F_A1): « EGG FR » and « egg fr » of the same client are one address
 MAX_LABEL = 60; MAX_CONTACT = 120; MAX_LINES = 6; MAX_LINE = 80
 _CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f​-‏‪-‮⁠﻿]")
 _CTRL_MORE = re.compile("[\\x80-\\x84\\x86-\\x9f\\u00ad\\u061c\\u2066-\\u2069]")       # review rc40: C1 controls, soft hyphen, Arabic letter mark and direction isolates (the class above stops at the embeddings / overrides)
@@ -21,6 +22,65 @@ _CTRL_MORE = re.compile("[\\x80-\\x84\\x86-\\x9f\\u00ad\\u061c\\u2066-\\u2069]")
 STRUCT_FIELDS = ("street", "house_num", "pcode", "city", "country")
 STRUCT_COLS = tuple("addr_" + f for f in STRUCT_FIELDS)        # billing_addresses.addr_street … addr_country ; addr_verified is the 6th
 INVOICE_COLS = {"addr_street": "bill_street", "addr_house_num": "bill_house_num", "addr_pcode": "bill_pcode", "addr_city": "bill_city", "addr_country": "bill_country", "addr_verified": "bill_addr_verified"}
+
+
+def label_duplicates(c):
+    """BILL-FA1FT (F_A1): [(client_key, labels)] of the addresses of one client whose labels differ only by case (ASCII, like the index). [] = the unique index can be created."""
+    return [(r[0], r[1]) for r in c.execute("SELECT client_key, group_concat(label, ' | ') FROM billing_addresses GROUP BY client_key, label COLLATE NOCASE HAVING COUNT(*)>1")]
+
+
+def ensure_label_index(c):
+    """BILL-FA1FT (F_A1), additive and idempotent (same pattern as ensure_number_index of app.py): UNIQUE(client_key, label COLLATE NOCASE) on top of the binary UNIQUE(client_key,label).
+    Created only when no existing address holds such a duplicate (a unique index over duplicates would fail and stop the start-up): otherwise it is NOT created, the duplicates are recorded once
+    in the audit log and reported by schema_checks; the application still refuses new ones itself (label_taken). Nothing is deleted or renamed. Returns True when the index exists."""
+    if c.execute("SELECT 1 FROM sqlite_master WHERE type='index' AND name=?", (LABEL_INDEX,)).fetchone(): return True
+    dup = label_duplicates(c)
+    if dup:
+        if not c.execute("SELECT 1 FROM audit WHERE event='billing_address_label_index_skipped'").fetchone():
+            c.execute("INSERT INTO audit(event,detail) VALUES(?,?)", ("billing_address_label_index_skipped", "duplicates (case): " + "; ".join(f"client_key={k}: {v}" for k, v in dup)))
+        return False
+    c.execute(f"CREATE UNIQUE INDEX IF NOT EXISTS {LABEL_INDEX} ON billing_addresses(client_key, label COLLATE NOCASE)")
+    return True
+
+
+def drop_label_index(c):
+    """Documented rollback of F_A1: drops the index only (no row touched). The next start of this code re-creates it when the data allow it."""
+    c.execute(f"DROP INDEX IF EXISTS {LABEL_INDEX}")
+
+
+def label_twin(c, key, label, exclude_id=None):
+    """The label of ANOTHER address of client `key` that `label` only differs from by case (full Unicode case folding, which the NOCASE index does not do) and by the spacing already
+    normalised by validate(); None when there is none."""
+    want = label.casefold()
+    for r in c.execute("SELECT label FROM billing_addresses WHERE client_key=? AND id IS NOT ? ORDER BY id", (key, exclude_id)):
+        if r[0].casefold() == want: return r[0]
+    return None
+
+
+def label_taken(c, key, label, exclude_id=None):
+    """True when another address of client `key` already has this label, ignoring case (see label_twin)."""
+    return label_twin(c, key, label, exclude_id) is not None
+
+
+def twin_message(label, twin):
+    """The refusal shown to the user (plain French, says what to do). `twin` = the label returned by label_twin."""
+    if twin == label: return f"une adresse « {twin} » existe déjà pour ce client : choisir un autre nom"
+    return (f"une adresse « {twin} » existe déjà pour ce client : deux noms d'adresse ne peuvent pas se distinguer seulement par les majuscules et les minuscules "
+            f"(« {label} » et « {twin} »). Choisir un autre nom")
+
+
+def unchanged_label(a, new_label):
+    """BILL-RC48-FIX2 (N-2): True when the label typed is the stored one, spacing aside (validate() collapses repeated spaces, so a stored « Egg  BE » comes back as « Egg BE »)."""
+    return new_label == a["label"] or new_label == " ".join(a["label"].split())
+
+
+def rename_conflict(c, a, new_label):
+    """Message when saving address `a` (a row of billing_addresses) under `new_label` is refused because of a twin, else None.
+    BILL-RC48-FIX (A): an address whose label does NOT change stays editable (contact, address, structured fields) even when a twin already exists
+    (duplicates created before the unique index, or Unicode variants like « Zürich » / « ZÜRICH »): only an actual change of label is checked."""
+    if unchanged_label(a, new_label): return None
+    twin = label_twin(c, a["client_key"], new_label, a["id"])
+    return twin_message(new_label, twin) if twin is not None else None
 
 
 def migrate(c):
@@ -101,7 +161,7 @@ def listing(c, key, include_inactive=False):
 
 def make_global(c):
     """Idempotent: the four addresses seeded for the first client (rc37) become the global list. Only exact seeded labels, never anything else."""
-    c.execute("UPDATE billing_addresses SET client_key=? WHERE client_key='NOM:bsci' AND label IN ('EGG FR','EGG BE','EGG CH','EGG MEA') AND NOT EXISTS (SELECT 1 FROM billing_addresses g WHERE g.client_key=? AND g.label=billing_addresses.label)", (GLOBAL_KEY, GLOBAL_KEY))
+    c.execute("UPDATE billing_addresses SET client_key=? WHERE client_key='NOM:bsci' AND label IN ('EGG FR','EGG BE','EGG CH','EGG MEA') AND NOT EXISTS (SELECT 1 FROM billing_addresses g WHERE g.client_key=? AND g.label=billing_addresses.label COLLATE NOCASE)", (GLOBAL_KEY, GLOBAL_KEY))
 
 
 def get(c, aid):

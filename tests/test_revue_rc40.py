@@ -7,7 +7,7 @@ Classes :
   Concurrency   deux avoirs / deux émissions simultanés sur la même ligne
   Injection     champs libres des lignes dans les écrans et le PDF
   RestoreForged sauvegarde falsifiée (lignes manuelles / lignes créditées d'un document émis)
-  OpenDefects   défauts CONFIRMÉS mais NON corrigés (@expectedFailure : « succès inattendu » = corrigé, retirer le décorateur)
+  OpenDefects   défauts confirmés à la revue, TOUS corrigés depuis (BILL-FC1, BILL-FA1FT) ; plus aucun @expectedFailure ici
 Écrit sans être exécuté (le superviseur lance les tests, runner isolé)."""
 import html as H, io, json, os, random, re, threading, unittest
 from decimal import Decimal, ROUND_HALF_UP
@@ -241,31 +241,30 @@ class RestoreForged(tcl.Base):
 
 # ===================================================================================================================================================
 class OpenDefects(tcl.Base):
-    """Confirmés par lecture du code (voir le rapport), NON corrigés ici car ils touchent le schéma de production ou une règle métier : décision du propriétaire / du superviseur."""
+    """Défauts confirmés par lecture du code à la revue rc40, TOUS corrigés depuis (F_C1 : BILL-FC1 ; F_T1, F_T2, F_A1 : BILL-FA1FT). Ils restent dans cette classe pour garder leur identifiant."""
 
-    @unittest.expectedFailure
     def test_F_C1_a_line_whose_product_ends_on_a_half_cent_can_be_credited_in_full(self):
         """1,5 × 0,15 = 0,225 → 0,23 (demi-supérieur, comme la facture) mais le déclencheur SQL credit_lines_within_line arrondit en virgule flottante (ROUND(1.5*0.15,2) = 0,22, plafond 0,225) :
-        l'avoir total de cette ligne est refusé par la base alors que l'application l'autorise."""
+        l'avoir total de cette ligne était refusé par la base alors que l'application l'autorise. CORRIGÉ (BILL-FC1) : plafond en centimes entiers exacts ; ce test est maintenant un vrai test.
+        (Il reste dans cette classe pour garder son identifiant.)"""
         iid = self.issued_with(lines=(('Demi-cent', '1.5', '0.15', 'flat', 'soumis'),)); (l1,) = self.line_ids(iid)
         self.assertEqual(rules.line_amount(1.5, 0.15), D('0.23'))
         cid, fl = self.credit(iid, scope='partial', **{f'cl_{l1}': '0.23'}); self.assertIsNotNone(cid, fl)
 
-    @unittest.expectedFailure
     def test_F_T1_a_draft_line_cannot_be_moved_under_an_issued_invoice_by_sql(self):
-        """BEFORE UPDATE de invoice_lines_no_update_issued ne regarde que OLD.invoice_id : un UPDATE invoice_id=<facture émise> sur une ligne de brouillon passe."""
+        """Avant : BEFORE UPDATE de invoice_lines_no_update_issued ne regardait que OLD.invoice_id : un UPDATE invoice_id=<facture émise> sur une ligne de brouillon passait.
+        CORRIGÉ (BILL-FA1FT, app/line_guards.py : déclencheur invoice_line_no_move_to_issued) ; ce test est maintenant un vrai test."""
         iid = self.issued_with(); d = self.draft_with(lines=(('Ligne mobile', '1', '5', 'flat', 'soumis'),), period=('2026-10-01', '2026-10-31')); (ld,) = self.line_ids(d)
         msg = self.raw("UPDATE invoice_lines SET invoice_id=%d, position=9 WHERE id=%d" % (iid, ld)); self.assertIsNotNone(msg); self.assertIn('immutable', msg)
 
-    @unittest.expectedFailure
     def test_F_T2_a_credited_line_row_of_a_draft_note_cannot_be_redirected_by_sql(self):
-        """Les gardes credit_lines_same_invoice / same_vat_mode / within_line sont des BEFORE INSERT : un UPDATE (invoice_line_id, amount) sur une ligne d'avoir brouillon les contourne
-        (l'application rattrape à l'émission, pas la base)."""
+        """Avant : les gardes credit_lines_same_invoice / same_vat_mode / within_line étaient des BEFORE INSERT : un UPDATE (invoice_line_id, amount) sur une ligne d'avoir brouillon les contournait
+        (l'application rattrapait à l'émission, pas la base). CORRIGÉ (BILL-FA1FT, app/credit_lines.py : déclencheurs credit_line_upd_*) ; ce test est maintenant un vrai test."""
         iid = self.issued_with(); l1, l2 = self.line_ids(iid); cid, fl = self.credit(iid, scope='partial', **{f'cl_{l2}': '10'}); self.assertIsNotNone(cid, fl)
         msg = self.raw("UPDATE credit_note_lines SET invoice_line_id=%d, amount=5000, vat_mode='soumis' WHERE credit_note_id=%d" % (l1, cid)); self.assertIsNotNone(msg)
 
-    @unittest.expectedFailure
     def test_F_A1_two_global_addresses_differing_only_by_case_are_refused(self):
+        """CORRIGÉ (BILL-FA1FT) : index unique (client_key, label COLLATE NOCASE) + contrôle applicatif (address_service.label_taken) ; ce test est maintenant un vrai test."""
         self.mandate(name='Mandat adresse', legal_id='CHE-000.000.077')
         self.raw("INSERT INTO billing_addresses(client_key,label,address,created_at) VALUES('*','EGG FR','Rue 1','2026-10-27T10:00:00')")
         self.flashes(); self.c.post('/adresses/ajouter', data={'client_key': '*', 'label': 'egg fr', 'contact': '', 'address': 'Rue 2'})

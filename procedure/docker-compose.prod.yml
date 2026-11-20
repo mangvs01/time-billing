@@ -26,5 +26,6 @@ services:
       TRUST_PROXY: ${TRUST_PROXY:-1}
       SESSION_HOURS: ${SESSION_HOURS:-8}
       EXTERNAL_INVOICE_NUMBERS: ${EXTERNAL_INVOICE_NUMBERS:-2026-09}   # G4 (N1) : n° de factures réelles émises hors application, jamais réattribués
+      QR_BILL_ENABLED: ${QR_BILL_ENABLED:-}   # BILL-QR-PRET : QR-facture proposée seulement si .env porte QR_BILL_ENABLED=1 ; vide ou absent = ÉTEINTE (docs/QR-ALLUMAGE.md)
     volumes:
       - ./data:/data

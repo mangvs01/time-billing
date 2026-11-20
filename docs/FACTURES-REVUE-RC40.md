@@ -76,7 +76,7 @@ Aucun défaut ne produit un document émis faux dans le fonctionnement normal : 
 - **Preuve** : `app/credit_lines.py:33-37` : le déclencheur `credit_lines_within_line` plafonne à `ROUND(qty*unit_rate,2)+0.005` en **flottant** SQLite ; l'application et la facture arrondissent en `Decimal` demi-supérieur (`billing_rules.line_amount`, `:167-169`). Mesuré (SQLite en mémoire) : `1,5 × 0,15` → application 0,23, SQL 0,22 (plafond 0,225) ; idem `3 × 0,075`, `1,005 × 1`, `2,675 × 1`, `7 × 0,145` (1,02 contre 1,01). L'avoir total de ce type de ligne est refusé par la base (« The credits of an invoice line cannot exceed its amount ») alors que `check_creditable` (`credit_service.py:180-211`) l'accepte : le client ne peut pas être crédité de l'intégralité de la ligne.
 - **Patch proposé** (migration comme celle de `credit_ops_within_note`, `credit_lines.py:56-69`) : remplacer `+0.005` par `+0.0101` dans le déclencheur (le contrôle exact reste celui de l'application), avec `DROP TRIGGER IF EXISTS` puis `CREATE` dans `migrate()` quand le SQL stocké ne contient pas le nouveau marqueur.
 - **Pourquoi pas appliqué** : modifie un déclencheur de la base de production au démarrage. À valider.
-- **Test** : `OpenDefects.test_F_C1_…` (`expectedFailure` ; « succès inattendu » une fois corrigé).
+- **Test** : `OpenDefects.test_F_C1_…` (`expectedFailure` ; « succès inattendu » une fois corrigé). **CORRIGÉ le 19/11/2026 (BILL-FC1)** : plafond SQL en centimes entiers exacts, décorateur retiré (voir `docs/TESTS-ATTENDUS.md` § D).
 
 ### F-T1 / F-T2 — Gardes de lignes contournables par UPDATE direct (Basse)
 - **Preuve** : `app/app.py:178` — `invoice_lines_no_update_issued` teste `OLD.invoice_id` seulement ; `UPDATE invoice_lines SET invoice_id=<facture émise>, position=9 WHERE id=<ligne de brouillon>` passe. `credit_lines.py:27-37` — `same_invoice`, `same_vat_mode`, `within_line` sont des `BEFORE INSERT` ; un `UPDATE` de `invoice_line_id` / `amount` sur une ligne d'avoir brouillon les contourne (l'application le rattrape à l'émission par `check_creditable` + `credit_lines_totals_match`, pas la base). Aucune route n'exécute ces `UPDATE` ; exploitable seulement par accès SQL direct.
@@ -87,11 +87,11 @@ Aucun défaut ne produit un document émis faux dans le fonctionnement normal : 
   CREATE TRIGGER IF NOT EXISTS credit_lines_written_once BEFORE UPDATE OF credit_note_id, invoice_line_id, position, description, amount, vat_mode ON credit_note_lines
     BEGIN SELECT RAISE(ABORT,'Credited lines are written once'); END;
   ```
-  puis ajouter les deux noms à la liste de `schema_checks.rc19_problems`. **Tests** : `OpenDefects.test_F_T1_…`, `test_F_T2_…`.
+  puis ajouter les deux noms à la liste de `schema_checks.rc19_problems`. **Tests** : `OpenDefects.test_F_T1_…`, `test_F_T2_…`. **CORRIGÉ le 19/11/2026 (BILL-FA1FT)** par des déclencheurs plus ciblés que le patch ci-dessus (voir `docs/TESTS-ATTENDUS.md` § E) ; décorateurs retirés.
 
 ### F-A1 — Libellés d'adresse (Basse)
 - **Preuve** : `address_service.py:14` — `UNIQUE(client_key,label)` est sensible à la casse ; `app.py:740-752` n'ajoute aucun contrôle ; `listing` (`address_service.py:123-125`) propose les adresses du client **et** la liste globale : « EGG FR » et « egg fr », ou un « EGG FR » propre au client en plus du global, apparaissent côte à côte dans le menu. Un choix par erreur imprime la mauvaise adresse sur une facture (la copie est ensuite figée).
-- **Décision à prendre** : refuser un libellé identique à la casse et aux espaces près, au sein d'un client **et** face à la liste globale. **Test** : `OpenDefects.test_F_A1_…`.
+- **Décision à prendre** : refuser un libellé identique à la casse et aux espaces près, au sein d'un client **et** face à la liste globale. **Test** : `OpenDefects.test_F_A1_…`. **CORRIGÉ le 19/11/2026 (BILL-FA1FT)** au sein d'un client (index unique NOCASE + contrôle applicatif) ; la comparaison avec la liste globale reste à décider (voir `docs/TESTS-ATTENDUS.md` § E).
 
 ### F-H1 — Numéros des factures historiques (Basse)
 - **Preuve** : `historical_billing.py:111-117` et `:182-187` comparent exactement (`number=?`, `invoice_ref=?`) ; c'est la règle « N1 compare les numéros exactement » du module (en-tête, lignes 12-14). Les déclencheurs de brouillon (`app.py:~296-300`) sont, eux, insensibles à la casse. Conséquence : une facture historique `iss-1` peut être validée alors qu'une facture émise `ISS-1` existe. Hors périmètre rc37-rc40 ; signalé pour décision.

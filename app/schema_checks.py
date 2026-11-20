@@ -3,6 +3,7 @@ verifier-sauvegarde) and the tests. integrity_check and foreign_key_check do not
 compiled writes do (EXPLAIN prepares the statement with its triggers)."""
 import itertools, json
 
+from app import credit_lines, line_guards
 from app.post_billing import same_values
 
 _nonce = itertools.count()   # a fresh SQL text per probe: a cached EXPLAIN statement is not prepared again after a schema change
@@ -50,6 +51,15 @@ def rc19_problems(c):
                         ("credit_lines_same_invoice", "credit_note_lines"), ("credit_lines_same_vat_mode", "credit_note_lines"), ("credit_lines_within_line", "credit_note_lines"),
                         ("credit_lines_totals_match", "credit_notes"), ("credit_ops_within_note", "credit_operations")):
         if trig.get(name) != table: out.append(f"déclencheur {name} absent ou mal rattaché ({trig.get(name)})")
+    # BILL-RC48-FIX (F): rc48's own objects, checked by NAME, TABLE and TEXT (a partial rollback or a stale trigger of rc47 must not pass): the cap of a credited line (exact cent rounding),
+    # the four BEFORE UPDATE guards of credit_note_lines and the move guard of invoice_lines
+    wanted = {**{n: ("credit_note_lines", t) for n, t in credit_lines.expected_triggers().items()}, line_guards.NAME: ("invoice_lines", credit_lines.norm_sql(line_guards.TRIGGER))}
+    stored = {r[0]: (r[1], r[2]) for r in c.execute("SELECT name,tbl_name,sql FROM sqlite_master WHERE type='trigger'")}
+    for name, (table, text) in wanted.items():
+        have = stored.get(name)
+        if have is None or have[0] != table: out.append(f"déclencheur {name} absent ou mal rattaché ({have[0] if have else None}) : redémarrer l'application pour le créer")
+        elif credit_lines.norm_sql(have[1]) != text:
+            out.append(f"déclencheur {name} différent de celui de cette version" + (" (ancienne formule d'arrondi du plafond d'une ligne d'avoir : redémarrer l'application)" if name == "credit_lines_within_line" and not credit_lines.within_line_is_current(c) else ""))
     tables = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     for t in ("invoice_lines", "billing_addresses", "invoice_number_changes", "credit_note_lines"):
         if t not in tables: out.append(f"table {t} absente")
@@ -63,6 +73,9 @@ def rc19_problems(c):
     if "idx_invoices_number_norm" not in {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='index'")}:
         dup = c.execute("SELECT upper(trim(number)) k,COUNT(*) n FROM invoices WHERE number IS NOT NULL GROUP BY k HAVING n>1").fetchall()
         out.append("index d'unicité normalisée des numéros de facture absent" + (f" (doublons à la casse près : {', '.join(r[0] for r in dup)} : à régler avant de le créer)" if dup else " (redémarrer l'application pour le créer)"))
+    if "billing_addresses" in tables and "idx_billing_addresses_label_nocase" not in {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='index'")}:      # BILL-FA1FT (F_A1)
+        dup = c.execute("SELECT client_key, group_concat(label, ' | ') FROM billing_addresses GROUP BY client_key, label COLLATE NOCASE HAVING COUNT(*)>1").fetchall()
+        out.append("index d'unicité des libellés d'adresse de facturation (à la casse près) absent" + (f" (doublons à régler avant de le créer : {'; '.join(r[1] for r in dup)})" if dup else " (redémarrer l'application pour le créer)"))
     hcols = {r[1] for r in c.execute("PRAGMA table_info(historical_invoices)")}
     need = {"project_id", "source_file", "source_sha256", "source_sheet", "source_cell", "source_column", "invoice_date", "invoice_ref", "qty_days", "amount_ht",
             "unit_rate", "basis", "qty_derived", "status", "note", "created_at", "validated_at", "validated_by"}

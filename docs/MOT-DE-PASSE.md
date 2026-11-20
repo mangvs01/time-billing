@@ -15,7 +15,7 @@ Il y a **un seul compte** (l'utilisateur `APP_USER`, par défaut `admin`). Son m
 
 1. Se connecter. Menu **« Paramètres & sauvegardes »**, cadre **« Accès à l'application »**, bouton **« Changer mon mot de passe »** (sur téléphone : menu **« Plus »**, entrée **« Mot de passe »**).
 2. Saisir le **mot de passe actuel**, puis le **nouveau mot de passe deux fois**.
-3. Règles : **12 caractères au moins** (200 au plus), **différent de l'actuel**, deux saisies **identiques**. Une phrase de passe convient très bien. Le message de refus dit en français ce qui ne va pas, et rien n'est modifié.
+3. Règles : **10 caractères au moins** (200 au plus), **différent de l'actuel**, deux saisies **identiques**. Une phrase de passe convient très bien. Le message de refus dit en français ce qui ne va pas, et rien n'est modifié.
 4. Après « Mot de passe changé » : l'appareil utilisé **reste connecté** ; **tous les autres appareils sont déconnectés** (ils devront se reconnecter avec le nouveau mot de passe).
 5. **5 erreurs de mot de passe actuel en 15 minutes** bloquent l'écran (et la connexion) depuis ce poste pendant 15 minutes : même compteur que la page de connexion.
 

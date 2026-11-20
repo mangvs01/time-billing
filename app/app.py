@@ -6,7 +6,7 @@ from functools import wraps
 from werkzeug.exceptions import HTTPException
 from flask import Flask, request, redirect, render_template, flash, send_file, jsonify, session, abort, g, url_for, make_response
 # Package-qualified imports: gunicorn loads "app.app" from /app, so /app/app is not on sys.path.
-from app import pdf_layout, historical_import, import_service, invoice_service, credit_service as credits, billing_rules as rules, forecast as forecast_mod, restore_service, security, post_billing, historical_billing, invoice_checks, calendar_service as cal, invoice_lines as manual_lines, address_service as addresses, credit_lines
+from app import pdf_layout, historical_import, import_service, invoice_service, credit_service as credits, billing_rules as rules, forecast as forecast_mod, restore_service, security, post_billing, historical_billing, invoice_checks, calendar_service as cal, invoice_lines as manual_lines, address_service as addresses, credit_lines, line_guards, db_messages
 from app.rollback_service import rollback_import
 os.umask(0o077)  # RC10: every file the service creates (backups, staged imports, restore copies) is private to its owner
 # RC8: secrets from the environment only, validated at startup (fail closed); values never logged
@@ -17,7 +17,7 @@ if SEC["trust_proxy"]:
  APP.wsgi_app=ProxyFix(APP.wsgi_app,x_for=1,x_proto=1,x_host=1)
 APP.config["MAX_CONTENT_LENGTH"]=15*1024*1024
 # Calendrier : rc36 CANDIDATE (tests only; not built, not deployed) — rc35 = thème sombre (autre mission)
-VERSION="9.2-rc47"
+VERSION="9.2-rc48"
 # Optional label shown in the page title (e.g. "STAGING" on the test instance); empty in production.
 ENV_LABEL=(os.environ.get("ENV_LABEL") or "").strip()[:30]
 DB=os.environ.get("DB_PATH","/data/timebilling.db")
@@ -315,7 +315,9 @@ def init(path=None):
     BEGIN SELECT RAISE(ABORT,'An issued invoice needs a number'); END;
   """)
   ensure_number_index(c)
-  credit_lines.migrate(c)   # rc38: credit notes on manual lines (table, guards, operations cap)
+  addresses.ensure_label_index(c)      # BILL-FA1FT (F_A1): no two addresses of one client differing only by case (skipped, with an audit note, if existing data already hold such a pair)
+  credit_lines.migrate(c)   # rc38: credit notes on manual lines (table, guards, operations cap) ; BILL-FA1FT: UPDATE guards of the credited lines (F_T2)
+  line_guards.migrate(c)    # BILL-FA1FT (F_T1): a draft line cannot be moved under an issued invoice by UPDATE
  migrate_rc19(path)
  c=connect(path,autocommit=True)
  try:
@@ -831,8 +833,10 @@ def address_add():
    label,contact,address=addresses.validate(request.form.get("label"),request.form.get("contact"),request.form.get("address"))
    st=addresses.clean_struct(request.form)      # BQR5: structured form (optional, empty = not structured)
    nxt=c.execute("SELECT COALESCE(MAX(sort_order),0)+1 FROM billing_addresses WHERE client_key=?",(key,)).fetchone()[0]
+   twin=addresses.label_twin(c,key,label)
+   if twin is not None: raise ValueError(addresses.twin_message(label,twin))
    try: c.execute("INSERT INTO billing_addresses(client_key,label,contact,address,active,sort_order,created_at,addr_street,addr_house_num,addr_pcode,addr_city,addr_country,addr_verified) VALUES(?,?,?,?,1,?,?,?,?,?,?,?,?)",(key,label,contact,address,nxt,rules.utc_now_iso(),*st))
-   except sqlite3.IntegrityError: raise ValueError(f"une adresse « {label} » existe déjà pour ce client")
+   except sqlite3.IntegrityError: raise ValueError(f"une adresse « {label} » existe déjà pour ce client : choisir un autre nom")
    c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("billing_address_added",f"client_key={key};label={label}"))
   flash(f"Adresse « {label} » ajoutée.")
  except Exception as e: flash("Adresse non ajoutée : "+str(e))
@@ -851,8 +855,11 @@ def address_update(aid):
    else:
     label,contact,address=addresses.validate(request.form.get("label"),request.form.get("contact"),request.form.get("address"))
     st=addresses.clean_struct(request.form) if "addr_street" in request.form else None      # BQR5: a form without the structured fields (older screen) leaves them alone
+    conflict=addresses.rename_conflict(c,a,label)      # BILL-RC48-FIX (A): only an actual change of label is checked against the twins
+    if conflict: raise ValueError(conflict)
+    if addresses.unchanged_label(a,label): label=a["label"]      # BILL-RC48-FIX2 (N-2): label not really changed (spacing only) : keep the stored one, so the unique index never sees a phantom rename
     try: c.execute("UPDATE billing_addresses SET label=?,contact=?,address=?,updated_at=? WHERE id=?",(label,contact,address,rules.utc_now_iso(),aid))
-    except sqlite3.IntegrityError: raise ValueError(f"une adresse « {label} » existe déjà pour ce client")
+    except sqlite3.IntegrityError: raise ValueError(f"une adresse « {label} » existe déjà pour ce client : choisir un autre nom")
     if st is not None: c.execute("UPDATE billing_addresses SET addr_street=?,addr_house_num=?,addr_pcode=?,addr_city=?,addr_country=?,addr_verified=? WHERE id=?",(*st,aid))
     c.execute("INSERT INTO audit(event,detail) VALUES(?,?)",("billing_address_updated",f"id={aid};label={label}")); flash(f"Adresse « {label} » enregistrée. Les brouillons qui l'ont déjà choisie gardent leur copie jusqu'à « Actualiser ».")
  except HTTPException: raise
@@ -1928,7 +1935,9 @@ def credit_new(iid):
   except LookupError:
    c.execute("ROLLBACK"); flash("Une note de crédit se rattache uniquement à une facture émise."); return back("archive")
   except Exception as e:
-   c.execute("ROLLBACK"); refused("Note de crédit non créée : "+str(e))
+   c.execute("ROLLBACK")
+   if isinstance(e,sqlite3.DatabaseError): APP.logger.warning("note de crédit refusée par la base : %s",e); refused("Note de crédit non créée : "+db_messages.french(e))      # BILL-RC48-FIX (G): never the raw English guard text
+   else: refused("Note de crédit non créée : "+str(e))
   finally: c.close()
  with db() as c:
   inv=c.execute("SELECT i.*,p.name project FROM invoices i JOIN projects p ON p.id=i.project_id WHERE i.id=?",(iid,)).fetchone()
@@ -2287,6 +2296,14 @@ def restore_review(token):
  raw=open(restore_file(token),"rb").read()
  with db() as c: data=restore_service.validate(c,raw); pv=restore_service.preview(c,data)
  return render_template("restore_review.html",token=token,pv=pv,sha=hashlib.sha256(raw).hexdigest())
+def restore_refusal_text(e):
+ """BILL-RC48-FIX (G): the reason shown when a restore stops. A RestoreRefused is already French; a refusal of the database (guard, constraint) is translated; anything else gets a generic
+ sentence (the detail goes to the service log). The base is never touched in these cases (the rebuild happens in a separate file)."""
+ if isinstance(e,restore_service.RestoreRefused): return str(e)
+ APP.logger.warning("restauration refusée : %s",e,exc_info=not isinstance(e,sqlite3.DatabaseError))
+ if isinstance(e,sqlite3.DatabaseError):
+  return db_messages.french(e)+". Ce fichier n'est pas utilisable tel quel par cette version de l'application ; demander à l'administrateur de restaurer plutôt la sauvegarde de la base elle-même (fichier SQLite)."
+ return "erreur inattendue pendant la reconstruction (le détail technique est dans le journal du service)"
 @APP.route("/restore/<token>",methods=["POST"])
 @login_required
 def restore_commit(token):
@@ -2306,7 +2323,7 @@ def restore_commit(token):
   flash(f"Restauration effectuée. Sauvegarde préalable vérifiée : {backup[0]}.")
   return back("settings")
  except Exception as e:
-  flash(f"Restauration refusée, base inchangée : {e}")
+  flash(f"Restauration refusée, base inchangée : {restore_refusal_text(e)}")
   return redirect(url_for("restore_review",token=token))
  finally:
   if tmp and os.path.exists(tmp): os.remove(tmp)
